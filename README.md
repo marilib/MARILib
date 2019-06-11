@@ -17,3 +17,13 @@ MARILib is distributed under the Cecill C license
 If you use MARILib for your research, the Cecill C license engages you to cite us :
 Druot et al., "A Multidisciplinary Airplane Research Integrated Library
 With Applications To Partial Turboelectric Propulsion", AIAA Aviation conference, Dallas 2019
+
+
+IMPORTANT REMARKS :
+
+The ease of use of MARILib should not overshadow the complexity of Airplane Design where many variables interact in a non-linear way.
+
+The purpose of MARILib is not to deliver accurate airplane assessment but rather good order of magnitude of airplane characteristics.
+
+If unexpected or surprising results are achieved, please, keep in mind initializing functions are taking big assumptions to be able
+to run the process, check the proposed values and do not hesitate to input your own guesses.
