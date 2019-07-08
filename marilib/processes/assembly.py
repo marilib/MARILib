@@ -165,7 +165,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.propulsion.bli_effect = init.boundary_layer_effect()
 
-    propulsion.rating_code = propulsion.rating_code()
+    aircraft.propulsion.rating_code = init.rating_code()
 
     return
 
