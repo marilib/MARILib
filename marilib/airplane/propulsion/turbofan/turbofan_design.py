@@ -36,7 +36,7 @@ def eval_turbofan_engine_design(aircraft):
 
     engine = aircraft.turbofan_engine
 
-    engine.rating_factor = (0.800,0.688,0.624,0.560,0.100)
+    engine.rating_factor = {"MTO":0.800, "MCN":0.688, "MCL":0.624, "MCR":0.560, "FID":0.100}
 
     return
 
@@ -53,8 +53,6 @@ def eval_turbofan_nacelle_design(aircraft):
     engine = aircraft.turbofan_engine
 
     nacelle = aircraft.turbofan_nacelle
-
-    nacelle.width = 0.49 * engine.bpr ** 0.67 + 4.8E-6 * engine.reference_thrust        # statistical regression
 
     nacelle.length = 0.86 * nacelle.width + engine.bpr ** 0.37      # statistical regression
 
@@ -73,6 +71,7 @@ def eval_turbofan_nacelle_design(aircraft):
             nacelle.z_ext = - 0.5 * fuselage.height \
                             + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
                             - 0.5*nacelle.width
+
         elif (engine.n_engine==4):
             nacelle.y_int = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
@@ -91,6 +90,7 @@ def eval_turbofan_nacelle_design(aircraft):
                             - 0.5*nacelle.width
         else:
             raise Exception("engine.n_engine, number of engine not supported")
+
     elif (nacelle.attachment == 2):
         if (engine.n_engine==2):
             nacelle.y_ext = 0.5 * fuselage.width + 0.6 * nacelle.width      # statistical regression
@@ -100,6 +100,7 @@ def eval_turbofan_nacelle_design(aircraft):
             nacelle.z_ext = 0.5 * fuselage.height
         else:
             raise Exception("engine.n_engine, number of engine not supported")
+
     else:
         raise Exception("nacelle.attachment, index is out of range")
 

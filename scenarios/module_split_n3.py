@@ -4,30 +4,63 @@
 Created on Thu Jan 24 23:22:21 2019
 
 @author: DRUOT Thierry
+
+------------------------------------------------------------------------------------------------------------
+This scenario allows to simulate with GEMS a full design process where HQ based empennage sizing is treated
+as constraint satisfaction internally managed by hq0.
+hq0 does not manage the mass constraints which simulate a common practice where overall design and hq
+are solved alternatively in 2 or 3 loops
+
+Global design parameter n°1 : aircraft.turbofan_engine.reference_thrust, bounds = (50000,150000)
+Global design parameter n°2 : aircraft.wing.area, bounds = (50,200)
+
+Mass design parameter n°1 : aircraft.weights.mtow
+Mass design parameter n°2 : aircraft.weights.mlw
+Mass design parameter n°3 : aircraft.weights.mzfw
+Mass constraint n°1 : aircraft.weights.mass_constraint_1 ==> 0
+Mass constraint n°2 : aircraft.weights.mass_constraint_2 ==> 0
+Mass constraint n°3 : aircraft.weights.mass_constraint_3 ==> 0
+
+HQ constraint n°1 : aircraft.center_of_gravity.cg_constraint_1 ==> 0     |
+HQ constraint n°2 : aircraft.center_of_gravity.cg_constraint_2 ==> 0     | Managed internally by eval_hq0
+HQ constraint n°3 : aircraft.center_of_gravity.cg_constraint_3 ==> 0     |
+
+Perfo constraint n°1 : aircraft.high_speed.perfo_constraint_1 > 0
+Perfo constraint n°2 : aircraft.high_speed.perfo_constraint_2 > 0
+Perfo constraint n°3 : aircraft.low_speed.perfo_constraint_3 > 0
+Perfo constraint n°4 : aircraft.high_speed.perfo_constraint_3 > 0
+Perfo constraint n°5 : aircraft.low_speed.perfo_constraint_1 > 0
+Perfo constraint n°6 : aircraft.low_speed.perfo_constraint_2 > 0
+
+Possible criteria : aircraft.weights.mtow
+                  : aircraft.cost_mission.block_fuel
+                  : aircraft.environmental_impact.CO2_metric
+                  : aircraft.economics.cash_operating_cost
+                  : aircraft.economics.direct_operating_cost
+------------------------------------------------------------------------------------------------------------
 """
 
 from marilib.tools import units as unit
 
 from marilib.aircraft_data.aircraft_description import Aircraft
 
-from marilib.processes import initialization as init
-
 from marilib.airplane.airframe.airframe_design \
-    import eval_cabin_design, eval_fuselage_design, eval_vtp_design, eval_htp_design, eval_wing_design
+    import eval_cabin_design, eval_fuselage_design, eval_vtp_design, eval_vtp_statistical_sizing, \
+           eval_htp_design, eval_htp_statistical_sizing, eval_wing_design
 
 from marilib.airplane.propulsion.propulsion_design \
     import eval_propulsion_design
 
 from marilib.aircraft_model.airplane.airplane_design \
-    import eval_aerodynamics_design
+    import eval_aerodynamics_design, eval_mass_coupling
+
+from marilib.processes.component \
+    import eval_nominal_mission, eval_mission_coupling, eval_take_off_performances, eval_landing_performances, \
+           eval_co2_metric, eval_cost_mission, eval_economics
 
 from marilib.processes.assembly \
     import aircraft_initialize, eval_mass_breakdown, eval_climb_performances, \
-           eval_payload_range_analysis, eval_handling_quality_analysis, eval_hq0, eval_mda0
-
-from marilib.processes.component \
-    import eval_nominal_mission, eval_take_off_performances, eval_landing_performances, \
-           eval_co2_metric, eval_cost_mission, eval_economics
+           eval_hq0, eval_payload_range_analysis
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -41,27 +74,16 @@ def fuselage_design(aircraft):
     return
 
 #-----------------------------------------------------------------------------------------------------------
-def predesign_initialization(aircraft):
-    # Variables :
-    # aircraft.turbofan_nacelle.width
-    # aircraft.turbofan_nacelle.y_ext
-    # Must be initialized before running lifting_plane_design
-    #---------------------------------------------------------------------------
-    bpr = aircraft.turbofan_engine.bpr
-    reference_thrust = aircraft.turbofan_engine.reference_thrust
-    aircraft.turbofan_nacelle.width = init.turbofan_nacelle_width(bpr,reference_thrust)
-
-    nacelle_attachment = aircraft.turbofan_nacelle.attachment
-    fuselage_width = aircraft.fuselage.width
-    nacelle_width = aircraft.turbofan_nacelle.width
-    aircraft.turbofan_nacelle.y_ext = init.turbofan_nacelle_y_ext(nacelle_attachment,fuselage_width,nacelle_width)
+def lifting_plane_design(aircraft):
+    eval_wing_design(aircraft)
+    eval_vtp_design(aircraft)
+    eval_htp_design(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
-def lifting_plane_design(aircraft):
-    eval_vtp_design(aircraft)
-    eval_wing_design(aircraft)
-    eval_htp_design(aircraft)
+def geometry_coupling(aircraft):
+    eval_vtp_statistical_sizing(aircraft)
+    eval_htp_statistical_sizing(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
@@ -80,14 +102,21 @@ def aircraft_mass(aircraft):
     return
 
 #-----------------------------------------------------------------------------------------------------------
-def handling_quality_analysis(aircraft):
-#    eval_handling_quality_analysis(aircraft)    # Computes CG constraints only
+def mass_coupling(aircraft):
+    eval_mass_coupling(aircraft)
+
+#-----------------------------------------------------------------------------------------------------------
+def handling_quality_adaptation(aircraft):
     eval_hq0(aircraft)                          # Compute Wing X position, HTP & VTP areas without solving mass constraints
 
 #-----------------------------------------------------------------------------------------------------------
 def nominal_mission(aircraft):
     eval_nominal_mission(aircraft)
     return
+
+#-----------------------------------------------------------------------------------------------------------
+def mission_coupling(aircraft):
+    eval_mission_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def performance_analysis(aircraft):
@@ -119,21 +148,30 @@ n_engine = 2        # Number of engine
 
 aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
 
-fuselage_design(aircraft)
+#---------------------------------------------------------------------------
+# Setting HQ optimization mode
+aircraft.center_of_gravity.cg_range_optimization = 1
+#---------------------------------------------------------------------------
 
-predesign_initialization(aircraft)
+fuselage_design(aircraft)
 
 lifting_plane_design(aircraft)
 
 propulsion(aircraft)
 
+geometry_coupling(aircraft)
+
 aircraft_aerodynamics(aircraft)
 
 aircraft_mass(aircraft)
 
+mass_coupling(aircraft)
+
 nominal_mission(aircraft)
 
-handling_quality_analysis(aircraft)
+mission_coupling(aircraft)
+
+handling_quality_adaptation(aircraft)
 
 performance_analysis(aircraft)
 

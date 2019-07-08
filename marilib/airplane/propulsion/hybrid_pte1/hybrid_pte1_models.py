@@ -36,7 +36,7 @@ def hybrid_sfc(aircraft,pamb,tamb,mach,rating,nei):
                                e_engine.mcr_e_power_ratio,
                                e_engine.fid_e_power_ratio])
 
-    sfc0 = ( 0.4 + 1/engine.bpr**0.895 )/36000
+    sfc0 = ( 0.4 + 1./engine.bpr**0.895 )/36000.
 
     if (propulsion.bli_effect>0):
         kBLIe = propulsion.bli_e_thrust_factor
@@ -50,7 +50,7 @@ def hybrid_sfc(aircraft,pamb,tamb,mach,rating,nei):
     eff_e_prop = e_nacelle.efficiency_prop
     eff_chain = power_elec.overall_efficiency
 
-    eff_h = kC + (1-kC)*( kW*kBLIe*(eff_e_prop/eff_prop)*eff_chain + (1-kW) )
+    eff_h = kC + (1.-kC)*( kW*kBLIe*(eff_e_prop/eff_prop)*eff_chain + (1.-kW) )
 
     sfc = sfc0 / eff_h
 
@@ -110,7 +110,7 @@ def hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
         dVbli_o_V  = 0.
         fn_fan2 = 0.
-        sec = 0
+        sec = 0.
 
     fn = (fn_core + fn_fan1)*(engine.n_engine - nei) + fn_fan2
 
@@ -127,7 +127,7 @@ def electric_nacelle_drag(aircraft,nacelle,Re,Mach):
 
     wing = aircraft.wing
 
-    fac = (1 + 0.126*Mach**2)
+    fac = (1. + 0.126*Mach**2)
 
     # All nacelle drag
     nac_nwa = nacelle.net_wetted_area

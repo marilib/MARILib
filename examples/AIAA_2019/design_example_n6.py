@@ -19,7 +19,7 @@ from marilib.processes import assembly as run
 #======================================================================================================
 propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 290
 design_range = unit.m_NM(7400)

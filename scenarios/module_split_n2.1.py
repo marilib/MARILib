@@ -6,7 +6,8 @@ Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry
 
 ------------------------------------------------------------------------------------------------------------
-This scenario allows to play with GEMS a full design process with statistical empennage sizing
+This scenario allows to play with GEMS a full design process with HQ based empennage sizing treated as a
+constraint satisfaction problem
 
 All processes must be managed at MDO level
 
@@ -25,12 +26,21 @@ Mass constraint n°1 : aircraft.weights.mass_constraint_1 ==> 0
 Mass constraint n°2 : aircraft.weights.mass_constraint_2 ==> 0
 Mass constraint n°3 : aircraft.weights.mass_constraint_3 ==> 0
 
-Perfo constraint n°1 : aircraft.high_speed.perfo_constraint_1 > 0
-Perfo constraint n°2 : aircraft.high_speed.perfo_constraint_2 > 0
-Perfo constraint n°3 : aircraft.low_speed.perfo_constraint_3 > 0
-Perfo constraint n°4 : aircraft.high_speed.perfo_constraint_3 > 0
-Perfo constraint n°5 : aircraft.low_speed.perfo_constraint_1 > 0
-Perfo constraint n°6 : aircraft.low_speed.perfo_constraint_2 > 0
+
+HQ design parameter n°1 : aircraft.wing.x_root
+HQ design parameter n°2 : aircraft.horizontal_tail.area
+HQ design parameter n°3 : aircraft.vertical_tail.area
+HQ constraint n°1 : aircraft.center_of_gravity.cg_constraint_1 ==> 0
+HQ constraint n°2 : aircraft.center_of_gravity.cg_constraint_2 ==> 0
+HQ constraint n°3 : aircraft.center_of_gravity.cg_constraint_3 ==> 0
+
+
+Perfo constraint n°1 : aircraft.high_speed.perfo_constraint_1 >= 0
+Perfo constraint n°2 : aircraft.high_speed.perfo_constraint_2 >= 0
+Perfo constraint n°3 : aircraft.low_speed.perfo_constraint_3 >= 0
+Perfo constraint n°4 : aircraft.high_speed.perfo_constraint_3 >= 0
+Perfo constraint n°5 : aircraft.low_speed.perfo_constraint_1 >= 0
+Perfo constraint n°6 : aircraft.low_speed.perfo_constraint_2 >= 0
 
 Possible criteria : aircraft.weights.mtow
                   : aircraft.cost_mission.block_fuel
@@ -59,7 +69,8 @@ from marilib.processes.component \
            eval_co2_metric, eval_cost_mission, eval_economics
 
 from marilib.processes.assembly \
-    import aircraft_initialize, eval_mass_breakdown, eval_climb_performances, eval_payload_range_analysis
+    import aircraft_initialize, eval_mass_breakdown, eval_climb_performances, \
+           eval_handling_quality_analysis, eval_cg_coupling, eval_payload_range_analysis
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -88,48 +99,51 @@ def geometry_coupling(aircraft):
 #-----------------------------------------------------------------------------------------------------------
 def propulsion(aircraft):
     eval_propulsion_design(aircraft)
+    return
 
 #-----------------------------------------------------------------------------------------------------------
 def aircraft_aerodynamics(aircraft):
     eval_aerodynamics_design(aircraft)
+    return
 
 #-----------------------------------------------------------------------------------------------------------
 def aircraft_mass(aircraft):
     eval_mass_breakdown(aircraft)
+    return
 
 #-----------------------------------------------------------------------------------------------------------
 def mass_coupling(aircraft):
     eval_mass_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
+def handling_quality_analysis(aircraft):
+    eval_handling_quality_analysis(aircraft)
+    eval_cg_coupling(aircraft)
+
+#-----------------------------------------------------------------------------------------------------------
 def nominal_mission(aircraft):
     eval_nominal_mission(aircraft)
+    return
 
 #-----------------------------------------------------------------------------------------------------------
 def mission_coupling(aircraft):
     eval_mission_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
-def climb_performances(aircraft):
-    eval_climb_performances(aircraft)
-
-#-----------------------------------------------------------------------------------------------------------
-def low_speed_performances(aircraft):
+def performance_analysis(aircraft):
     eval_take_off_performances(aircraft)
+    eval_climb_performances(aircraft)
     eval_landing_performances(aircraft)
+    eval_payload_range_analysis(aircraft)
+    return
 
 #-----------------------------------------------------------------------------------------------------------
-def co2_metric(aircraft):
+def criteria(aircraft):
     eval_co2_metric(aircraft)
-
-#-----------------------------------------------------------------------------------------------------------
-def economics(aircraft):
     eval_cost_mission(aircraft)
     eval_economics(aircraft)
+    return
 
-#-----------------------------------------------------------------------------------------------------------
-def payload_range_analysis(aircraft):
-    eval_payload_range_analysis(aircraft)
 
 
 # Initialize aircraft data structure
@@ -143,8 +157,12 @@ cruise_mach = 0.78                  # Nominal cruise mach number
 propu_config = 1    # 1: turbofan, 2: partial turbo electric
 n_engine = 2        # Number of engine
 
-
 aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
+
+#---------------------------------------------------------------------------
+# Setting HQ optimization mode
+aircraft.center_of_gravity.cg_range_optimization = 1
+#---------------------------------------------------------------------------
 
 fuselage_design(aircraft)
 
@@ -160,18 +178,14 @@ aircraft_mass(aircraft)
 
 mass_coupling(aircraft)
 
+handling_quality_analysis(aircraft)
+
 nominal_mission(aircraft)
 
 mission_coupling(aircraft)
 
-climb_performances(aircraft)
+performance_analysis(aircraft)
 
-low_speed_performances(aircraft)
-
-co2_metric(aircraft)
-
-economics(aircraft)
-
-payload_range_analysis(aircraft)
+criteria(aircraft)
 
 

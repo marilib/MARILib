@@ -31,8 +31,6 @@ def eval_propulsion_design(aircraft):
 
     propulsion = aircraft.propulsion
 
-    propulsion.rating_code = (0,1,2,3,4)
-
     if (propulsion.architecture==1):
 
         engine = aircraft.turbofan_engine

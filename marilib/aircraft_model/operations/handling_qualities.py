@@ -47,7 +47,7 @@ def forward_cg_stall(aircraft,altp,disa,nei,hld_conf,speed_mode,mass):
     if(nei>0):
         dcx_oei = nei*propu.oei_drag(pamb,mach)
     else:
-        dcx_oei = 0
+        dcx_oei = 0.
 
     dw_angle = frame_aero.wing_downwash(aircraft,cz_max_wing)    # Downwash angle due to the wing
     cx_basic,lod_trash = airplane_aero.drag(aircraft,pamb,tamb,mach,cz_max_wing)    # By definition of the drag_ function
@@ -113,15 +113,15 @@ def vertical_tail_sizing(aircraft):
     cyb_vtp,xlc_vtp,aoa_max_vtp,ki_vtp = frame_aero.vtp_aero_data(aircraft)
 
     payload = 0.5*payload.nominal               # Light payload
-    range = design_driver.design_range/15       # Short mission
+    range = design_driver.design_range/15.      # Short mission
     altp = design_driver.ref_cruise_altp
     mach = design_driver.cruise_mach
-    disa = 30                                   # Hot condition
+    disa = 30.                                  # Hot condition
 
     tow,block_fuel,block_time,total_fuel = sub_proc.mission_tow(aircraft,payload,range,altp,mach,disa)
 
-    altp = 0
-    disa = 15
+    altp = 0.
+    disa = 15.
   
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
 
@@ -135,8 +135,8 @@ def vertical_tail_sizing(aircraft):
   
     mach_mca = mach_35ft/1.1      #Approximation of required VMCA
 
-    altp = 0
-    disa = 15
+    altp = 0.
+    disa = 15.
   
     nei = 1
 

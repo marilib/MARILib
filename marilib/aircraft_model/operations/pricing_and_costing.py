@@ -21,7 +21,7 @@ def landing_gear_price(aircraft):
 
     ldg = aircraft.landing_gears
 
-    gear_price = 720 * ldg.mass
+    gear_price = 720. * ldg.mass
 
     return gear_price
 
@@ -77,12 +77,12 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     # Cash Operating Cost
     #-----------------------------------------------------------------------------------------------------------------------------------------------
-    eco.fuel_cost =   (block_fuel*(eco.fuel_price*1e3)/fuel_density) \
-                    + battery.energy_cruise*eco.elec_price
+    eco.fuel_cost =   (block_fuel*(eco.fuel_price*1e3)/fuel_density)
+    eco.elec_cost =  battery.mass * battery.energy_density * eco.elec_price
 
-    b_h = block_time/3600
+    b_h = block_time/3600.
     t_t = b_h + 0.25
-    w_f = (10000 + weights.mwe-propulsion.mass)*1e-5
+    w_f = (10000. + weights.mwe-propulsion.mass)*1e-5
 
     labor_frame = ((1.26+1.774*w_f-0.1071*w_f**2)*t_t + (1.614+0.7227*w_f+0.1204*w_f**2))*labor_cost
     matrl_frame = (12.39+29.8*w_f+0.1806*w_f**2)*t_t + (15.20+97.330*w_f-2.8620*w_f**2)
@@ -91,26 +91,26 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
     t_h = 0.05*(propulsion.reference_thrust_effective/4.4482198)*1e-4
 
     labor_engine = engine.n_engine*(0.645*t_t+t_h*(0.566*t_t+0.434))*labor_cost
-    matrl_engine = engine.n_engine*(25*t_t+t_h*(0.62*t_t+0.38))
+    matrl_engine = engine.n_engine*(25.*t_t+t_h*(0.62*t_t+0.38))
     engine_cost = labor_engine + matrl_engine
 
     w_g = weights.mtow*1e-3
 
     eco.cockpit_crew_cost = b_h*2*(440-0.532*w_g)
 
-    eco.cabin_crew_cost = b_h*numpy.ceil(cabin.n_pax_ref/50)*labor_cost
+    eco.cabin_crew_cost = b_h*numpy.ceil(cabin.n_pax_ref/50.)*labor_cost
 
     eco.landing_fees = 8.66*(weights.mtow*1e-3)
 
-    eco.navigation_fees = 57*(cost_mission.range/185200)*numpy.sqrt((weights.mtow/1000)/50)
+    eco.navigation_fees = 57.*(cost_mission.range/185200.)*numpy.sqrt((weights.mtow/1000.)/50.)
 
     eco.catering_cost = 3.07 * cabin.n_pax_ref
 
-    eco.pax_handling_cost = 2 * cabin.n_pax_ref
+    eco.pax_handling_cost = 2. * cabin.n_pax_ref
 
     eco.ramp_handling_cost = 8.70 * cabin.n_pax_ref
 
-    std_op_cost = eco.fuel_cost + frame_cost + engine_cost + eco.cockpit_crew_cost + eco.landing_fees + eco.navigation_fees
+    std_op_cost = eco.fuel_cost + eco.elec_cost + frame_cost + engine_cost + eco.cockpit_crew_cost + eco.landing_fees + eco.navigation_fees
 
     cash_op_cost = std_op_cost + eco.cabin_crew_cost + eco.catering_cost + eco.pax_handling_cost + eco.ramp_handling_cost
 
@@ -122,13 +122,13 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     frame_price = one_airframe_price(aircraft)
 
-    battery_price = eco.battery_price*battery.mass
+    battery_price = eco.battery_mass_price*battery.mass
 
     aircraft_price = frame_price + engine_price * engine.n_engine + gear_price + battery_price
 
     eco.total_investment = frame_price * 1.06 + engine.n_engine * engine_price * 1.025
 
-    eco.interest = (eco.total_investment/(utilisation*period)) * (irp * 0.04 * (((1 + interest_rate)**irp)/((1 + interest_rate)**irp - 1)) - 1)
+    eco.interest = (eco.total_investment/(utilisation*period)) * (irp * 0.04 * (((1. + interest_rate)**irp)/((1. + interest_rate)**irp - 1.)) - 1.)
 
     eco.insurance = 0.0035 * aircraft_price/utilisation
 

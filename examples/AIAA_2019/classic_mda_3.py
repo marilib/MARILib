@@ -20,7 +20,7 @@ from marilib.processes import assembly as run, initialization as init
 propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
 number_of_engine = 2
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 150
 design_range = unit.m_NM(3000)
@@ -42,10 +42,8 @@ aircraft.wing.area = 151.9
 #======================================================================================================
 # MDA process
 #======================================================================================================
+# This call perform a full MDA with HQ based empennage sizing treated as a constraint satisfaction problem
 
-# Initialization of HTP and VTP areas, compulsory with mda3
-#------------------------------------------------------------------------------------------------------
-run.eval_mda0(aircraft)
 
 # Full MDA process
 #------------------------------------------------------------------------------------------------------

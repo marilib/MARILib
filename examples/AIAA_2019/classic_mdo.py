@@ -22,7 +22,7 @@ from marilib.aircraft_model.operations import handling_qualities as h_q
 propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
 number_of_engine = 2
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 150
 design_range = unit.m_NM(3000)

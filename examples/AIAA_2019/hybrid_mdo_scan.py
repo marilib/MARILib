@@ -21,7 +21,7 @@ from marilib.processes import assembly as run, initialization as init
 propulsive_architecture = 2 # 1:turbofan, 2:partial turboelectric
 number_of_engine = 2
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 150
 design_range = unit.m_NM(3000)

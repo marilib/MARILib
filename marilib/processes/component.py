@@ -23,7 +23,7 @@ def eval_nominal_mission(aircraft):
     Compute nominal mission with range as input
     """
 
-    disa = 0
+    disa = 0.
     altp = aircraft.design_driver.ref_cruise_altp
     mach = aircraft.design_driver.cruise_mach
     nei = 0
@@ -48,7 +48,17 @@ def eval_nominal_mission(aircraft):
 
     aircraft.weights.mass_constraint_3 = aircraft.weights.mtow - mtow
 
-#    aircraft.weights.mtow = mtow    # MTOW is overwritten here
+    return
+
+
+#===========================================================================================================
+def eval_mission_coupling(aircraft):
+    """
+    Mass-Mission coupling
+    This relation is put apart from nominal_mission because GEMS does not manage functions that compute their own input
+    """
+
+    aircraft.weights.mtow = aircraft.weights.owe + aircraft.nominal_mission.payload + aircraft.nominal_mission.total_fuel
 
     return
 
@@ -84,7 +94,7 @@ def mission_tow(aircraft,payload,range,altp,mach,disa):
         return Y
     #---------------------------------------------------------------------------------------
 
-    tow_ini = weights.owe + payload + 2000
+    tow_ini = weights.owe + payload + 2000.
 
     fct_arg = (aircraft,payload,range,altp,mach,disa)
 

@@ -22,7 +22,7 @@ def lift_from_speed(aircraft,pamb,mach,mass):
     wing = aircraft.wing
     g = earth.gravity()
     gam = earth.heat_ratio()
-    c_z = (2*mass*g)/(gam*pamb*mach**2*wing.area)
+    c_z = (2.*mass*g)/(gam*pamb*mach**2*wing.area)
     return c_z
 
 
@@ -44,7 +44,7 @@ def get_speed(pamb,speed_mode,mach):
 
     speed = {
             1 : earth.vcas_from_mach(pamb,mach),   # CAS required
-            2 : mach                                # mach required
+            2 : mach                               # mach required
             }.get(speed_mode, "Erreur: select speed_mode equal to 1 or 2")
     return speed
 
@@ -57,7 +57,7 @@ def get_mach(pamb,speed_mode,speed):
 
     mach = {
             1 : earth.mach_from_vcas(pamb,speed),   # Input is CAS
-            2 : speed                                # Input is mach
+            2 : speed                               # Input is mach
             }.get(speed_mode, "Erreur: select speed_mode equal to 1 or 2")
     return mach
 
@@ -146,7 +146,7 @@ def max_path(aircraft,nei,altp,disa,speed_mode,mass,rating):
     dcz = 0.05
     isformax=True
 
-    fct = [fct_max_path, 1,aircraft,nei,altp,disa,speed_mode,mass,rating,isformax]
+    fct = [fct_max_path, aircraft,nei,altp,disa,speed_mode,mass,rating,isformax]
 
     (cz,slope,rc) = maximize_1d(cz_ini,dcz,fct)
 

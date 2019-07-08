@@ -12,13 +12,12 @@ class TurbofanPylon(object):
     """
     Turbofan pylon data
     """
+    INFO = {\
+    "mass":{"unit":"kg", "om":1.e3, "txt":"Equipped mass of the pylons"},
+    "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the pylons"}
+    }
     def __init__(self, mass = None,
                         c_g = None):
-        """
-        Constructor :
-            :param mass: Uu kg - OoM 10^3 - Equipped mass of the pylons
-            :param c_g: Uu m - OoM 10^1 - Longitudinal position of the CG of the pylons
-        """
         self.mass = mass
         self.c_g = c_g
 
@@ -27,6 +26,28 @@ class TurbofanNacelle(object):
     """
     Turbofan nacelle data
     """
+    INFO = {\
+    "attachment":{"unit":"int", "om":1.e0, "txt":"Nacelle attachment (1= under wing, 2= rear fuselage)"},
+    "width":{"unit":"m", "om":1.e0, "txt":"Maximum width of the nacelles"},
+    "length":{"unit":"m", "om":1.e0, "txt":"Length of the fan cowl"},
+    "x_ext":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the center of the air inlet of the external nacelle"},
+    "y_ext":{"unit":"m", "om":1.e1, "txt":"Span wise position of the center of the air inlet of the external nacelle"},
+    "z_ext":{"unit":"m", "om":1.e0, "txt":"Vertical position of the center of the air inlet of the external nacelle"},
+    "x_int":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the center of the air inlet of the internal nacelle"},
+    "y_int":{"unit":"m", "om":1.e1, "txt":"Span wise position of the center of the air inlet of the internal nacelle"},
+    "z_int":{"unit":"m", "om":1.e0, "txt":"Vertical position of the center of the air inlet of the internal nacelle"},
+    "net_wetted_area":{"unit":"m2", "om":1.e1, "txt":"Total net wetted area of the nacelles (fan cowls)"},
+    "efficiency_fan":{"unit":"no_dim", "om":1.e0, "txt":"Fan efficiency for turbofan (capability to turn shaft power into kinetic energy)"},
+    "efficiency_prop":{"unit":"no_dim", "om":1.e0, "txt":"Propeller like Fan+Cowl efficiency for turbofan (FanThrust.Vair)/(Shaft power)"},
+    "hub_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the hub of the turbofan nacelle (for pusher fan only)"},
+    "fan_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the fan of the turbofan nacelle"},
+    "nozzle_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the nozzle of the turbofan nacelle"},
+    "nozzle_area":{"unit":"m2", "om":1.e0, "txt":"Exhaust nozzle area of the turbofan nacelle"},
+    "body_length":{"unit":"m", "om":1.e0, "txt":"Length of the body in front of the turbofan nacelle"},
+    "bnd_layer":{"unit":"structure", "om":1.e0, "txt":"Boundary layer thickness law in front of the e-fan, 2d array"},
+    "mass":{"unit":"kg", "om":1.e3, "txt":"Equipped mass of the nacelles (including engine mass)"},
+    "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the nacelles"}
+    }
     def __init__(self, attachment = None,
                        width = None,
                        length = None,
@@ -47,30 +68,6 @@ class TurbofanNacelle(object):
                        bnd_layer = None,
                        mass = None,
                        c_g = None):
-        """
-        Constructor
-
-            :param attachment: Uu int - OoM 10^0 - Nacelle attachment (1= under wing, 2= rear fuselage)
-            :param width: Uu m - OoM 10^0 - Maximum width of the nacelles
-            :param length: Uu m - OoM 10^0 - Length of the fan cowl
-            :param x_ext: Uu m - OoM 10^1 - Longitudinal position of the center of the air inlet of the external nacelle
-            :param y_ext: Uu m - OoM 10^1 - Span wise position of the center of the air inlet of the external nacelle
-            :param z_ext: Uu m - OoM 10^0 - Vertical position of the center of the air inlet of the external nacelle
-            :param x_int: Uu m - OoM 10^1 - Longitudinal position of the center of the air inlet of the internal nacelle
-            :param y_int: Uu m - OoM 10^1 - Span wise position of the center of the air inlet of the internal nacelle
-            :param z_int: Uu m - OoM 10^0 - Vertical position of the center of the air inlet of the internal nacelle
-            :param net_wetted_area: Uu m2 - OoM 10^1 - Total net wetted area of the nacelles (fan cowls)
-            :param efficiency_fan: Uu no_dim - OoM 10^0 - Fan efficiency for turbofan (capability to turn shaft power into kinetic energy)
-            :param efficiency_prop: Uu no_dim - OoM 10^0 - "Propeller like" Fan+Cowl efficiency for turbofan (FanThrust.Vair)/(Shaft power)
-            :param hub_width: Uu m - OoM 10^0 - Diameter of the hub of the turbofan nacelle (for pusher fan only)
-            :param fan_width: Uu m - OoM 10^0 - Diameter of the fan of the turbofan nacelle
-            :param nozzle_width: Uu m - OoM 10^0 - Diameter of the nozzle of the turbofan nacelle
-            :param nozzle_area: Uu m2 - OoM 10^0 - Exhaust nozzle area of the turbofan nacelle
-            :param body_length: Uu m - OoM 10^0 - Length of the body in front of the turbofan nacelle
-            :param bnd_layer: Uu structure - OoM 10^0 - Boundary layer thickness law in front of the e-fan, 2d array
-            :param mass: Uu kg - OoM 10^3 - Equipped mass of the nacelles (including engine mass)
-            :param c_g: Uu m - OoM 10^1 - Longitudinal position of the CG of the nacelles
-        """
         self.attachment = attachment
         self.width = width
         self.length = length
@@ -97,6 +94,16 @@ class TurbofanEngine(object):
     """
     Turbofan engine data
     """
+    INFO = {\
+    "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of turbofan"},
+    "bpr":{"unit":"no_dim", "om":1.e0, "txt":"By Pass Ratio of the turbofan"},
+    "reference_thrust":{"unit":"daN", "om":1.e4, "txt":"Design Reference Thrust of the engines"},
+    "rating_factor":{"unit":"int", "om":1.e0, "txt":"Array of rating factors versus reference thrust"},
+    "core_thrust_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total thrust of a turbofan which is due to the core (typically between 10% & 16% for BPR>5)"},
+    "core_width_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total nacelle diameter which is taken by the core"},
+    "core_weight_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total nacelle mass which is taken by the core"},
+    "kfn_off_take":{"unit":"no_dim", "om":1.e0, "txt":"reference_thrust factor due to power off take (if any)"}
+    }
     def __init__(self, n_engine = None,
                        bpr = None,
                        reference_thrust = None,
@@ -105,17 +112,6 @@ class TurbofanEngine(object):
                        core_width_ratio = None,
                        core_weight_ratio = None,
                        kfn_off_take = None):
-        """
-        Constructor :
-            :param n_engine: Uu int - OoM 10^0 - Number of turbofan
-            :param bpr: Uu no_dim - OoM 10^0 - By Pass Ratio of the turbofan
-            :param reference_thrust: Uu daN - OoM 10^4 - Design Reference Thrust of the engines
-            :param rating_factor: Uu int - OoM 10^0 - Array of rating factors versus reference thrust
-            :param core_thrust_ratio: Uu no_dim - OoM 10^0 - Fraction of the total thrust of a turbofan which is due to the core (typically between 10% & 16% for BPR>5)
-            :param core_width_ratio: Uu no_dim - OoM 10^0 - Fraction of the total nacelle diameter which is taken by the core
-            :param core_weight_ratio: Uu no_dim - OoM 10^0 - Fraction of the total nacelle mass which is taken by the core
-            :param kfn_off_take: Uu no_dim - OoM 10^0 - reference_thrust factor due to power off take (if any)
-        """
         self.n_engine = n_engine
         self.bpr = bpr
         self.reference_thrust = reference_thrust

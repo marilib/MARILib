@@ -103,9 +103,26 @@ def eval_aircraft_weights(aircraft):
 
     weights.mass_constraint_2 = weights.mlw - mlw
 
-#    weights.mzfw = mzfw     # MZFW is overwritten here
+    return
 
-#    weights.mlw = mlw       # MLW is overwritten here
+
+#===========================================================================================================
+def eval_mass_coupling(aircraft):
+    """
+    Weights estimation internal coupling
+    This relation is put apart from aircraft_weights because GEMS does not manage functions that compute their own input
+    """
+
+    cabin = aircraft.cabin
+    payload = aircraft.payload
+    weights = aircraft.weights
+
+    weights.mzfw = weights.owe + payload.maximum
+
+    if (cabin.n_pax_ref>100):
+        weights.mlw = min(weights.mtow , (1.07*weights.mzfw))
+    else:
+        weights.mlw = weights.mtow
 
     return
 
@@ -169,19 +186,19 @@ def eval_aerodynamics_design(aircraft):
 
     mach = design_driver.cruise_mach
     altp = design_driver.ref_cruise_altp
-    disa = 0
+    disa = 0.
 
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
 
     aerodynamics.cruise_lod_max, aerodynamics.cz_cruise_lod_max = airplane_aero.lod_max(aircraft, pamb, tamb, mach)
 
-    aerodynamics.hld_conf_clean = 0        # By definition (0=<hld_conf=<1)
+    aerodynamics.hld_conf_clean = 0.0   # By definition (0=<hld_conf=<1)
     aerodynamics.cz_max_clean,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_clean)
 
     aerodynamics.hld_conf_to = 0.3      # Take off (empirical setting)
     aerodynamics.cz_max_to,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_to)
 
-    aerodynamics.hld_conf_ld = 1        # By definition (0=<hld_conf=<1), 1 is full landing
+    aerodynamics.hld_conf_ld = 1.0      # By definition (0=<hld_conf=<1), 1 is full landing
     aerodynamics.cz_max_ld,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_ld)
 
     return

@@ -29,7 +29,7 @@ def fuel_efficiency_metric(aircraft):
     low_weight = 0.45*weights.mtow + 0.63*weights.mtow**0.924
     medium_weight = 0.5*(high_weight+low_weight)
 
-    disa = 0
+    disa = 0.
 
     mach = design_driver.cruise_mach    # take cruise mach instead of Maxi Range because SFC is constant
 
@@ -37,7 +37,7 @@ def fuel_efficiency_metric(aircraft):
     #-----------------------------------------------------------------------------------------------------------
     (sar_max_hw,altp_sar_max_hw) = perfo.sar_max(aircraft,high_weight,mach,disa)
     (altp_sar_max_hw,hw_ceiling) = check_ceiling(aircraft,high_weight,altp_sar_max_hw,mach,disa)
-    if(hw_ceiling<0):
+    if(hw_ceiling<0.):
         lower_mach = mach - 0.03
         (sar_max_hw,altp_sar_max_hw) = perfo.sar_max(aircraft,high_weight,lower_mach,disa)
         (altp_sar_max_hw,hw_ceiling) = check_ceiling(aircraft,high_weight,altp_sar_max_hw,lower_mach,disa)
@@ -47,7 +47,7 @@ def fuel_efficiency_metric(aircraft):
 
     (sar_max_mw,altp_sar_max_mw) = perfo.sar_max(aircraft,medium_weight,mach,disa)
     (altp_sar_max_mw,mw_ceiling) = check_ceiling(aircraft,medium_weight,altp_sar_max_mw,mach,disa)
-    if(mw_ceiling<0):
+    if(mw_ceiling<0.):
         lower_mach = mach - 0.03
         (sar_max_mw,altp_sar_max_mw) = perfo.sar_max(aircraft,medium_weight,lower_mach,disa)
         (altp_sar_max_mw,mw_ceiling) = check_ceiling(aircraft,medium_weight,altp_sar_max_mw,lower_mach,disa)
@@ -57,7 +57,7 @@ def fuel_efficiency_metric(aircraft):
 
     (sar_max_lw,altp_sar_max_lw) = perfo.sar_max(aircraft,low_weight,mach,disa)
     (altp_sar_max_lw,lw_ceiling) = check_ceiling(aircraft,low_weight,altp_sar_max_lw,mach,disa)
-    if(lw_ceiling<0):
+    if(lw_ceiling<0.):
         lower_mach = mach - 0.03
         (sar_max_lw,altp_sar_max_lw) = perfo.sar_max(aircraft,low_weight,lower_mach,disa)
         (altp_sar_max_lw,lw_ceiling) = check_ceiling(aircraft,low_weight,altp_sar_max_lw,lower_mach,disa)
@@ -80,8 +80,8 @@ def check_ceiling(aircraft,mass,altp_ini,mach,disa):
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
-    vz_req_mcl = unit.mps_ftpmin(300)
-    vz_req_mcr = unit.mps_ftpmin(0)
+    vz_req_mcl = unit.mps_ftpmin(300.)
+    vz_req_mcr = unit.mps_ftpmin(0.)
 
     isomach = 2
     nei = 0

@@ -20,7 +20,7 @@ def turbofan_sfc(aircraft,pamb,tamb,mach,rating,nei):
 
     engine = aircraft.turbofan_engine
 
-    sfc = ( 0.4 + 1/engine.bpr**0.895 )/36000
+    sfc = ( 0.4 + 1./engine.bpr**0.895 )/36000.
 
     return sfc
 
@@ -37,9 +37,9 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     factor = engine.rating_factor       # [MTO,MCN,MCL,MCR,FID]
 
-    kth =  0.475*Mach**2 + 0.091*(engine.bpr/10)**2 \
-         - 0.283*Mach*engine.bpr/10 \
-         - 0.633*Mach - 0.081*engine.bpr/10 + 1.192
+    kth =  0.475*Mach**2 + 0.091*(engine.bpr/10.)**2 \
+         - 0.283*Mach*engine.bpr/10. \
+         - 0.633*Mach - 0.081*engine.bpr/10. + 1.192
 
     (rho,sig) = earth.air_density(Pamb,Tamb)
 
@@ -47,7 +47,7 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     fn_core = fn0 * engine.core_thrust_ratio        # Core thrust
 
-    fn_fan0 = fn0 * (1-engine.core_thrust_ratio)    # Fan thrust
+    fn_fan0 = fn0 * (1.-engine.core_thrust_ratio)    # Fan thrust
 
     Vsnd = earth.sound_speed(Tamb)
     Vair = Vsnd*Mach
@@ -70,12 +70,12 @@ def turbofan_nacelle_drag(aircraft,nacelle,Re,Mach):
 
     wing = aircraft.wing
 
-    fac = (1 + 0.126*Mach**2)
+    fac = (1. + 0.126*Mach**2)
 
     # All nacelle drag
     nac_nwa = nacelle.net_wetted_area
 
-    nac_cxf =   1.15*((0.455/fac)*(numpy.log(10)/numpy.log(Re*nacelle.length))**2.58)*nac_nwa/wing.area
+    nac_cxf =   1.15*((0.455/fac)*(numpy.log(10.)/numpy.log(Re*nacelle.length))**2.58)*nac_nwa/wing.area
 
     return nac_cxf,nac_nwa
 

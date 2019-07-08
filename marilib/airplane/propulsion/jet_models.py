@@ -161,10 +161,10 @@ def air_flows(rho,v_air,r,d,y):
     """
 
     # exponent in the formula of the speed profile inside a turbulent BL of thickness bly : Vy/Vair = (y/d)**(1/7)
-    n = 1/7
+    n = 1./7.
 
     # Cumulated air flow at y_elev, without BL
-    q0 = (2.*numpy.pi)*(rho*v_air)*(r*y + (1/2)*y**2)
+    q0 = (2.*numpy.pi)*(rho*v_air)*(r*y + 0.5*y**2)
 
     ym = min(y,d)
 
@@ -173,7 +173,7 @@ def air_flows(rho,v_air,r,d,y):
 
     if (y>d):
         # Add to Q1 the air flow outside the BL
-        q1 = q1 + q0 - (2.*numpy.pi)*(rho*v_air)*( r*d + (1/2)*d**2 )
+        q1 = q1 + q0 - (2.*numpy.pi)*(rho*v_air)*( r*d + 0.5*d**2 )
 
     q2 = q1 - q0        # Cumulated air flow at y_elev, inside the BL (going speed wise)
 
@@ -199,7 +199,7 @@ def specific_air_flows(r,d,y):
     n = 1/7 # exponent in the formula of the speed profile inside a turbulent
             # BL of thickness d : Vy/Vair = (y/d)^(1/7)
 
-    q0s = (2.*numpy.pi)*( r*y + (1/2)*y**2 )
+    q0s = (2.*numpy.pi)*( r*y + 0.5*y**2 )
                             # Cumulated specific air flow at y, without BL
     ym = min(y,d)
 
@@ -207,7 +207,7 @@ def specific_air_flows(r,d,y):
                             # Cumulated specific air flow at y, without BL
     if y>d:
 
-        q1s = q1s + q0s - (2.*numpy.pi)*( r*d + (1/2)*d**2 )
+        q1s = q1s + q0s - (2.*numpy.pi)*( r*d + 0.5*d**2 )
                             # Add to Q1 the specific air flow outside the BL
     q2s = q0s - q1s
         # Cumulated specific air flow at y, inside the BL (going speed wise)
@@ -224,6 +224,6 @@ def boundary_layer(re,x_length):
     Thickness of a turbulent boundary layer which developped turbulently from its starting point
     """
 
-    d = (0.385*x_length)/(re*x_length)**(1/5)
+    d = (0.385*x_length)/(re*x_length)**(1./5.)
 
     return d

@@ -73,7 +73,7 @@ def heat_constant(gam,R):
     """
     Reference air heat at constant pressure
     """
-    Cp = gam*R/(gam-1) # Heat constant at constant pressure
+    Cp = gam*R/(gam-1.) # Heat constant at constant pressure
     return Cp
 
 #===========================================================================================================
@@ -89,18 +89,18 @@ def air_viscosity(tamb):
 
 
 #===========================================================================================================
-def reynolds_number(pamb,tamb,mach):
+def reynolds_number_old(pamb,tamb,mach):
     """
     Reynolds number
     """
-    fac = ( 1 + 0.126*mach**2 )
+    fac = ( 1. + 0.126*mach**2 )
     re = 47899*pamb*mach*(fac*tamb + 110.4) / (tamb**2 * fac**2.5)
     return re
 
 #===========================================================================================================
-def reynolds_number_Sutherland(pamb,tamb,mach):
+def reynolds_number(pamb,tamb,mach):
     """
-    Reynolds number
+    Reynolds number based on Sutherland viscosity model
     """
     vsnd = sound_speed(tamb)
     rho,sig = air_density(pamb,tamb)
@@ -133,7 +133,7 @@ def atmosphere(altp,disa):
     while (Z[1+j]<=altp):
         T[j+1] = T[j] + dtodz[j]*(Z[j+1]-Z[j])
         if (0.<numpy.abs(dtodz[j])):
-            P[j+1] = P[j]*(1 + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
+            P[j+1] = P[j]*(1. + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
         else:
             P[j+1] = P[j]*numpy.exp(-(g/R)*((Z[j+1]-Z[j])/T[j]))
         j = j + 1
@@ -190,7 +190,7 @@ def atmosphere_geo(altg,disa):
     while (j<n and Z[1+j]<=altg):
         T[j+1] = T[j] + dtodz[j]*(Z[j+1]-Z[j])
         if (0.<numpy.abs(dtodz[j])):
-            P[j+1] = P[j]*(1 + (dtodz[j]/(T[j]+disa))*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
+            P[j+1] = P[j]*(1. + (dtodz[j]/(T[j]+disa))*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
         else:
             P[j+1] = P[j]*numpy.exp(-(g/R)*((Z[j+1]-Z[j])/(T[j]+disa)))
         j = j + 1
@@ -226,14 +226,14 @@ def pressure_altitude(pamb):
 
     j = 0
     n = len(P)-1
-    P[1] = P[0]*(1 + (dtodz[0]/T[0])*(Z[1]-Z[0]))**(-g/(R*dtodz[0]))
+    P[1] = P[0]*(1. + (dtodz[0]/T[0])*(Z[1]-Z[0]))**(-g/(R*dtodz[0]))
     T[1] = T[0] + dtodz[0]*(Z[1]-Z[0])
 
     while (j<n and pamb<P[j+1]):
         j = j + 1
         T[j+1] = T[j] + dtodz[j]*(Z[j+1]-Z[j])
         if (0.<numpy.abs(dtodz[j])):
-            P[j+1] = P[j]*(1 + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
+            P[j+1] = P[j]*(1. + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
         else:
             P[j+1] = P[j]*numpy.exp(-(g/R)*((Z[j+1]-Z[j])/T[j]))
 
@@ -270,7 +270,7 @@ def pressure(altp):
     while (Z[1+j]<=altp):
         T[j+1] = T[j] + dtodz[j]*(Z[j+1]-Z[j])
         if (0.<numpy.abs(dtodz[j])):
-            P[j+1] = P[j]*(1 + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
+            P[j+1] = P[j]*(1. + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
         else:
             P[j+1] = P[j]*numpy.exp(-(g/R)*((Z[j+1]-Z[j])/T[j]))
         j = j + 1
@@ -309,7 +309,7 @@ def total_temperature(tamb,mach):
     Stagnation temperature
     """
     gam = heat_ratio()
-    ttot = tamb*(1+((gam-1)/2)*mach**2)
+    ttot = tamb*(1.+((gam-1.)/2.)*mach**2)
     return ttot
 
 #===========================================================================================================
@@ -318,7 +318,7 @@ def total_pressure(pamb,mach):
     Stagnation pressure
     """
     gam = heat_ratio()
-    ptot = pamb*(1+((gam-1)/2)*mach**2)**(gam/(gam-1))
+    ptot = pamb*(1+((gam-1.)/2.)*mach**2)**(gam/(gam-1.))
     return ptot
 
 #===========================================================================================================
@@ -339,8 +339,8 @@ def mach_from_vcas(pamb,Vcas):
     gam = heat_ratio()
     P0 = sea_level_pressure()
     vc0 = sea_level_sound_speed()
-    fac = gam/(gam-1)
-    mach = numpy.sqrt(((((((gam-1)/2)*(Vcas/vc0)**2+1)**fac-1)*P0/pamb+1)**(1/fac)-1)*(2/(gam-1)))
+    fac = gam/(gam-1.)
+    mach = numpy.sqrt(((((((gam-1.)/2.)*(Vcas/vc0)**2+1)**fac-1.)*P0/pamb+1.)**(1./fac)-1.)*(2./(gam-1.)))
     return mach
 
 #===========================================================================================================
@@ -351,8 +351,8 @@ def vcas_from_mach(pamb,mach):
     gam = heat_ratio()
     P0 = sea_level_pressure()
     vc0 = sea_level_sound_speed()
-    fac = gam/(gam-1)
-    vcas = vc0*numpy.sqrt(5*((((pamb/P0)*((1+((gam-1)/2)*mach**2)**fac-1))+1)**(1/fac)-1))
+    fac = gam/(gam-1.)
+    vcas = vc0*numpy.sqrt(5.*((((pamb/P0)*((1.+((gam-1.)/2.)*mach**2)**fac-1.))+1.)**(1./fac)-1.))
     return vcas
 
 #===========================================================================================================
@@ -376,7 +376,7 @@ def cross_over_altp(Vcas,mach):
     vc0 = sea_level_sound_speed()
     fac = gam/(gam-1)
 
-    pamb = ((1+((gam-1)/2)*(Vcas/vc0)**2)**fac-1)*P0/((1+((gam-1)/2)*mach**2)**fac-1)
+    pamb = ((1.+((gam-1.)/2.)*(Vcas/vc0)**2)**fac-1.)*P0/((1.+((gam-1.)/2.)*mach**2)**fac-1.)
 
     altp = pressure_altitude(pamb)
 
@@ -393,11 +393,11 @@ def climb_mode(speed_mode,dtodz,tstd,disa,mach):
     gam = heat_ratio()
 
     if (speed_mode==1):
-        fac = (gam-1)/2
-        acc_factor = 1 + (((1+fac*mach**2)**(gam/(gam-1))-1)/(1+fac*mach**2)**(1/(gam-1))) \
-                       + ((gam*R)/(2*g))*(mach**2)*(tstd/(tstd+disa))*dtodz
+        fac = (gam-1.)/2.
+        acc_factor = 1. + (((1.+fac*mach**2)**(gam/(gam-1.))-1.)/(1.+fac*mach**2)**(1./(gam-1.))) \
+                        + ((gam*R)/(2.*g))*(mach**2)*(tstd/(tstd+disa))*dtodz
     elif (speed_mode==2):
-        acc_factor = 1 + ((gam*R)/(2*g))*(mach**2)*(tstd/(tstd+disa))*dtodz
+        acc_factor = 1. + ((gam*R)/(2.*g))*(mach**2)*(tstd/(tstd+disa))*dtodz
     else:
         raise Exception("climb_mode index is out of range")
 

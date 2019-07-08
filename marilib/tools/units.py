@@ -9,41 +9,41 @@ Created on Thu Jan 24 23:22:21 2019
 
 import numpy
       
-def s_min(min): return min*60   # Translate minutes into seconds
+def s_min(min): return min*60.   # Translate minutes into seconds
 
-def min_s(s): return s/60   # Translate seconds into minutes
+def min_s(s): return s/60.   # Translate seconds into minutes
 
-def s_h(h): return h*3600   # Translate hours into seconds
+def s_h(h): return h*3600.   # Translate hours into seconds
 
-def h_s(s): return s/3600   # Translate seconds into hours
+def h_s(s): return s/3600.   # Translate seconds into hours
 
 def m_ft(ft): return ft*0.3048   # Translate feet into metres
 
 def ft_m(m): return m/0.3048   # Translate metres into feet
 
-def m_NM(NM): return NM*1852   # Translate nautical miles into metres
+def m_NM(NM): return NM*1852.   # Translate nautical miles into metres
 
-def NM_m(m): return m/1852   # Translate metres into nautical miles
+def NM_m(m): return m/1852.   # Translate metres into nautical miles
 
-def mps_kmph(kmph): return kmph*1000/3600   # Translate knots into meters per second
+def mps_kmph(kmph): return kmph*1000./3600.   # Translate knots into meters per second
 
-def kmph_mps(mps): return mps*3600/1000   # Translate knots into meters per second
+def kmph_mps(mps): return mps*3600./1000.   # Translate knots into meters per second
 
 def mps_kt(kt): return kt*1852/3600   # Translate knots into meters per second
 
-def kt_mps(mps): return mps*3600/1852   # Translate meters per second into knots
+def kt_mps(mps): return mps*3600./1852.   # Translate meters per second into knots
 
-def mps_ftpmin(ftpmin): return ftpmin*0.3048/60   # Translate feet per minutes into meters per second
+def mps_ftpmin(ftpmin): return ftpmin*0.3048/60.   # Translate feet per minutes into meters per second
 
-def ftpmin_mps(mps): return mps/0.3048*60   # Translate meters per second into feet per minutes
+def ftpmin_mps(mps): return mps/0.3048*60.   # Translate meters per second into feet per minutes
 
 def liter_usgal(usgal): return usgal*3.7853982   # Translate US gallons into liters
 
 def usgal_liter(liter): return liter/3.7853982   # Translate liters into US gallons
 
-def rad_deg(deg): return deg*numpy.pi/180   # Translate degrees into radians
+def rad_deg(deg): return deg*numpy.pi/180.   # Translate degrees into radians
 
-def deg_rad(rad): return rad*180/numpy.pi   # Translate radians into degrees
+def deg_rad(rad): return rad*180./numpy.pi   # Translate radians into degrees
 
 def J_kWh(kWh): return kWh*3.6e6   # Translate kWh into J
 
@@ -53,6 +53,32 @@ def kWh_J(J): return J/3.6e6   # Translate J into kWh
 def smart_round(X,S):
 	Fac = (10*numpy.ones(S))**numpy.min(4,max(0,4-round(numpy.log10(S))))
 	return round(X*Fac)#Fac
+
+
+#=========================================================================================================================================
+def user_format(value):
+    from numpy import max, ceil, log10, floor, float64, arange
+
+    if isinstance(value, tuple):
+        lst = list(value)
+        for i in arange(len(lst)):
+            lst[i] = user_format(lst[i])
+        return lst
+
+    if isinstance(value, (float, float64)):
+        if value == 0. or value == -0.:
+            return format(value, "".join((".4f")))
+
+        else:
+            V = abs(value)
+            if abs(value) > 1:
+                nb_dec = int(max((0,5-ceil(log10(V+1e-4)))))
+            else:
+                nb_dec = int(3 - floor(log10(V)))
+            return format(value, "".join((".",str(nb_dec),"f")))
+
+    else:
+        return value
 
 
 #==========================================================================================================================
@@ -166,8 +192,8 @@ UNIT["lb/lbf/h"] = 0.000028327
 
 # dim = "SpecificEnergyConsumption"
 UNIT["J/N/s"] = 1.
-UNIT["kJ/daN/h"] = 1e3
-UNIT["MJ/lbf/h"] = 1e6
+UNIT["kJ/daN/h"] = 1.e3
+UNIT["MJ/lbf/h"] = 1.e6
 
 # dim = "SpecificConsumptionvsPower"
 UNIT["kg/W/s"] = 1.
@@ -257,7 +283,7 @@ UNIT["dc"] = 0.0001
 # dim = "DragSensitivity"
 UNIT["1/cx"] = 1.
 UNIT["%/cx"] = 0.01
-UNIT["%/dc"] = 0.01*10000
+UNIT["%/dc"] = 0.01*10000.
 
 # dim = "MachNumbervariationrate"
 UNIT["Mach/s"] = 1.
@@ -467,5 +493,7 @@ def convert_from(ulab,val):
 
 def convert_to(ulab,val):
 # Convert val expressed in standard unit to ulab
+
+
     return val/UNIT[ulab]
 

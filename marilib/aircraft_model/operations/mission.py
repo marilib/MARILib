@@ -9,7 +9,7 @@ Created on Thu Jan 24 23:22:21 2019
 
 
 import numpy
-from marilib.tools.math import maximize_1d, trinome
+from marilib.tools.math import maximize_1d, trinome, vander3
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth
@@ -40,7 +40,7 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
 
     lod_cruise = 0.95 * lod_max
 
-    nei = 0.
+    nei = 0
 
     sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
 
@@ -51,11 +51,11 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
-    fuel_taxi_out = (34 + 2.3e-4*engine.reference_thrust)*engine.n_engine
-    time_taxi_out = 540
+    fuel_taxi_out = (34. + 2.3e-4*engine.reference_thrust)*engine.n_engine
+    time_taxi_out = 540.
 
     fuel_take_off = 1e-4*(2.8+2.3/engine.bpr)*tow
-    time_take_off = 220*tow/(engine.reference_thrust*engine.n_engine)
+    time_take_off = 220.*tow/(engine.reference_thrust*engine.n_engine)
 
     # Mission leg
     #-----------------------------------------------------------------------------------------------------------
@@ -64,11 +64,6 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
     elif (propulsion.architecture==2):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
                         - (sfc/sec)*battery.energy_cruise
-    elif (propulsion.architecture==3):
-        fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
-                        - (sfc/sec)*battery.energy_cruise
-    elif (propulsion.architecture==4):
-        fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
     else:
         raise Exception("propulsion.architecture index is out of range")
 
@@ -79,10 +74,10 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
     # Arrival ground phases
     #-----------------------------------------------------------------------------------------------------------
     fuel_landing = 1e-4*(0.5+2.3/engine.bpr)*l_w
-    time_landing = 180
+    time_landing = 180.
 
-    fuel_taxi_in = (26 + 1.8e-4*engine.reference_thrust)*engine.n_engine
-    time_taxi_in = 420
+    fuel_taxi_in = (26. + 1.8e-4*engine.reference_thrust)*engine.n_engine
+    time_taxi_in = 420.
 
     # Block fuel and time
     #-----------------------------------------------------------------------------------------------------------
@@ -91,7 +86,7 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
 
     # Diversion and holding reserve fuel
     #-----------------------------------------------------------------------------------------------------------
-    fuel_diversion = l_w*(1-numpy.exp(-(sfc*g*regul.diversion_range())/(tas*lod_cruise)))
+    fuel_diversion = l_w*(1.-numpy.exp(-(sfc*g*regul.diversion_range())/(tas*lod_cruise)))
 
     fuel_holding = sfc*(l_w*g/lod_max)*regul.holding_time()
 
@@ -99,7 +94,7 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
     #-----------------------------------------------------------------------------------------------------------
     design_range = aircraft.design_driver.design_range
 
-    fuel_total = fuel_mission*(1+regul.reserve_fuel_ratio(design_range)) + fuel_diversion + fuel_holding
+    fuel_total = fuel_mission*(1.+regul.reserve_fuel_ratio(design_range)) + fuel_diversion + fuel_holding
 
     #-----------------------------------------------------------------------------------------------------------
     return block_fuel,time_block,fuel_total
@@ -122,7 +117,7 @@ def specific_air_range(aircraft,altp,mass,mach,disa):
 
     [Cx,LoD] = airplane_aero.drag(aircraft,pamb,tamb,mach,Cz)
 
-    nei = 0.
+    nei = 0
 
     sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
 
@@ -143,9 +138,9 @@ def sar_max(aircraft,mass,mach,disa):
 
     altp_ini = design_driver.ref_cruise_altp
 
-    d_altp = 250
+    d_altp = 250.
 
-    fct = [fct_sar_max, 1,mass,mach,disa,aircraft]
+    fct = [fct_sar_max, mass,mach,disa,aircraft]
 
     (altp_sar_max,sar_max,rc) = maximize_1d(altp_ini,d_altp,fct)
 
@@ -164,7 +159,7 @@ def ceilings(aircraft,toc,oei_ceil):
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
-    disa = 15
+    disa = 15.
 
     # propulsion ceilings
     #-----------------------------------------------------------------------------------------------------------
@@ -212,14 +207,14 @@ def time_to_climb(aircraft,toc,disa,mass,vcas1,vcas2,mach):
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
-    if(vcas1>unit.mps_kt(250)):
+    if(vcas1>unit.mps_kt(250.)):
         print("time_to_climb_, vcas1 must be lower than or equal to 250kt")
     if(vcas1>vcas2):
         print("time_to_climb_, vcas1 must be lower than or equal to vcas2")
 
     cross_over_altp = earth.cross_over_altp(vcas2,mach)
 
-    if(cross_over_altp<unit.m_ft(1500)):
+    if(cross_over_altp<unit.m_ft(1500.)):
         print("time_to_climb_, cross over altitude is too low")
 
     if(toc<cross_over_altp):
@@ -227,98 +222,100 @@ def time_to_climb(aircraft,toc,disa,mass,vcas1,vcas2,mach):
 
     # Duration of initial climb
     #-----------------------------------------------------------------------------------------------------------
-    altp = numpy.array([0.,0.,0.])
-    altp[0] = unit.m_ft(1500)
-    altp[2] = unit.m_ft(10000)
-    altp[1] = (altp[0]+altp[2])/2
+    altp0 = unit.m_ft(1500.)
+    altp2 = unit.m_ft(10000.)
+    altp1 = (altp0+altp2)/2.
+    altp = numpy.array([altp0, altp1, altp2])
 
     nei = 0
     speed_mode = 1    # Constant CAS
     rating = MCL
 
-    v_z = numpy.array([0.,0.,0.])
-    [slope,v_z[0]] = flight.air_path(aircraft,nei,altp[0],disa,speed_mode,vcas1,mass,rating)
-    [slope,v_z[1]] = flight.air_path(aircraft,nei,altp[1],disa,speed_mode,vcas1,mass,rating)
-    [slope,v_z[2]] = flight.air_path(aircraft,nei,altp[2],disa,speed_mode,vcas1,mass,rating)
+    [slope,v_z0] = flight.air_path(aircraft,nei,altp[0],disa,speed_mode,vcas1,mass,rating)
+    [slope,v_z1] = flight.air_path(aircraft,nei,altp[1],disa,speed_mode,vcas1,mass,rating)
+    [slope,v_z2] = flight.air_path(aircraft,nei,altp[2],disa,speed_mode,vcas1,mass,rating)
+    v_z = numpy.array([v_z0, v_z1, v_z2])
 
-    if(numpy.extract(v_z<0,v_z).size>0):
+    if (v_z[0]<0. or v_z[1]<0. or v_z[2]<0.):
         print("time_to_climb_, Climb to acceleration altitude is not possible")
 
-    A = numpy.vander(altp,3)
-    B = 1/v_z
+    A = vander3(altp)
+    B = 1./v_z
     C = trinome(A,B)
 
-    time1 = ((C[0]*altp[2]/3 + C[1]/2)*altp[2] + C[2])*altp[2]
-    time1 = time1 - ((C[0]*altp[0]/3 + C[1]/2)*altp[0] + C[2])*altp[0]
+    time1 = ((C[0]*altp[2]/3. + C[1]/2.)*altp[2] + C[2])*altp[2]
+    time1 = time1 - ((C[0]*altp[0]/3. + C[1]/2.)*altp[0] + C[2])*altp[0]
 
     # Acceleration
     #-----------------------------------------------------------------------------------------------------------
-    vcas = numpy.array([0.,0.,0.])
-    vcas[0] = vcas1
-    vcas[2] = vcas2
-    vcas[1] = (vcas[0]+vcas[2])/2
+    vc0 = vcas1
+    vc2 = vcas2
+    vc1 = (vc0+vc2)/2.
+    vcas = numpy.array([vc0, vc1, vc2])
 
-    acc = numpy.array([0.,0.,0.])
-    acc[0] = flight.acceleration(aircraft,nei,altp[2],disa,speed_mode,vcas[0],mass,rating)
-    acc[1] = flight.acceleration(aircraft,nei,altp[2],disa,speed_mode,vcas[1],mass,rating)
-    acc[2] = flight.acceleration(aircraft,nei,altp[2],disa,speed_mode,vcas[2],mass,rating)
+    acc0 = flight.acceleration(aircraft,nei,altp[2],disa,speed_mode,vcas[0],mass,rating)
+    acc1 = flight.acceleration(aircraft,nei,altp[2],disa,speed_mode,vcas[1],mass,rating)
+    acc2 = flight.acceleration(aircraft,nei,altp[2],disa,speed_mode,vcas[2],mass,rating)
+    acc = numpy.array([acc0, acc1, acc2])
 
-    if(numpy.extract(acc<0,acc).size>0):
+    if(acc[0]<0. or acc[1]<0. or acc[2]<0.):
         print("time_to_climb_, acceleration is not possible")
 
-    A = numpy.vander(vcas,3)
-    B = 1/acc
+    A = vander3(vcas)
+    B = 1./acc
     C = trinome(A,B)
 
-    time2 = ((C[0]*vcas[2]/3 + C[1]/2)*vcas[2] + C[2])*vcas[2]
-    time2 = time2 - ((C[0]*vcas[0]/3 + C[1]/2)*vcas[0] + C[2])*vcas[0]
+    time2 = ((C[0]*vcas[2]/3. + C[1]/2.)*vcas[2] + C[2])*vcas[2]
+    time2 = time2 - ((C[0]*vcas[0]/3. + C[1]/2.)*vcas[0] + C[2])*vcas[0]
 
     # Duration of climb to cross over
     #-----------------------------------------------------------------------------------------------------------
-    altp[0] = unit.m_ft(10000)
-    altp[2] = cross_over_altp
-    altp[1] = (altp[0]+altp[2])/2
+    altp0 = unit.m_ft(10000.)
+    altp2 = cross_over_altp
+    altp1 = (altp0+altp2)/2.
+    altp = numpy.array([altp0, altp1, altp2])
 
-    [slope,v_z[0]] = flight.air_path(aircraft,nei,altp[0],disa,speed_mode,vcas2,mass,rating)
-    [slope,v_z[1]] = flight.air_path(aircraft,nei,altp[1],disa,speed_mode,vcas2,mass,rating)
-    [slope,v_z[2]] = flight.air_path(aircraft,nei,altp[2],disa,speed_mode,vcas2,mass,rating)
+    [slope,v_z0] = flight.air_path(aircraft,nei,altp[0],disa,speed_mode,vcas2,mass,rating)
+    [slope,v_z1] = flight.air_path(aircraft,nei,altp[1],disa,speed_mode,vcas2,mass,rating)
+    [slope,v_z2] = flight.air_path(aircraft,nei,altp[2],disa,speed_mode,vcas2,mass,rating)
+    v_z = numpy.array([v_z0, v_z1, v_z2])
 
-    if(numpy.extract(v_z<0,v_z).size>0):
+    if(v_z[0]<0. or v_z[1]<0. or v_z[2]<0.):
         print("time_to_climb_, Climb to cross over altitude is not possible")
 
-    A = numpy.vander(altp,3)
-    B = 1/v_z
+    A = vander3(altp)
+    B = 1./v_z
     C = trinome(A,B)
 
-    time3 = ((C[0]*altp[2]/3 + C[1]/2)*altp[2] + C[2])*altp[2]
-    time3 = time3 - ((C[0]*altp[0]/3 + C[1]/2)*altp[0] + C[2])*altp[0]
+    time3 = ((C[0]*altp[2]/3. + C[1]/2.)*altp[2] + C[2])*altp[2]
+    time3 = time3 - ((C[0]*altp[0]/3. + C[1]/2.)*altp[0] + C[2])*altp[0]
 
     # Duration of climb to altp
     #-----------------------------------------------------------------------------------------------------------
     if(cross_over_altp<toc):
-
-        altp[0] = cross_over_altp
-        altp[2] = toc
-        altp[1] = (altp[0]+altp[2])/2
+        altp0 = cross_over_altp
+        altp2 = toc
+        altp1 = (altp0+altp2)/2.
+        altp = numpy.array([altp0, altp1, altp2])
 
         speed_mode = 2    # mach
 
-        [slope,v_z[0]] = flight.air_path(aircraft,nei,altp[0],disa,speed_mode,mach,mass,rating)
-        [slope,v_z[1]] = flight.air_path(aircraft,nei,altp[1],disa,speed_mode,mach,mass,rating)
-        [slope,v_z[2]] = flight.air_path(aircraft,nei,altp[2],disa,speed_mode,mach,mass,rating)
+        [slope,v_z0] = flight.air_path(aircraft,nei,altp[0],disa,speed_mode,mach,mass,rating)
+        [slope,v_z1] = flight.air_path(aircraft,nei,altp[1],disa,speed_mode,mach,mass,rating)
+        [slope,v_z2] = flight.air_path(aircraft,nei,altp[2],disa,speed_mode,mach,mass,rating)
+        v_z = numpy.array([v_z0, v_z1, v_z2])
 
-        if(numpy.extract(v_z<0,v_z).size>0):
+        if(v_z[0]<0. or v_z[1]<0. or v_z[2]<0.):
             print("time_to_climb_, Climb to top of climb is not possible")
 
-        A = numpy.vander(altp,3)
-        B = 1/v_z
+        A = vander3(altp)
+        B = 1./v_z
         C = trinome(A,B)
 
-        time4 =  ((C[0]*altp[2]/3 + C[1]/2)*altp[2] + C[2])*altp[2] \
-               - ((C[0]*altp[0]/3 + C[1]/2)*altp[0] + C[2])*altp[0]
+        time4 =  ((C[0]*altp[2]/3. + C[1]/2.)*altp[2] + C[2])*altp[2] \
+               - ((C[0]*altp[0]/3. + C[1]/2.)*altp[0] + C[2])*altp[0]
     else:
-
-        time4 = 0
+        time4 = 0.
 
     #    Total time
     #-----------------------------------------------------------------------------------------------------------
@@ -406,7 +403,7 @@ def take_off_field_length(aircraft,altp,disa,mass,hld_conf):
         else:
             tofl = numpy.nan
             kvs1g = numpy.nan
-            seg2_path = 0
+            seg2_path = 0.
             limitation = 0
 
     return tofl,seg2_path,kvs1g,limitation

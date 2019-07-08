@@ -5,7 +5,6 @@ Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry
 """
 
-
 from marilib.tools import units as unit
 
 from marilib.aircraft_model.airplane import viewer as show
@@ -20,7 +19,7 @@ from marilib.processes import assembly as run
 propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
 number_of_engine = 2
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 150
 design_range = unit.m_NM(3000)
@@ -61,6 +60,7 @@ run.eval_performance_analysis(aircraft)
 # Handling quality analysis
 #------------------------------------------------------------------------------------------------------
 run.eval_handling_quality_analysis(aircraft)
+
 
 print("-------------------------------------------")
 print("Sequence : done")
@@ -119,8 +119,6 @@ print("Evaluation mission range = ","%.0f"%unit.NM_m(aircraft.cost_mission.range
 print("Evaluation mission block fuel = ","%.0f"%aircraft.cost_mission.block_fuel," kg")
 print("Evaluation mission cash op cost = ","%.0f"%aircraft.economics.cash_operating_cost," $")
 print("CO2 metric = ","%.4f"%(aircraft.environmental_impact.CO2_metric*1000)," kg/km/m0.48")
-
-
 
 # airplane 3D view
 #------------------------------------------------------------------------------------------------------

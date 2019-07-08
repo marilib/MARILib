@@ -124,7 +124,7 @@ def eval_hybrid_engine_design(aircraft):
     (fn,data) = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[MTO],MTO,fd_nei[MTO])
     (fn_core,fn_fan0,fn0,shaft_power0) = data
 
-    shaft_power1 = (1-e_power_ratio[MTO])*shaft_power0     # Shaft power dedicated to the fan at take off
+    shaft_power1 = (1.-e_power_ratio[MTO])*shaft_power0     # Shaft power dedicated to the fan at take off
 
     Vsnd = earth.sound_speed(Tamb)
     Vair = Vsnd*fd_mach[MTO]
@@ -164,7 +164,7 @@ def eval_hybrid_nacelle_design(aircraft):
 
     kSize = numpy.sqrt(engine.kfn_off_take)      # Diameter decrease due to max thrust decrease
 
-    kSize_eff = (kSize + engine.core_width_ratio * (1-kSize))      # Diameter decrease considering core is unchanged
+    kSize_eff = (kSize + engine.core_width_ratio * (1.-kSize))      # Diameter decrease considering core is unchanged
 
     nacelle.width = nacWidth0*kSize_eff     # Real nacelle diameter assuming core section remains unchanged
 
@@ -211,7 +211,7 @@ def eval_hybrid_nacelle_design(aircraft):
     eval_bli_nacelle_design(e_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_length,body_width)
 
     e_nacelle.x_axe = fuselage.length + 0.2*e_nacelle.width
-    e_nacelle.y_axe = 0
+    e_nacelle.y_axe = 0.
     e_nacelle.z_axe = 0.91*fuselage.height - 0.55*fuselage.height
 
     # Engine performance update
@@ -414,9 +414,9 @@ def eval_hybrid_nacelle_mass(aircraft):
 
     shaftPowerMax = max(e_shaft_power)
 
-    turboFanMass0 = 1250 + 0.021*engine.reference_thrust # Statistical regression
+    turboFanMass0 = 1250. + 0.021*engine.reference_thrust # Statistical regression
 
-    turboFanMass1 = 1250 + 0.021*engine.reference_thrust*engine.kfn_off_take
+    turboFanMass1 = 1250. + 0.021*engine.reference_thrust*engine.kfn_off_take
 
     kTurboFanMass = turboFanMass1 / turboFanMass0
 
@@ -424,12 +424,12 @@ def eval_hybrid_nacelle_mass(aircraft):
 
     nacelle.mass = engine.n_engine * turboFanMass0 * kMass     # Total engine mass
 
-    power_elec.mass = (  1/power_elec.generator_pw_density + 1/power_elec.rectifier_pw_density \
-                       + 1/power_elec.wiring_pw_density + 1/power_elec.cooling_pw_density \
+    power_elec.mass = (  1./power_elec.generator_pw_density + 1./power_elec.rectifier_pw_density \
+                       + 1./power_elec.wiring_pw_density + 1./power_elec.cooling_pw_density \
                        ) * shaftPowerMax
 
-    e_nacelle.mass = (  1/e_nacelle.controller_pw_density + 1/e_nacelle.motor_pw_density \
-                      + 1/e_nacelle.nacelle_pw_density \
+    e_nacelle.mass = (  1./e_nacelle.controller_pw_density + 1./e_nacelle.motor_pw_density \
+                      + 1./e_nacelle.nacelle_pw_density \
                       ) * shaftPowerMax
 
     # Propulsion system CG

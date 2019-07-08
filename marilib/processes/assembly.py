@@ -73,7 +73,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.economics.fuel_price = init.fuel_price()
     aircraft.economics.elec_price = init.elec_price()
-    aircraft.economics.battery_price = init.battery_price()
+    aircraft.economics.battery_mass_price = init.battery_mass_price()
     aircraft.economics.labor_cost = init.labor_cost()
     aircraft.economics.irp = init.irp()
     aircraft.economics.period = init.period()
@@ -97,6 +97,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.cabin.n_pax_front = init.n_pax_front(n_pax_ref)
     aircraft.cabin.n_aisle = init.n_aisle(aircraft.cabin.n_pax_front)
+    aircraft.fuselage.width = init.fuselage_width(aircraft.cabin.n_pax_front,aircraft.cabin.n_aisle)
 
     aircraft.payload.m_pax_nominal = init.m_pax_nominal(design_range)      # TLR
     aircraft.payload.m_pax_max = init.m_pax_max(design_range)              # TLR
@@ -110,8 +111,12 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.wing.area = init.wing_area(n_pax_ref,design_range)                                              # Main design variable
     aircraft.wing.aspect_ratio = init.wing_aspect_ratio()
     aircraft.wing.span = init.wing_span(aircraft.wing.area,aircraft.wing.aspect_ratio)
+    aircraft.wing.x_root = init.wing_x_root(aircraft.wing.aspect_ratio,aircraft.wing.span)
 
-    if (aircraft.propulsion.architecture<4):
+    aircraft.horizontal_tail.area = init.htp_area(aircraft.wing.area)
+    aircraft.vertical_tail.area = init.vtp_area(aircraft.wing.area)
+
+    if (aircraft.propulsion.architecture<3):
         aircraft.turbofan_engine.n_engine = n_engine
         aircraft.turbofan_engine.bpr = init.bpr(n_pax_ref)
         aircraft.turbofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
@@ -123,16 +128,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
         aircraft.turbofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
         aircraft.turbofan_nacelle.efficiency_fan = init.efficiency_fan()
         aircraft.turbofan_nacelle.efficiency_prop = init.efficiency_prop()
-
-    if (aircraft.propulsion.architecture==3):
-        aircraft.body_nacelle.length = init.nacelle_body_length()
-        aircraft.body_nacelle.width = init.nacelle_body_width()
-        aircraft.body_nacelle.hub_width = init.nacelle_body_hub_width()
-
-    if (aircraft.propulsion.architecture==4):
-        aircraft.turboprop_engine.n_engine = n_engine
-        aircraft.turboprop_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
-        aircraft.turboprop_engine.propeller_efficiency = init.propeller_efficiency()
+        aircraft.turbofan_nacelle.width = init.turbofan_nacelle_width(aircraft.turbofan_engine.bpr,
+                                                                      aircraft.turbofan_engine.reference_thrust)
+        aircraft.turbofan_nacelle.y_ext = init.turbofan_nacelle_y_ext(aircraft.turbofan_nacelle.attachment,
+                                                                      aircraft.fuselage.width,
+                                                                      aircraft.turbofan_nacelle.width)
 
     aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
 
@@ -165,6 +165,36 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.propulsion.bli_effect = init.boundary_layer_effect()
 
+    propulsion.rating_code = propulsion.rating_code()
+
+    return
+
+
+#===========================================================================================================
+def eval_aircraft_geom_analysis(aircraft):
+    """
+    Perform geometrical analysis
+    Do not solve any coupling
+    """
+
+    airframe.eval_cabin_design(aircraft)
+
+    airframe.eval_fuselage_design(aircraft)
+
+    airframe.eval_wing_design(aircraft)
+
+    airframe.eval_vtp_design(aircraft)
+
+    airframe.eval_vtp_statistical_sizing(aircraft)
+
+    airframe.eval_htp_design(aircraft)
+
+    airframe.eval_htp_statistical_sizing(aircraft)
+
+    propulsion.eval_propulsion_design(aircraft)
+
+    airplane.eval_aerodynamics_design(aircraft)
+
     return
 
 
@@ -172,7 +202,76 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 def eval_aircraft_pre_design(aircraft):
     """
     Perform geometrical pre design
-    Solves the coupling carried by nacelle geometry
+    Solves the coupling carried by nacelle geometry and tail areas
+    """
+
+    airframe.eval_cabin_design(aircraft)
+    airframe.eval_fuselage_design(aircraft)
+
+    #===========================================================================================================
+    def fct_aircraft_pre_design(x_in,aircraft):
+
+        ac = aircraft
+
+        ac.turbofan_nacelle.width = x_in[0]                         # Coupling variable
+        ac.turbofan_nacelle.y_ext = x_in[1]                         # Coupling variable
+        ac.horizontal_tail.area = x_in[2]                           # Coupling variable
+        ac.vertical_tail.area = x_in[3]                             # Coupling variable
+
+        airframe.eval_wing_design(ac)
+        airframe.eval_vtp_design(ac)
+        airframe.eval_vtp_statistical_sizing(ac)
+        airframe.eval_htp_design(ac)
+        airframe.eval_htp_statistical_sizing(ac)
+
+        propulsion.eval_propulsion_design(ac)
+
+        y_out = np.array([x_in[0] - ac.turbofan_nacelle.width,
+                          x_in[1] - ac.turbofan_nacelle.y_ext,
+                          x_in[2] - ac.horizontal_tail.area,
+                          x_in[3] - ac.vertical_tail.area])
+
+        return y_out
+    #-----------------------------------------------------------------------------------------------------------
+
+    bpr = aircraft.turbofan_engine.bpr
+    reference_thrust = aircraft.turbofan_engine.reference_thrust
+    nacelle_attachment = aircraft.turbofan_nacelle.attachment
+    fuselage_width = aircraft.fuselage.width
+    wing_area = aircraft.wing.area
+
+    nacelle_width_i = init.turbofan_nacelle_width(bpr,reference_thrust)
+    nacelle_y_ext_i = init.turbofan_nacelle_y_ext(nacelle_attachment,fuselage_width,nacelle_width_i)
+    htp_area_i = init.htp_area(wing_area)
+    vtp_area_i = init.vtp_area(wing_area)
+
+    x_ini = np.array([nacelle_width_i,nacelle_y_ext_i,htp_area_i,vtp_area_i])
+
+    fct_arg = aircraft
+
+    output_dict = fsolve(fct_aircraft_pre_design, x0=x_ini, args=fct_arg, full_output=True)
+
+    aircraft.turbofan_nacelle.width = output_dict[0][0]                         # Coupling variable
+    aircraft.turbofan_nacelle.y_ext = output_dict[0][1]                         # Coupling variable
+    aircraft.horizontal_tail.area = output_dict[0][2]                           # Coupling variable
+    aircraft.vertical_tail.area = output_dict[0][3]                             # Coupling variable
+
+    airframe.eval_wing_design(aircraft)
+    airframe.eval_vtp_design(aircraft)
+    airframe.eval_htp_design(aircraft)
+
+    propulsion.eval_propulsion_design(aircraft)
+
+    airplane.eval_aerodynamics_design(aircraft)
+
+    return
+
+
+#===========================================================================================================
+def eval_aircraft_pre_design_for_hq(aircraft):
+    """
+    Perform geometrical pre design
+    Solves the coupling carried by nacelle geometry only
     """
 
     airframe.eval_cabin_design(aircraft)
@@ -186,8 +285,8 @@ def eval_aircraft_pre_design(aircraft):
         ac.turbofan_nacelle.width = x_in[0]                         # Coupling variable
         ac.turbofan_nacelle.y_ext = x_in[1]                         # Coupling variable
 
-        airframe.eval_vtp_design(ac)
         airframe.eval_wing_design(ac)
+        airframe.eval_vtp_design(ac)
         airframe.eval_htp_design(ac)
 
         propulsion.eval_propulsion_design(ac)
@@ -198,15 +297,7 @@ def eval_aircraft_pre_design(aircraft):
         return y_out
     #-----------------------------------------------------------------------------------------------------------
 
-    bpr = aircraft.turbofan_engine.bpr
-    reference_thrust = aircraft.turbofan_engine.reference_thrust
-    nacelle_attachment = aircraft.turbofan_nacelle.attachment
-    fuselage_width = aircraft.fuselage.width
-
-    nacelle_width_i = init.turbofan_nacelle_width(bpr,reference_thrust)
-    nacelle_y_ext_i = init.turbofan_nacelle_y_ext(nacelle_attachment,fuselage_width,nacelle_width_i)
-
-    x_ini = np.array([nacelle_width_i,nacelle_y_ext_i])
+    x_ini = np.array([aircraft.turbofan_nacelle.width,aircraft.turbofan_nacelle.y_ext])
 
     fct_arg = aircraft
 
@@ -215,8 +306,8 @@ def eval_aircraft_pre_design(aircraft):
     aircraft.turbofan_nacelle.width = output_dict[0][0]                         # Coupling variable
     aircraft.turbofan_nacelle.y_ext = output_dict[0][1]                         # Coupling variable
 
-    airframe.eval_vtp_design(aircraft)
     airframe.eval_wing_design(aircraft)
+    airframe.eval_vtp_design(aircraft)
     airframe.eval_htp_design(aircraft)
 
     propulsion.eval_propulsion_design(aircraft)
@@ -347,7 +438,7 @@ def eval_payload_range_analysis(aircraft):
     """
     Compute Payload - Range diagram corner points
     """
-    disa = 0
+    disa = 0.
     altp = aircraft.design_driver.ref_cruise_altp
     mach = aircraft.design_driver.cruise_mach
 
@@ -423,7 +514,7 @@ def eval_climb_performances(aircraft):
     # Time to climb to requested altitude
     #------------------------------------------------------------------------------------------------------
     toc = aircraft.high_speed.req_toc_altp
-    disa = 0
+    disa = 0.
     mass = aircraft.weights.mtow
     vcas1 = aircraft.high_speed.cas1_ttc
     vcas2 = aircraft.high_speed.cas2_ttc
@@ -485,8 +576,8 @@ def eval_handling_quality_analysis(aircraft):
 
     # Forward limit : trim landing
     #------------------------------------------------------------------------------------------------------
-    altp = unit.m_ft(0)
-    disa = 0
+    altp = unit.m_ft(0.)
+    disa = 0.
     nei = 0
     speed_mode = 1
     hld_conf = aircraft.aerodynamics.hld_conf_ld
@@ -519,6 +610,21 @@ def eval_handling_quality_analysis(aircraft):
 
 
 #===========================================================================================================
+def eval_cg_coupling(aircraft):
+    """
+    This function provides coupling relations to perlorm empennage sizing as a constraint satisfaction problem
+    """
+
+    c_g = aircraft.center_of_gravity
+
+    c_g.max_fwd_req_cg = c_g.max_fwd_trim_cg
+    c_g.max_bwd_stab_cg = c_g.max_bwd_req_cg
+    c_g.max_bwd_oei_cg = c_g.max_bwd_oei_req_cg
+
+    return
+
+
+#===========================================================================================================
 def eval_hq0(aircraft):
     """
     Perform hq based empennage sizing without updating characteristic masses MTOW, MLW & MZFW
@@ -531,12 +637,13 @@ def eval_hq0(aircraft):
 
         c_g = aircraft.center_of_gravity
 
-        aircraft.vertical_tail.lever_arm = x_in[0]
+        aircraft.wing.x_root = x_in[0]
         aircraft.horizontal_tail.area = x_in[1]
         aircraft.vertical_tail.area = x_in[2]
 
-        eval_mda0(aircraft)
-
+        eval_aircraft_pre_design_for_hq(aircraft)   # Solves geometrical coupling without tails areas
+        eval_mass_breakdown(aircraft)               # Just mass analysis without any solving
+        eval_performance_analysis(aircraft)
         eval_handling_quality_analysis(aircraft)
 
         y_out = np.array([c_g.cg_constraint_1,
@@ -545,8 +652,8 @@ def eval_hq0(aircraft):
         return y_out
     #-----------------------------------------------------------------------------------------------------------
 
-    x_ini = np.array([aircraft.vertical_tail.lever_arm,
-                      aircraft.horizontal_tail.area * 1.05,     # Down scaling initial HTP area reduces the number of convergence problems ...
+    x_ini = np.array([aircraft.wing.x_root,
+                      aircraft.horizontal_tail.area,
                       aircraft.vertical_tail.area])
 
     fct_arg = aircraft
@@ -557,7 +664,7 @@ def eval_hq0(aircraft):
         print(output_dict[3])
         raise Exception("Convergence problem in HQ optimization")
 
-    aircraft.vertical_tail.lever_arm = output_dict[0][0]
+    aircraft.wing.x_root = output_dict[0][0]
     aircraft.horizontal_tail.area = output_dict[0][1]
     aircraft.vertical_tail.area = output_dict[0][2]
 
@@ -571,10 +678,10 @@ def eval_hq0(aircraft):
 #===========================================================================================================
 def eval_mda0(aircraft):
     """
-    Run the design sequence with statistical empennage sizing
+    Run the design sequence with statistical empennage sizing but without satisfying mass constraints
     """
 
-    eval_aircraft_pre_design(aircraft)  # Solves geometrical coupling
+    eval_aircraft_pre_design(aircraft)  # Solves geometrical coupling including
 
     eval_mass_breakdown(aircraft)       # Just mass analysis without any solving
 
@@ -586,12 +693,13 @@ def eval_mda0(aircraft):
 #===========================================================================================================
 def eval_mda1(aircraft):
     """
-    Run the design sequence with statistical empennage sizing and local mass constraints satisfaction
+    Run the design sequence with statistical empennage sizing and local mass constraints satisfaction (mass_constraint_1&2)
+    but without mass-mission adaptation
     """
 
-    eval_aircraft_pre_design(aircraft)  # Solves geometrical coupling
+    eval_aircraft_pre_design(aircraft)  # Solves geometrical coupling including tail areas statistical assessment
 
-    eval_mass_estimation(aircraft)      # Solves mass coupling on MZFW and MLW
+    eval_mass_estimation(aircraft)      # Solves internal mass coupling on MZFW and MLW
 
     eval_performance_analysis(aircraft)
 
@@ -601,10 +709,10 @@ def eval_mda1(aircraft):
 #===========================================================================================================
 def eval_mda2(aircraft):
     """
-    Run the design sequence with mass-mission adaptation and statistical empennage sizing
+    Run the design sequence with mass-mission adaptation (mass_constraint_1,2&3) and statistical empennage sizing
     """
 
-    eval_aircraft_pre_design(aircraft)      # Solves geometrical coupling
+    eval_aircraft_pre_design(aircraft)      # Solves geometrical coupling including tail areas statistical assessment
 
     eval_mass_mission_adaptation(aircraft)  # Solves mass coupling on MZFW, MLW and MTOW
 
@@ -616,7 +724,7 @@ def eval_mda2(aircraft):
 #===========================================================================================================
 def eval_mda3(aircraft):
     """
-    Run full MDA design with mass-mission adaptation and hq based empennage sizing
+    Run full MDA design with mass-mission adaptation (mass_constraint_1,2&3) and hq based empennage sizing
     """
 
     aircraft.center_of_gravity.cg_range_optimization = 1    # Start HQ optimization mode
@@ -626,12 +734,13 @@ def eval_mda3(aircraft):
 
         c_g = aircraft.center_of_gravity
 
-        aircraft.vertical_tail.lever_arm = x_in[0]
+        aircraft.wing.x_root = x_in[0]
         aircraft.horizontal_tail.area = x_in[1]
         aircraft.vertical_tail.area = x_in[2]
 
-        eval_mda2(aircraft)
-
+        eval_aircraft_pre_design_for_hq(aircraft)   # Solves geometrical coupling without tails areas
+        eval_mass_mission_adaptation(aircraft)      # Solves mass coupling on MZFW, MLW and MTOW
+        eval_performance_analysis(aircraft)
         eval_handling_quality_analysis(aircraft)
 
         y_out = np.array([c_g.cg_constraint_1,
@@ -640,8 +749,8 @@ def eval_mda3(aircraft):
         return y_out
     #-----------------------------------------------------------------------------------------------------------
 
-    x_ini = np.array([aircraft.vertical_tail.lever_arm,
-                      aircraft.horizontal_tail.area * 1.05,     # Down scaling initial HTP area reduces the number of convergence problems ...
+    x_ini = np.array([aircraft.wing.x_root,
+                      aircraft.horizontal_tail.area,
                       aircraft.vertical_tail.area])
 
     fct_arg = aircraft
@@ -651,7 +760,7 @@ def eval_mda3(aircraft):
     if (output_dict[2]!=1):
         raise Exception("Convergence problem in HQ optimization")
 
-    aircraft.vertical_tail.lever_arm = output_dict[0][0]
+    aircraft.wing.x_root = output_dict[0][0]
     aircraft.horizontal_tail.area = output_dict[0][1]
     aircraft.vertical_tail.area = output_dict[0][2]
 
@@ -691,7 +800,7 @@ def eval_optim_data(x_in,ac,crit_index,crit_ref):
     # Run MDA
     #------------------------------------------------------------------------------------------------------
 
-    eval_mda2(ac)
+    eval_mda3(ac)
 
     # Constraints are violated if negative
     #------------------------------------------------------------------------------------------------------
