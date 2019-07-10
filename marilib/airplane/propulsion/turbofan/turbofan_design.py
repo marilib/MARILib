@@ -54,6 +54,8 @@ def eval_turbofan_nacelle_design(aircraft):
 
     nacelle = aircraft.turbofan_nacelle
 
+    nacelle.width = 0.5 * engine.bpr ** 0.7 + 5.E-6 * engine.reference_thrust
+
     nacelle.length = 0.86 * nacelle.width + engine.bpr ** 0.37      # statistical regression
 
     Knac = numpy.pi * nacelle.width * nacelle.length

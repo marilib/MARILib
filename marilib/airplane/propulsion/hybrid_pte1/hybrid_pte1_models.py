@@ -97,8 +97,8 @@ def hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
     shaft_power2 = power_ratio[rating]*shaft_power0*(engine.n_engine - nei)     # Shaft power dedicated to electric generator
 
     # Effective eFan shaft power
-    pw_shaft2 =   shaft_power2*power_elec.overall_efficiency \
-                + e_nacelle.motor_efficiency*e_nacelle.controller_efficiency*battery_power_feed[rating]
+    pw_shaft2 =   shaft_power2 * power_elec.overall_efficiency \
+                + e_nacelle.motor_efficiency * e_nacelle.controller_efficiency * battery_power_feed[rating]
 
     if (pw_shaft2 > 0.):
 
@@ -109,7 +109,7 @@ def hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
             (fn_fan2,q0) = jet.fan_thrust(e_nacelle,Pamb,Tamb,Mach,pw_shaft2)
             dVbli_o_V = 0.
 
-        sec = (pw_shaft2/e_nacelle.motor_efficiency)/fn_fan2
+        sec = (pw_shaft2/(e_nacelle.motor_efficiency*e_nacelle.controller_efficiency))/fn_fan2
 
     else:
 

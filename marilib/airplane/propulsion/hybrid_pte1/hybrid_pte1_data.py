@@ -163,7 +163,8 @@ class RearElectricEngine(object):
     "fid_e_fan_thrust ":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
     "flight_data ":{"unit":"dict", "txt":"Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}"}
     }
-    def __init__(self, mto_e_shaft_power = None,
+    def __init__(self, n_engine = None,
+                       mto_e_shaft_power = None,
                        mto_e_fan_thrust = None,
                        mcn_e_shaft_power = None,
                        mcn_e_fan_thrust = None,
@@ -174,6 +175,7 @@ class RearElectricEngine(object):
                        fid_e_shaft_power = None,
                        fid_e_fan_thrust = None,
                        flight_data = None):
+        self.n_engine = n_engine
         self.mto_e_shaft_power = mto_e_shaft_power
         self.mto_e_fan_thrust = mto_e_fan_thrust
         self.mcn_e_shaft_power = mcn_e_shaft_power

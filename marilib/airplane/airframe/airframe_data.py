@@ -388,7 +388,7 @@ class Tanks(object):
     "fuel_density":{"unit":"kg/m3", "om":1.e2, "txt":"Fuel density"},
     "fuel_cantilever_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of tanks in the cantilever wing"},
     "fuel_central_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of tanks in the central part of the wing (inside the fuselage)"},
-    "fuel_pod_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of tanks in the external bodies"},
+    "fuel_total_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of wing tanks"},
     "fuel_max_fwd_mass":{"unit":"kg", "om":1.e3, "txt":"Fuel mass of max forward fuel cg"},
     "fuel_max_fwd_cg":{"unit":"m", "om":1.e1, "txt":"Max forward fuel cg"},
     "fuel_max_bwd_mass":{"unit":"kg", "om":1.e3, "txt":"Fuel mass of max backward fuel cg"},
@@ -401,7 +401,7 @@ class Tanks(object):
                        fuel_density = None,
                        fuel_cantilever_cg = None,
                        fuel_central_cg = None,
-                       fuel_pod_cg = None,
+                       fuel_total_cg = None,
                        fuel_max_fwd_mass = None,
                        fuel_max_fwd_cg = None,
                        fuel_max_bwd_mass = None,
@@ -414,7 +414,7 @@ class Tanks(object):
         self.fuel_density = fuel_density
         self.fuel_cantilever_cg = fuel_cantilever_cg
         self.fuel_central_cg = fuel_central_cg
-        self.fuel_pod_cg = fuel_pod_cg
+        self.fuel_total_cg = fuel_total_cg
         self.fuel_max_fwd_mass = fuel_max_fwd_mass
         self.fuel_max_fwd_cg = fuel_max_fwd_cg
         self.fuel_max_bwd_mass = fuel_max_bwd_mass

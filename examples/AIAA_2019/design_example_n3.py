@@ -94,6 +94,11 @@ print("Climb speed effective in MCR rating = "+"%.1f"%unit.ftpmin_mps(aircraft.h
 print("")
 print("Time to climb required = "+"%.1f"%unit.min_s(aircraft.high_speed.req_ttc)+" min")
 print("Time to climb effective = "+"%.1f"%unit.min_s(aircraft.high_speed.eff_ttc)+" min")
+print("-------------------------------------------")
+print("Evaluation mission range = ","%.0f"%unit.NM_m(aircraft.cost_mission.range)," NM")
+print("Evaluation mission block fuel = ","%.0f"%aircraft.cost_mission.block_fuel," kg")
+print("Evaluation mission cash op cost = ","%.0f"%aircraft.economics.cash_operating_cost," $")
+print("CO2 metric = ","%.4f"%(aircraft.environmental_impact.CO2_metric*1000)," kg/km/m0.48")
 
 # airplane 3D view
 #------------------------------------------------------------------------------------------------------

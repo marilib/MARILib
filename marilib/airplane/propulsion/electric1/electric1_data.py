@@ -12,11 +12,6 @@ class Ef1PowerElectricChain(object):
     Electric chain data
     """
     INFO = {\
-    "mto":{"unit":"uc", "om":1.e0, "txt":"Take off e-fan motor power"},
-    "mcn":{"unit":"uc", "om":1.e0, "txt":"Maxi continuous e-fan motor power"},
-    "mcl":{"unit":"uc", "om":1.e0, "txt":"Max climb e-fan motor power"},
-    "mcr":{"unit":"uc", "om":1.e0, "txt":"Max cruise e-fan motor power"},
-    "fid":{"unit":"uc", "om":1.e0, "txt":"Flight idle e-fan motor power"},
     "max_power":{"unit":"kW", "om":1.e4, "txt":"E-fan motor maximum power"},
     "max_power_rating":{"unit":"int", "om":1.e0, "txt":"Engine rating of e-fan motor maximum power"},
     "overall_efficiency":{"unit":"no_dim", "om":1.e0, "txt":"Power efficiency of the electric chain"},
@@ -27,12 +22,7 @@ class Ef1PowerElectricChain(object):
     "mass":{"unit":"kg", "om":1.e2, "txt":"Mass of the electric chain (generator, rectifier, wires, cooling)"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the electric chain"}
     }
-    def __init__(self, mto = None,
-                       mcn = None,
-                       mcl = None,
-                       mcr = None,
-                       fid = None,
-                       max_power = None,
+    def __init__(self, max_power = None,
                        max_power_rating = None,
                        overall_efficiency = None,
                        generator_pw_density = None,
@@ -41,11 +31,6 @@ class Ef1PowerElectricChain(object):
                        cooling_pw_density = None,
                        mass = None,
                        c_g = None):
-        self.mto = mto
-        self.mcn = mcn
-        self.mcl = mcl
-        self.mcr = mcr
-        self.fid = fid
         self.max_power = max_power
         self.max_power_rating = max_power_rating
         self.overall_efficiency = overall_efficiency
@@ -90,6 +75,11 @@ class ElectrofanNacelle(object):
     "net_wetted_area":{"unit":"m2", "om":1.e1, "txt":"Total net wetted area of the nacelles (fan cowls)"},
     "efficiency_fan":{"unit":"no_dim", "om":1.e0, "txt":"Fan efficiency for turbofan (capability to turn shaft power into kinetic energy)"},
     "efficiency_prop":{"unit":"no_dim", "om":1.e0, "txt":"Propeller like Fan+Cowl efficiency for turbofan (FanThrust.Vair)/(Shaft power)"},
+    "motor_efficiency":{"unit":"no_dim", "om":1.e0, "txt":"Motor efficiency"},
+    "controller_efficiency":{"unit":"no_dim", "om":1.e0, "txt":"Controller electric efficiency"},
+    "controller_pw_density":{"unit":"kW/kg", "om":1.e0, "txt":"Power density of controller"},
+    "motor_pw_density":{"unit":"kW/kg", "om":1.e0, "txt":"Power density of electric motor"},
+    "nacelle_pw_density":{"unit":"kW/kg", "om":1.e0, "txt":"Power density of e-fan nacelle and mountings"},
     "hub_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the hub of the turbofan nacelle (for pusher fan only)"},
     "fan_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the fan of the turbofan nacelle"},
     "nozzle_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the nozzle of the turbofan nacelle"},
@@ -111,6 +101,11 @@ class ElectrofanNacelle(object):
                        net_wetted_area = None,
                        efficiency_fan = None,
                        efficiency_prop = None,
+                       motor_efficiency = None,
+                       controller_efficiency = None,
+                       controller_pw_density = None,
+                       motor_pw_density = None,
+                       nacelle_pw_density = None,
                        hub_width = None,
                        fan_width = None,
                        nozzle_width = None,
@@ -131,6 +126,13 @@ class ElectrofanNacelle(object):
         self.net_wetted_area = net_wetted_area
         self.efficiency_fan = efficiency_fan
         self.efficiency_prop = efficiency_prop
+        self.motor_efficiency = motor_efficiency
+        self.controller_efficiency = controller_efficiency
+        self.motor_efficiency = motor_efficiency
+        self.controller_efficiency = controller_efficiency
+        self.controller_pw_density = controller_pw_density
+        self.motor_pw_density = motor_pw_density
+        self.nacelle_pw_density = nacelle_pw_density
         self.hub_width = hub_width
         self.fan_width = fan_width
         self.nozzle_width = nozzle_width
@@ -148,6 +150,8 @@ class ElectrofanEngine(object):
     """
     INFO = {\
     "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of electric engine"},
+    "reference_thrust":{"unit":"daN", "om":1.e4, "txt":"Design Reference Thrust of the engines"},
+    "rating_factor":{"unit":"int", "om":1.e0, "txt":"Array of rating factors versus reference thrust"},
     "mto_e_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in take off rating (one engine), Sea Level, ISA+15, Mach 0,25"},
     "mto_e_fan_thrust ":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25"},
     "mcn_e_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in maxi continuous rating (one engine), required ceiling altitude, ISA, cruise Mach"},
@@ -160,7 +164,10 @@ class ElectrofanEngine(object):
     "fid_e_fan_thrust ":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
     "flight_data ":{"unit":"dict", "txt":"Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}"}
     }
-    def __init__(self, mto_e_shaft_power = None,
+    def __init__(self, n_engine = None,
+                       reference_thrust = None,
+                       rating_factor = None,
+                       mto_e_shaft_power = None,
                        mto_e_fan_thrust = None,
                        mcn_e_shaft_power = None,
                        mcn_e_fan_thrust = None,
@@ -171,6 +178,9 @@ class ElectrofanEngine(object):
                        fid_e_shaft_power = None,
                        fid_e_fan_thrust = None,
                        flight_data = None):
+        self.n_engine = n_engine
+        self.reference_thrust = reference_thrust
+        self.rating_factor = rating_factor
         self.mto_e_shaft_power = mto_e_shaft_power
         self.mto_e_fan_thrust = mto_e_fan_thrust
         self.mcn_e_shaft_power = mcn_e_shaft_power
@@ -190,16 +200,22 @@ class Ef1Battery(object):
     """
     INFO = {\
     "energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
-    "power_density":{"unit":"kW/kg", "om":1.e0, "txt":"Battery power density (capability to release power per mass unit"},
+    "power_density":{"unit":"kW/kg", "om":1.e0, "txt":"Battery power density (capability to release power per mass unit)"},
+    "density":{"unit":"kg/m3", "om":1.e3, "txt":"Battery density (mass per volume unit)"},
+    "fill_factor":{"unit":"no_dim", "om":1.e0, "txt":"ratio of available volume used for batteries"},
     "mass":{"unit":"kg", "om":1.e3, "txt":"Total battery mass"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Global CG of batteries"}
     }
     def __init__(self, energy_density = None,
                        power_density = None,
+                       density = None,
+                       fill_factor = None,
                        mass = None,
                        c_g = None):
         self.energy_density = energy_density
         self.power_density = power_density
+        self.density = density
+        self.fill_factor = fill_factor
         self.mass = mass
         self.c_g = c_g
 

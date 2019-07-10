@@ -38,8 +38,8 @@ print("Initialization : done")
 # Modify initial values here
 #======================================================================================================
 
-aircraft.turbofan_engine.reference_thrust = 119000.
-aircraft.wing.area = 151.9
+# aircraft.turbofan_engine.reference_thrust = 119000.
+# aircraft.wing.area = 151.9
 
 #======================================================================================================
 # Design process

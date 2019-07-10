@@ -300,13 +300,18 @@ def battery_energy_cruise():
 
 #===========================================================================================================
 def battery_energy_density():
-    battery_energy_density_i = unit.J_kWh(0.2)    # Battery energy density
+    battery_energy_density_i = unit.J_kWh(0.2)    # Battery energy density (kWh/kg)
     return battery_energy_density_i
 
 #===========================================================================================================
 def battery_power_density():
     battery_power_density_i = 1.e3    # Battery power density (capability to release power per mass unit
     return battery_power_density_i
+
+#===========================================================================================================
+def battery_density():
+    battery_density_i = 2800.    # Battery density (kg/m3)
+    return battery_density_i
 
 #===========================================================================================================
 def e_chain_efficiency():
