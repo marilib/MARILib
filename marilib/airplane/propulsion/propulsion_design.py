@@ -31,14 +31,14 @@ def eval_propulsion_design(aircraft):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         engine = aircraft.turbofan_engine
 
         eval_turbofan_engine_design(aircraft)
         eval_turbofan_nacelle_design(aircraft)
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         engine = aircraft.turbofan_engine
 
@@ -86,11 +86,11 @@ def eval_propulsion_design(aircraft):
 
     propulsion.sfc_cruise_ref = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         sec = 0.
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         fn,sec,data = propu.hybrid_thrust(aircraft,pamb,tamb,mach,MCR,nei)
 
@@ -130,7 +130,7 @@ def eval_propulsion_mass(aircraft):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         pylon = aircraft.turbofan_pylon
         nacelle = aircraft.turbofan_nacelle
@@ -141,7 +141,7 @@ def eval_propulsion_mass(aircraft):
         propulsion.mass = pylon.mass + nacelle.mass
         propulsion.c_g = (pylon.c_g*pylon.mass + nacelle.c_g*nacelle.mass)/propulsion.mass
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         pylon = aircraft.turbofan_pylon
         nacelle = aircraft.turbofan_nacelle
@@ -214,12 +214,12 @@ def eval_battery_cg(aircraft):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         battery.mass = 0.
         battery.c_g = 0.
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         eval_fuselage_battery_cg(aircraft)
 

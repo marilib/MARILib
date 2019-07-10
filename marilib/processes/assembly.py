@@ -116,7 +116,8 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.horizontal_tail.area = init.htp_area(aircraft.wing.area)
     aircraft.vertical_tail.area = init.vtp_area(aircraft.wing.area)
 
-    if (aircraft.propulsion.architecture<3):
+    if (aircraft.propulsion.architecture=="TF" \
+        or aircraft.propulsion.architecture=="PTE1"):
         aircraft.turbofan_engine.n_engine = n_engine
         aircraft.turbofan_engine.bpr = init.bpr(n_pax_ref)
         aircraft.turbofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
@@ -199,10 +200,10 @@ def eval_aircraft_geom_analysis(aircraft):
 
 
 #===========================================================================================================
-def eval_aircraft_pre_design(aircraft):
+def eval_tail_statistical_sizing(aircraft):
     """
-    Perform geometrical pre design
-    Solves the coupling carried by nacelle geometry and tail areas
+    Perform tail area sizing according to statistical rules
+    Do not manage the coupling carried by nacelle geometry
     """
 
     airframe.eval_cabin_design(aircraft)
@@ -213,48 +214,32 @@ def eval_aircraft_pre_design(aircraft):
 
         ac = aircraft
 
-        ac.turbofan_nacelle.width = x_in[0]                         # Coupling variable
-        ac.turbofan_nacelle.y_ext = x_in[1]                         # Coupling variable
-        ac.horizontal_tail.area = x_in[2]                           # Coupling variable
-        ac.vertical_tail.area = x_in[3]                             # Coupling variable
+        ac.horizontal_tail.area = x_in[0]                           # Coupling variable
+        ac.vertical_tail.area = x_in[1]                             # Coupling variable
 
         airframe.eval_wing_design(ac)
         airframe.eval_vtp_design(ac)
-        airframe.eval_vtp_statistical_sizing(ac)
         airframe.eval_htp_design(ac)
+        airframe.eval_vtp_statistical_sizing(ac)
         airframe.eval_htp_statistical_sizing(ac)
 
-        propulsion.eval_propulsion_design(ac)
-
-        y_out = np.array([x_in[0] - ac.turbofan_nacelle.width,
-                          x_in[1] - ac.turbofan_nacelle.y_ext,
-                          x_in[2] - ac.horizontal_tail.area,
-                          x_in[3] - ac.vertical_tail.area])
+        y_out = np.array([x_in[0] - ac.horizontal_tail.area,
+                          x_in[1] - ac.vertical_tail.area])
 
         return y_out
     #-----------------------------------------------------------------------------------------------------------
 
-    bpr = aircraft.turbofan_engine.bpr
-    reference_thrust = aircraft.turbofan_engine.reference_thrust
-    nacelle_attachment = aircraft.turbofan_nacelle.attachment
-    fuselage_width = aircraft.fuselage.width
-    wing_area = aircraft.wing.area
+    htp_area_i = init.htp_area(aircraft.wing.area)
+    vtp_area_i = init.vtp_area(aircraft.wing.area)
 
-    nacelle_width_i = init.turbofan_nacelle_width(bpr,reference_thrust)
-    nacelle_y_ext_i = init.turbofan_nacelle_y_ext(nacelle_attachment,fuselage_width,nacelle_width_i)
-    htp_area_i = init.htp_area(wing_area)
-    vtp_area_i = init.vtp_area(wing_area)
-
-    x_ini = np.array([nacelle_width_i,nacelle_y_ext_i,htp_area_i,vtp_area_i])
+    x_ini = np.array([htp_area_i,vtp_area_i])
 
     fct_arg = aircraft
 
     output_dict = fsolve(fct_aircraft_pre_design, x0=x_ini, args=fct_arg, full_output=True)
 
-    aircraft.turbofan_nacelle.width = output_dict[0][0]                         # Coupling variable
-    aircraft.turbofan_nacelle.y_ext = output_dict[0][1]                         # Coupling variable
-    aircraft.horizontal_tail.area = output_dict[0][2]                           # Coupling variable
-    aircraft.vertical_tail.area = output_dict[0][3]                             # Coupling variable
+    aircraft.horizontal_tail.area = output_dict[0][0]                           # Coupling variable
+    aircraft.vertical_tail.area = output_dict[0][1]                             # Coupling variable
 
     airframe.eval_wing_design(aircraft)
     airframe.eval_vtp_design(aircraft)
@@ -268,10 +253,10 @@ def eval_aircraft_pre_design(aircraft):
 
 
 #===========================================================================================================
-def eval_aircraft_pre_design_for_hq(aircraft):
+def eval_aircraft_pre_design(aircraft):
     """
-    Perform geometrical pre design
     Solves the coupling carried by nacelle geometry only
+    Do not perform tail area sizing
     """
 
     airframe.eval_cabin_design(aircraft)
@@ -302,6 +287,104 @@ def eval_aircraft_pre_design_for_hq(aircraft):
     fct_arg = aircraft
 
     output_dict = fsolve(fct_aircraft_pre_design, x0=x_ini, args=fct_arg, full_output=True)
+
+    aircraft.turbofan_nacelle.width = output_dict[0][0]                         # Coupling variable
+    aircraft.turbofan_nacelle.y_ext = output_dict[0][1]                         # Coupling variable
+
+    airframe.eval_wing_design(aircraft)
+    airframe.eval_vtp_design(aircraft)
+    airframe.eval_htp_design(aircraft)
+
+    propulsion.eval_propulsion_design(aircraft)
+
+    airplane.eval_aerodynamics_design(aircraft)
+
+    return
+
+
+#===========================================================================================================
+def eval_aircraft_statistical_pre_design(aircraft):
+    """
+    Perform tail area sizing according to statistical rules on top of the coupling carried by nacelle geometry
+    """
+
+    airframe.eval_cabin_design(aircraft)
+    airframe.eval_fuselage_design(aircraft)
+
+    #===========================================================================================================
+    def fct_aircraft_pre_design(x_in,aircraft):
+
+        ac = aircraft
+
+        ac.horizontal_tail.area = x_in[0]                           # Coupling variable
+        ac.vertical_tail.area = x_in[1]                             # Coupling variable
+
+        eval_aircraft_pre_design(ac)
+
+        airframe.eval_vtp_statistical_sizing(ac)
+        airframe.eval_htp_statistical_sizing(ac)
+
+        y_out = np.array([x_in[0] - ac.horizontal_tail.area,
+                          x_in[1] - ac.vertical_tail.area])
+
+        return y_out
+    #-----------------------------------------------------------------------------------------------------------
+
+    htp_area_i = init.htp_area(aircraft.wing.area)
+    vtp_area_i = init.vtp_area(aircraft.wing.area)
+
+    x_ini = np.array([htp_area_i,vtp_area_i])
+
+    fct_arg = aircraft
+
+    output_dict = fsolve(fct_aircraft_pre_design, x0=x_ini, args=fct_arg, full_output=True)
+
+    aircraft.horizontal_tail.area = output_dict[0][0]                           # Coupling variable
+    aircraft.vertical_tail.area = output_dict[0][1]                             # Coupling variable
+
+    airframe.eval_wing_design(aircraft)
+    airframe.eval_vtp_design(aircraft)
+    airframe.eval_htp_design(aircraft)
+
+    propulsion.eval_propulsion_design(aircraft)
+
+    airplane.eval_aerodynamics_design(aircraft)
+
+    return
+
+
+#===========================================================================================================
+def eval_aircraft_statistical_pre_design_2(aircraft):
+    """
+    Solves the coupling carried by nacelle geometry on top of the statistical sizing of tail areas
+    """
+
+    airframe.eval_cabin_design(aircraft)
+    airframe.eval_fuselage_design(aircraft)
+
+    #===========================================================================================================
+    def fct_aircraft_statistical_pre_design(x_in,aircraft):
+
+        ac = aircraft
+
+        ac.turbofan_nacelle.width = x_in[0]                         # Coupling variable
+        ac.turbofan_nacelle.y_ext = x_in[1]                         # Coupling variable
+
+        eval_tail_statistical_sizing(ac)            # Nested solving
+
+        propulsion.eval_propulsion_design(ac)
+
+        y_out = np.array([x_in[0] - ac.turbofan_nacelle.width,
+                          x_in[1] - ac.turbofan_nacelle.y_ext])
+
+        return y_out
+    #-----------------------------------------------------------------------------------------------------------
+
+    x_ini = np.array([aircraft.turbofan_nacelle.width,aircraft.turbofan_nacelle.y_ext])
+
+    fct_arg = aircraft
+
+    output_dict = fsolve(fct_aircraft_statistical_pre_design, x0=x_ini, args=fct_arg, full_output=True)
 
     aircraft.turbofan_nacelle.width = output_dict[0][0]                         # Coupling variable
     aircraft.turbofan_nacelle.y_ext = output_dict[0][1]                         # Coupling variable
@@ -641,7 +724,7 @@ def eval_hq0(aircraft):
         aircraft.horizontal_tail.area = x_in[1]
         aircraft.vertical_tail.area = x_in[2]
 
-        eval_aircraft_pre_design_for_hq(aircraft)   # Solves geometrical coupling without tails areas
+        eval_aircraft_pre_design(aircraft)   # Solves geometrical coupling without tails areas
         eval_mass_breakdown(aircraft)               # Just mass analysis without any solving
         eval_performance_analysis(aircraft)
         eval_handling_quality_analysis(aircraft)
@@ -681,7 +764,7 @@ def eval_mda0(aircraft):
     Run the design sequence with statistical empennage sizing but without satisfying mass constraints
     """
 
-    eval_aircraft_pre_design(aircraft)  # Solves geometrical coupling including
+    eval_aircraft_statistical_pre_design(aircraft)  # Solves geometrical coupling including
 
     eval_mass_breakdown(aircraft)       # Just mass analysis without any solving
 
@@ -697,7 +780,7 @@ def eval_mda1(aircraft):
     but without mass-mission adaptation
     """
 
-    eval_aircraft_pre_design(aircraft)  # Solves geometrical coupling including tail areas statistical assessment
+    eval_aircraft_statistical_pre_design(aircraft)  # Solves geometrical coupling including tail areas statistical assessment
 
     eval_mass_estimation(aircraft)      # Solves internal mass coupling on MZFW and MLW
 
@@ -712,7 +795,7 @@ def eval_mda2(aircraft):
     Run the design sequence with mass-mission adaptation (mass_constraint_1,2&3) and statistical empennage sizing
     """
 
-    eval_aircraft_pre_design(aircraft)      # Solves geometrical coupling including tail areas statistical assessment
+    eval_aircraft_statistical_pre_design(aircraft)      # Solves geometrical coupling including tail areas statistical assessment
 
     eval_mass_mission_adaptation(aircraft)  # Solves mass coupling on MZFW, MLW and MTOW
 
@@ -738,8 +821,8 @@ def eval_mda3(aircraft):
         aircraft.horizontal_tail.area = x_in[1]
         aircraft.vertical_tail.area = x_in[2]
 
-        eval_aircraft_pre_design_for_hq(aircraft)   # Solves geometrical coupling without tails areas
-        eval_mass_mission_adaptation(aircraft)      # Solves mass coupling on MZFW, MLW and MTOW
+        eval_aircraft_pre_design(aircraft)          # Solves geometrical coupling without tail area sizing (nested solving)
+        eval_mass_mission_adaptation(aircraft)      # Solves mass coupling on MZFW, MLW and MTOW      (nested solving)
         eval_performance_analysis(aircraft)
         eval_handling_quality_analysis(aircraft)
 
@@ -771,24 +854,20 @@ def eval_mda3(aircraft):
 
 
 #===========================================================================================================
-def eval_optim_data(x_in,ac,crit_index,crit_ref):
+def eval_optim_data(x_in,ac,crit_index,crit_ref,mda_type):
     """
     Compute criterion and constraints
     """
 
-    if (ac.propulsion.architecture==1):
+    if (ac.propulsion.architecture=="TF"):
 
         ac.turbofan_engine.reference_thrust = x_in[0]
 
-    elif (ac.propulsion.architecture==2):
+    elif (ac.propulsion.architecture=="PTE1"):
 
         ac.turbofan_engine.reference_thrust = x_in[0]
 
-    elif (ac.propulsion.architecture==3):
-
-        ac.turbofan_engine.reference_thrust = x_in[0]
-
-    elif (ac.propulsion.architecture==4):
+    elif (ac.propulsion.architecture=="TP"):
 
         ac.turboprop_engine.reference_thrust = x_in[0]
 
@@ -800,7 +879,12 @@ def eval_optim_data(x_in,ac,crit_index,crit_ref):
     # Run MDA
     #------------------------------------------------------------------------------------------------------
 
-    eval_mda3(ac)
+    if (mda_type=="MDA2"):
+        eval_mda2(ac)
+    elif (mda_type=="MDA3"):
+        eval_mda3(ac)
+    else:
+        raise Exception("Type of MDA not allowed")
 
     # Constraints are violated if negative
     #------------------------------------------------------------------------------------------------------
@@ -834,12 +918,12 @@ def eval_optim_data(x_in,ac,crit_index,crit_ref):
 
 
 #===========================================================================================================
-def eval_optim_cst(x_in,aircraft,crit_index,crit_ref):
+def eval_optim_cst(x_in,aircraft,crit_index,crit_ref,mda_type):
     """
     Retrieve constraints
     """
 
-    crit,cst = eval_optim_data(x_in,aircraft,crit_index,crit_ref)
+    crit,cst = eval_optim_data(x_in,aircraft,crit_index,crit_ref,mda_type)
 
     print("cst :",cst)
 
@@ -847,12 +931,12 @@ def eval_optim_cst(x_in,aircraft,crit_index,crit_ref):
 
 
 #===========================================================================================================
-def eval_optim_crt(x_in,aircraft,crit_index,crit_ref):
+def eval_optim_crt(x_in,aircraft,crit_index,crit_ref,mda_type):
     """
     Retreve criteria
     """
 
-    crit,cst = eval_optim_data(x_in,aircraft,crit_index,crit_ref)
+    crit,cst = eval_optim_data(x_in,aircraft,crit_index,crit_ref,mda_type)
 
     print("Design :",x_in)
     print("Crit :",crit)
@@ -861,18 +945,16 @@ def eval_optim_crt(x_in,aircraft,crit_index,crit_ref):
 
 
 #===========================================================================================================
-def mdf_process(aircraft,search_domain,criterion):
+def mdf_process(aircraft,search_domain,criterion,mda_type):
     """
     Compute criterion and constraints
     """
 
-    if (aircraft.propulsion.architecture==1):
+    if (aircraft.propulsion.architecture=="TF"):
         start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture==2):
+    elif (aircraft.propulsion.architecture=="PTE1"):
         start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture==3):
-        start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture==4):
+    elif (aircraft.propulsion.architecture=="TP"):
         start_value = (aircraft.turboprop_engine.reference_thrust,aircraft.wing.area)
     else:
         raise Exception("propulsion.architecture index is out of range")
@@ -891,13 +973,11 @@ def mdf_process(aircraft,search_domain,criterion):
     else:
         raise Exception("Criterion name is unknown")
 
-    eval_mda0(aircraft)     # Initialization (compulsory only with mda3)
+    crit_ref,cst_ref = eval_optim_data(start_value,aircraft,crit_index,1.,mda_type)
 
-    crit_ref,cst_ref = eval_optim_data(start_value,aircraft,crit_index,1.)
-
-    res = minimize(eval_optim_crt, start_value, args=(aircraft,crit_index,crit_ref,), method="trust-constr",
+    res = minimize(eval_optim_crt, start_value, args=(aircraft,crit_index,crit_ref,mda_type,), method="trust-constr",
                    jac="3-point", hess=SR1(), hessp=None, bounds=search_domain, tol=1e-5,
-                   constraints=NonlinearConstraint(fun=lambda x:eval_optim_cst(x,aircraft,crit_index,crit_ref),
+                   constraints=NonlinearConstraint(fun=lambda x:eval_optim_cst(x,aircraft,crit_index,crit_ref,mda_type),
                                                    lb=0., ub=np.inf, jac='3-point'),
                    options={'maxiter':500,'gtol': 1e-13})
     #              tol=None, callback=None,
@@ -907,12 +987,12 @@ def mdf_process(aircraft,search_domain,criterion):
     #                       'initial_tr_radius': 1.0, 'initial_barrier_parameter': 0.1,
     #                       'initial_barrier_tolerance': 0.1, 'factorization_method': None, 'disp': False})
 
-    # res = minimize(eval_optim_crt, start_value, args=(aircraft,crit_index,crit_ref,), method="SLSQP", bounds=search_domain,
-    #                constraints={"type":"ineq","fun":eval_optim_cst,"args":(aircraft,crit_index,crit_ref,)},
+    # res = minimize(eval_optim_crt, start_value, args=(aircraft,crit_index,crit_ref,mda_type,), method="SLSQP", bounds=search_domain,
+    #                constraints={"type":"ineq","fun":eval_optim_cst,"args":(aircraft,crit_index,crit_ref,mda_type,)},
     #                jac="2-point",options={"maxiter":30,"ftol":0.0001,"eps":0.01},tol=1e-14)
 
-    #res = minimize(eval_optim_crt, x_in, args=(aircraft,crit_index,crit_ref,), method="COBYLA", bounds=((110000,140000),(120,160)),
-    #               constraints={"type":"ineq","fun":eval_optim_cst,"args":(aircraft,crit_index,crit_ref,)},
+    #res = minimize(eval_optim_crt, x_in, args=(aircraft,crit_index,crit_ref,mda_type,), method="COBYLA", bounds=((110000,140000),(120,160)),
+    #               constraints={"type":"ineq","fun":eval_optim_cst,"args":(aircraft,crit_index,crit_ref,mda_type,)},
     #               options={"maxiter":100,"tol":0.1,"catol":0.0002,'rhobeg': 1.0})
     print(res)
 
@@ -925,13 +1005,11 @@ def plot_mdf_process(aircraft,search_domain,criterion):
     Compute criterion and constraints
     """
 
-    if (aircraft.propulsion.architecture==1):
+    if (aircraft.propulsion.architecture=="TF"):
         start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture==2):
+    elif (aircraft.propulsion.architecture=="PTE1"):
         start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture==3):
-        start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture==4):
+    elif (aircraft.propulsion.architecture=="TP"):
         start_value = (aircraft.turboprop_engine.reference_thrust,aircraft.wing.area)
     else:
         raise Exception("propulsion.architecture index is out of range")

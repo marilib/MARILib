@@ -14,9 +14,9 @@ from marilib.tools import units as unit
 
 #===========================================================================================================
 def ref_cruise_altp(propulsive_architecture):
-    if (propulsive_architecture==1):
+    if (propulsive_architecture=="TF"):
         ref_cruise_altp_i = unit.m_ft(35000.)
-    elif (propulsive_architecture==2):
+    elif (propulsive_architecture=="PTE1"):
         ref_cruise_altp_i = unit.m_ft(35000.)
     else:
         raise Exception("propulsion.architecture index is out of range")
@@ -24,9 +24,9 @@ def ref_cruise_altp(propulsive_architecture):
 
 #===========================================================================================================
 def top_of_climb_altp(propulsive_architecture):
-    if (propulsive_architecture==1):
+    if (propulsive_architecture=="TF"):
         top_of_climb_altp_i = unit.m_ft(31000.)
-    elif (propulsive_architecture==2):
+    elif (propulsive_architecture=="PTE1"):
         top_of_climb_altp_i = unit.m_ft(31000.)
     else:
         raise Exception("propulsion.architecture index is out of range")
@@ -270,7 +270,7 @@ def core_weight_ratio():
 	
 #===========================================================================================================
 def prop_architecture():
-    prop_architecture_i = 1    # prop_architecture, 1: turbofan, 2: partial turbo electric
+    prop_architecture_i = "TF"    # prop_architecture, TF: turbofan, PTE1: partial turbo electric 1
     return prop_architecture_i
 
 #===========================================================================================================

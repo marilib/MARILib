@@ -44,9 +44,7 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
 
     sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
 
-    if (propulsion.architecture==2):
-        fn,sec,data = propu.hybrid_thrust(aircraft,pamb,tamb,mach,MCR,nei)
-    if (propulsion.architecture==3):
+    if (propulsion.architecture=="PTE1"):
         fn,sec,data = propu.hybrid_thrust(aircraft,pamb,tamb,mach,MCR,nei)
 
     # Departure ground phases
@@ -59,9 +57,9 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
 
     # Mission leg
     #-----------------------------------------------------------------------------------------------------------
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
                         - (sfc/sec)*battery.energy_cruise
     else:

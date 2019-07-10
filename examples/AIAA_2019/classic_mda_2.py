@@ -17,7 +17,7 @@ from marilib.processes import assembly as run, initialization as init
 #======================================================================================================
 # Initialization
 #======================================================================================================
-propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
+propulsive_architecture = "TF" # TF:turbofan, PTE1:partial turboelectric 1
 number_of_engine = 2
 
 aircraft = Aircraft()
@@ -50,7 +50,7 @@ aircraft.wing.area = 151.9
 
 # Solve the geometric coupling between airframe and engines
 #------------------------------------------------------------------------------------------------------
-run.eval_aircraft_pre_design(aircraft)
+run.eval_aircraft_statistical_pre_design(aircraft)
 
 # Estimate all mass and CGs with or without Mass-Mission adaptation
 #------------------------------------------------------------------------------------------------------

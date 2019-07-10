@@ -27,3 +27,7 @@ Changes from version 1.0.0 are :
 11- The cost of electricity for an hybrid architecture is now computed separetly and exposed in the attribute elec_cost
 
 12- Functions in math.py have been simplified and modified to allow using Autograd library
+
+13- Propulsive architecture index has been changed from integer to string ("TF", "PTE1")
+
+14- New sub-processes have been added into assembly.py 

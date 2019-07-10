@@ -16,7 +16,7 @@ from marilib.processes import assembly as run
 #======================================================================================================
 # Initialization
 #======================================================================================================
-propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
+propulsive_architecture = "TF" # TF:turbofan, PTE1:partial turboelectric 1
 number_of_engine = 2
 
 aircraft = Aircraft()
@@ -41,15 +41,16 @@ aircraft.wing.area = 151.9
 #======================================================================================================
 # MDA process
 #======================================================================================================
-# This sequence reproduces what is done by eval_mda0 or eval_mda1 of process.assembly.py depending on
-# the selection, resp. run.eval_mass_estimation(aircraft) or run.eval_mass_mission_adaptation(aircraft)
+# This sequence reproduces what is done by eval_mda0, eval_mda1 or eval_mda2 of process.assembly.py depending on
+# the selection, resp. run.eval_mass_breakdown(...), run.eval_mass_estimation(...) or run.eval_mass_mission_adaptation(...)
 
 # Solve the geometric coupling between airframe and engines
 #------------------------------------------------------------------------------------------------------
-run.eval_aircraft_pre_design(aircraft)
+run.eval_aircraft_statistical_pre_design(aircraft)
 
 # Estimate all mass and CGs with or without Mass-Mission adaptation
 #------------------------------------------------------------------------------------------------------
+#run.eval_mass_breakdown(aircraft)
 #run.eval_mass_estimation(aircraft)
 run.eval_mass_mission_adaptation(aircraft)
 

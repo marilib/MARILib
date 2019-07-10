@@ -30,11 +30,11 @@ def hybrid_sfc(aircraft,pamb,tamb,mach,rating,nei):
     e_engine = aircraft.electric_engine
     e_nacelle = aircraft.electric_nacelle
 
-    power_ratio = numpy.array([e_engine.mto_e_power_ratio,
-                               e_engine.mcn_e_power_ratio,
-                               e_engine.mcl_e_power_ratio,
-                               e_engine.mcr_e_power_ratio,
-                               e_engine.fid_e_power_ratio])
+    power_ratio = {"MTO":e_engine.mto_e_power_ratio,
+                   "MCN":e_engine.mcn_e_power_ratio,
+                   "MCL":e_engine.mcl_e_power_ratio,
+                   "MCR":e_engine.mcr_e_power_ratio,
+                   "FID":e_engine.fid_e_power_ratio}
 
     sfc0 = ( 0.4 + 1./engine.bpr**0.895 )/36000.
 
@@ -69,14 +69,19 @@ def hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
     e_engine = aircraft.electric_engine
     e_nacelle = aircraft.electric_nacelle
 
-    power_ratio = numpy.array([e_engine.mto_e_power_ratio,
-                               e_engine.mcn_e_power_ratio,
-                               e_engine.mcl_e_power_ratio,
-                               e_engine.mcr_e_power_ratio,
-                               e_engine.fid_e_power_ratio])
+    power_ratio = {"MTO":e_engine.mto_e_power_ratio,
+                   "MCN":e_engine.mcn_e_power_ratio,
+                   "MCL":e_engine.mcl_e_power_ratio,
+                   "MCR":e_engine.mcr_e_power_ratio,
+                   "FID":e_engine.fid_e_power_ratio}
 
     # Battery power feed is used in temporary phases only
-    battery_power_feed = numpy.array([1,0,1,0,0])*battery.power_feed
+    power_factor = battery.power_feed * e_nacelle.controller_efficiency * e_nacelle.motor_efficiency
+    battery_power_feed = {"MTO":power_factor,
+                          "MCN":0.,
+                          "MCL":power_factor,
+                          "MCR":0.,
+                          "FID":0.}
 
     fn,data = turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
     (fn_core,fn_fan0,fn0,shaft_power0) = data

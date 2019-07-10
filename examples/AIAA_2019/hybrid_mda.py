@@ -23,7 +23,7 @@ from marilib.aircraft_model.airplane import viewer as show
 #======================================================================================================
 # Initialization
 #======================================================================================================
-propulsive_architecture = 2 # 1:turbofan, 2:partial turboelectric
+propulsive_architecture = "PTE1" # TF:turbofan, PTE1:partial turboelectric 1
 number_of_engine = 2
 
 aircraft = Aircraft()
@@ -100,7 +100,7 @@ nac_pwd = aircraft.electric_nacelle.nacelle_pw_density
 global_e_mass = (1/gen_pwd + 1/rec_pwd + 1/wire_pwd + 1/cool_pwd + 1/cont_pwd + 1/mot_pwd + 1/nac_pwd)*e_power
 
 #------------------------------------------------------------------------------------------------------
-if (propulsive_architecture==2):
+if (propulsive_architecture=="PTE1"):
 
     kC = aircraft.turbofan_engine.core_thrust_ratio
     kW = aircraft.electric_engine.mcr_e_power_ratio

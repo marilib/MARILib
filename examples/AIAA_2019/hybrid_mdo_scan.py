@@ -18,7 +18,7 @@ from marilib.processes import assembly as run, initialization as init
 #======================================================================================================
 # Initialization
 #======================================================================================================
-propulsive_architecture = 2 # 1:turbofan, 2:partial turboelectric
+propulsive_architecture = "PTE1" # TF:turbofan, PTE1:partial turboelectric 1
 number_of_engine = 2
 
 aircraft = Aircraft()
@@ -97,8 +97,9 @@ for e_power in (0.05e6, 0.15e6, 0.25e6, 0.5e6, 1.0e6, 1.5e6, 2.0e6, 2.5e6, 3.0e6
     # Perform MDF optimization
     #------------------------------------------------------------------------------------------------------
     criterion = "block_fuel"
+    mda_type = "MDA2"
 
-    run.mdf_process(aircraft,search_domain,criterion)
+    run.mdf_process(aircraft,search_domain,criterion,mda_type)
 
     print("-------------------------------------------")
     print("Optimization : done")

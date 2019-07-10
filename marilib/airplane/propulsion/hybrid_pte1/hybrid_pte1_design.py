@@ -57,29 +57,31 @@ def eval_hybrid_engine_design(aircraft):
     roa = low_speed.req_oei_altp
 
     #                      MTO   MCN    MCL  MCR  FIR
-    fd_disa = numpy.array([15. , 0.   , 0. , 0. , 0. ])
-    fd_altp = numpy.array([0.  , roa  , toc, rca, rca])
-    fd_mach = numpy.array([0.25, crm/2, crm, crm, crm])
-    fd_nei  = numpy.array([0.  , 1.   , 0. , 0. , 0. ])
+    fd_disa = {"MTO":5.  , "MCN":0.   , "MCL":0. , "MCR":0. , "FID":0. }
+    fd_altp = {"MTO":0.  , "MCN":roa  , "MCL":toc, "MCR":rca, "FID":rca}
+    fd_mach = {"MTO":0.25, "MCN":crm/2, "MCL":crm, "MCR":crm, "FID":crm}
+    fd_nei  = {"MTO":0.  , "MCN":1.   , "MCL":0. , "MCR":0. , "FID":0. }
 
     e_engine.flight_data = {"disa":fd_disa, "altp":fd_altp, "mach":fd_mach, "nei":fd_nei}
 
-    e_fan_power = numpy.array([power_elec.mto,
-                               power_elec.mcn,
-                               power_elec.mcl,
-                               power_elec.mcr,
-                               power_elec.fid])
+    e_fan_power = {"MTO":power_elec.mto,
+                   "MCN":power_elec.mcn,
+                   "MCL":power_elec.mcl,
+                   "MCR":power_elec.mcr,
+                   "FID":power_elec.fid}
 
     # Battery power feed is used in temporary phases only (take off and climb)
-    battery_power_feed = numpy.array([1,0,1,0,0])*battery.power_feed \
-                                                 *e_nacelle.controller_efficiency \
-                                                 *e_nacelle.motor_efficiency
+    power_factor = battery.power_feed * e_nacelle.controller_efficiency * e_nacelle.motor_efficiency
+    battery_power_feed = {"MTO":power_factor,
+                          "MCN":0.,
+                          "MCL":power_factor,
+                          "MCR":0.,
+                          "FID":0.}
 
-    e_power_ratio = numpy.zeros(5)
-    e_shaft_power = numpy.zeros(5)
+    e_power_ratio = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
+    e_shaft_power = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
 
     for rating in propulsion.rating_code:
-
         (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(fd_altp[rating],fd_disa[rating])
         (fn,data) = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[rating],rating,fd_nei[rating])
         (fn_core,fn_fan0,fn0,shaft_power0) = data
@@ -218,7 +220,7 @@ def eval_hybrid_nacelle_design(aircraft):
     #-----------------------------------------------------------------------------------------------------------
     fd = e_engine.flight_data
 
-    e_fan_thrust = numpy.zeros(5)
+    e_fan_thrust = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
 
     for rating in propulsion.rating_code:
 

@@ -30,11 +30,11 @@ def sfc(aircraft,pamb,tamb,mach,rating,nei):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         sfc = turbofan_sfc(aircraft,pamb,tamb,mach,rating,nei)
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         sfc = hybrid_sfc(aircraft,pamb,tamb,mach,rating,nei)
 
@@ -53,11 +53,11 @@ def thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         fn,data = turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         fn,sec,data = hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
 
@@ -75,12 +75,12 @@ def nacelle_drag(aircraft,Re,Mach):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         nacelle = aircraft.turbofan_nacelle
         nacelle_cxf,nacelle_nwa = turbofan_nacelle_drag(aircraft,nacelle,Re,Mach)
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         nacelle = aircraft.turbofan_nacelle
         t_nacelle_cxf,t_nacelle_nwa = turbofan_nacelle_drag(aircraft,nacelle,Re,Mach)
@@ -105,12 +105,12 @@ def oei_drag(aircraft,pamb,tamb):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         nacelle = aircraft.turbofan_nacelle
         dcx = turbofan_oei_drag(aircraft,nacelle,pamb,tamb)
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         nacelle = aircraft.turbofan_nacelle
         dcx = turbofan_oei_drag(aircraft,nacelle,pamb,tamb)
@@ -129,11 +129,11 @@ def thrust_pitch_moment(aircraft,fn,pamb,mach,dcx_oei):
 
     gam = earth.heat_ratio()
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         nacelle = aircraft.turbofan_nacelle
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         nacelle = aircraft.turbofan_nacelle
 
@@ -156,11 +156,11 @@ def thrust_yaw_moment(aircraft,fn,pamb,mach,dcx_oei):
 
     gam = earth.heat_ratio()
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         nacelle = aircraft.turbofan_nacelle
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         nacelle = aircraft.turbofan_nacelle
 
@@ -180,11 +180,11 @@ def tail_cone_drag_effect(aircraft):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.architecture==1):
+    if (propulsion.architecture=="TF"):
 
         fac = 1.
 
-    elif (propulsion.architecture==2):
+    elif (propulsion.architecture=="PTE1"):
 
         dfus = aircraft.fuselage.width
         dhub = aircraft.electric_nacelle.hub_width
