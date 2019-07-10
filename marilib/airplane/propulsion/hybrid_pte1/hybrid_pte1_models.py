@@ -26,15 +26,15 @@ def hybrid_sfc(aircraft,pamb,tamb,mach,rating,nei):
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
 
-    power_elec = aircraft.power_elec_chain
-    e_engine = aircraft.electric_engine
-    e_nacelle = aircraft.electric_nacelle
+    power_elec = aircraft.pte1_power_elec_chain
+    e_engine = aircraft.rear_electric_engine
+    e_nacelle = aircraft.rear_electric_nacelle
 
-    power_ratio = {"MTO":e_engine.mto_e_power_ratio,
-                   "MCN":e_engine.mcn_e_power_ratio,
-                   "MCL":e_engine.mcl_e_power_ratio,
-                   "MCR":e_engine.mcr_e_power_ratio,
-                   "FID":e_engine.fid_e_power_ratio}
+    power_ratio = {"MTO":power_elec.mto_e_power_ratio,
+                   "MCN":power_elec.mcn_e_power_ratio,
+                   "MCL":power_elec.mcl_e_power_ratio,
+                   "MCR":power_elec.mcr_e_power_ratio,
+                   "FID":power_elec.fid_e_power_ratio}
 
     sfc0 = ( 0.4 + 1./engine.bpr**0.895 )/36000.
 
@@ -65,15 +65,15 @@ def hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
     nacelle = aircraft.turbofan_nacelle
 
     battery = aircraft.battery
-    power_elec = aircraft.power_elec_chain
-    e_engine = aircraft.electric_engine
-    e_nacelle = aircraft.electric_nacelle
+    power_elec = aircraft.pte1_power_elec_chain
+    e_engine = aircraft.rear_electric_engine
+    e_nacelle = aircraft.rear_electric_nacelle
 
-    power_ratio = {"MTO":e_engine.mto_e_power_ratio,
-                   "MCN":e_engine.mcn_e_power_ratio,
-                   "MCL":e_engine.mcl_e_power_ratio,
-                   "MCR":e_engine.mcr_e_power_ratio,
-                   "FID":e_engine.fid_e_power_ratio}
+    power_ratio = {"MTO":power_elec.mto_e_power_ratio,
+                   "MCN":power_elec.mcn_e_power_ratio,
+                   "MCL":power_elec.mcl_e_power_ratio,
+                   "MCR":power_elec.mcr_e_power_ratio,
+                   "FID":power_elec.fid_e_power_ratio}
 
     # Battery power feed is used in temporary phases only
     power_factor = battery.power_feed * e_nacelle.controller_efficiency * e_nacelle.motor_efficiency
@@ -125,7 +125,7 @@ def hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
 
 #===========================================================================================================
-def electric_nacelle_drag(aircraft,nacelle,Re,Mach):
+def rear_electric_nacelle_drag(aircraft,nacelle,Re,Mach):
     """
     Turbofan nacelle drag
     """

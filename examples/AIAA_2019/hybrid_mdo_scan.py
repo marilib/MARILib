@@ -66,24 +66,24 @@ result = numpy.array([["e-fan power              (kW)"],
 
 for e_power in (0.05e6, 0.15e6, 0.25e6, 0.5e6, 1.0e6, 1.5e6, 2.0e6, 2.5e6, 3.0e6, 3.5e6, 4.0e6):
 
-    aircraft.power_elec_chain.mto = e_power
-    aircraft.power_elec_chain.mcn = e_power
-    aircraft.power_elec_chain.mcl = e_power
-    aircraft.power_elec_chain.mcr = e_power
+    aircraft.pte1_power_elec_chain.mto = e_power
+    aircraft.pte1_power_elec_chain.mcn = e_power
+    aircraft.pte1_power_elec_chain.mcl = e_power
+    aircraft.pte1_power_elec_chain.mcr = e_power
 
     aircraft.propulsion.bli_effect = 1                      #init.boundary_layer_effect()
-    aircraft.power_elec_chain.overall_efficiency = 0.90     # 0.90 from init.e_chain_efficiency()
+    aircraft.pte1_power_elec_chain.overall_efficiency = 0.90     # 0.90 from init.e_chain_efficiency()
 
     pw_density_factor = 1.
 
-    aircraft.power_elec_chain.generator_pw_density = init.generator_power_density() * pw_density_factor
-    aircraft.power_elec_chain.rectifier_pw_density = init.rectifier_pw_density() * pw_density_factor
-    aircraft.power_elec_chain.wiring_pw_density = init.wiring_pw_density() * pw_density_factor
-    aircraft.power_elec_chain.cooling_pw_density = init.cooling_pw_density() * pw_density_factor
+    aircraft.pte1_power_elec_chain.generator_pw_density = init.generator_power_density() * pw_density_factor
+    aircraft.pte1_power_elec_chain.rectifier_pw_density = init.rectifier_pw_density() * pw_density_factor
+    aircraft.pte1_power_elec_chain.wiring_pw_density = init.wiring_pw_density() * pw_density_factor
+    aircraft.pte1_power_elec_chain.cooling_pw_density = init.cooling_pw_density() * pw_density_factor
 
-    aircraft.electric_nacelle.controller_pw_density = init.controller_pw_density() * pw_density_factor
-    aircraft.electric_nacelle.motor_pw_density = init.e_motor_pw_density() * pw_density_factor
-    aircraft.electric_nacelle.nacelle_pw_density = init.e_nacelle_pw_density() * pw_density_factor
+    aircraft.rear_electric_nacelle.controller_pw_density = init.controller_pw_density() * pw_density_factor
+    aircraft.rear_electric_nacelle.motor_pw_density = init.e_motor_pw_density() * pw_density_factor
+    aircraft.rear_electric_nacelle.nacelle_pw_density = init.e_nacelle_pw_density() * pw_density_factor
 
     #======================================================================================================
     # Design process
@@ -106,14 +106,14 @@ for e_power in (0.05e6, 0.15e6, 0.25e6, 0.5e6, 1.0e6, 1.5e6, 2.0e6, 2.5e6, 3.0e6
 
     # Some performances about electric chain
     #------------------------------------------------------------------------------------------------------
-    gen_pwd = aircraft.power_elec_chain.generator_pw_density
-    rec_pwd = aircraft.power_elec_chain.rectifier_pw_density
-    wire_pwd = aircraft.power_elec_chain.wiring_pw_density
-    cool_pwd = aircraft.power_elec_chain.cooling_pw_density
+    gen_pwd = aircraft.pte1_power_elec_chain.generator_pw_density
+    rec_pwd = aircraft.pte1_power_elec_chain.rectifier_pw_density
+    wire_pwd = aircraft.pte1_power_elec_chain.wiring_pw_density
+    cool_pwd = aircraft.pte1_power_elec_chain.cooling_pw_density
 
-    cont_pwd = aircraft.electric_nacelle.controller_pw_density
-    mot_pwd = aircraft.electric_nacelle.motor_pw_density
-    nac_pwd = aircraft.electric_nacelle.nacelle_pw_density
+    cont_pwd = aircraft.rear_electric_nacelle.controller_pw_density
+    mot_pwd = aircraft.rear_electric_nacelle.motor_pw_density
+    nac_pwd = aircraft.rear_electric_nacelle.nacelle_pw_density
 
     global_e_mass = (1/gen_pwd + 1/rec_pwd + 1/wire_pwd + 1/cool_pwd + 1/cont_pwd + 1/mot_pwd + 1/nac_pwd)*e_power
 

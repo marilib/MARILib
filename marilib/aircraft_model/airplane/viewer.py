@@ -107,12 +107,12 @@ def draw_3d_view(aircraft,window_title,plot_title):
     else:
         raise Exception("propulsion.architecture index is out of range")
 
-    e_nac_length = aircraft.electric_nacelle.length
-    e_nac_height = aircraft.electric_nacelle.width
-    e_nac_width = aircraft.electric_nacelle.width
-    e_nac_x_axe = aircraft.electric_nacelle.x_axe
-    e_nac_y_axe = aircraft.electric_nacelle.y_axe
-    e_nac_z_axe = aircraft.electric_nacelle.z_axe
+    e_nac_length = aircraft.rear_electric_nacelle.length
+    e_nac_height = aircraft.rear_electric_nacelle.width
+    e_nac_width = aircraft.rear_electric_nacelle.width
+    e_nac_x_axe = aircraft.rear_electric_nacelle.x_axe
+    e_nac_y_axe = aircraft.rear_electric_nacelle.y_axe
+    e_nac_z_axe = aircraft.rear_electric_nacelle.z_axe
 
     r_nose = 0.15       # Fuselage length ratio of nose evolutive part
     r_cone = 0.35       # Fuselage length ratio of tail cone evolutive part

@@ -330,7 +330,7 @@
         core_width_ratio = +
         core_weight_ratio = +
         kfn_off_take = +
-    [[power_elec_chain]]
+    [[pte1_power_elec_chain]]
         mto = None
         mcn = None
         mcl = None
@@ -345,7 +345,7 @@
         cooling_pw_density = None
         mass = None
         c_g = None
-    [[electric_nacelle]]
+    [[rear_electric_nacelle]]
         width = None
         length = None
         x_axe = None
@@ -367,7 +367,7 @@
         bnd_layer = None
         mass = None
         c_g = None
-    [[electric_engine]]
+    [[rear_electric_engine]]
         mto_e_power_ratio = None
         mto_e_shaft_power = None
         mto_e_fan_thrust = None

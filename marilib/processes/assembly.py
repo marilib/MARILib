@@ -117,7 +117,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.vertical_tail.area = init.vtp_area(aircraft.wing.area)
 
     if (aircraft.propulsion.architecture=="TF" \
-        or aircraft.propulsion.architecture=="PTE1"):
+     or aircraft.propulsion.architecture=="PTE1"):
         aircraft.turbofan_engine.n_engine = n_engine
         aircraft.turbofan_engine.bpr = init.bpr(n_pax_ref)
         aircraft.turbofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
@@ -137,11 +137,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
 
-    aircraft.power_elec_chain.mto = init.electric_shaft_power()       # Watts, electric motor power
-    aircraft.power_elec_chain.mcn = init.electric_shaft_power()       # Watts, electric motor power
-    aircraft.power_elec_chain.mcl = init.electric_shaft_power()       # Watts, electric motor power
-    aircraft.power_elec_chain.mcr = init.electric_shaft_power()       # Watts, electric motor power
-    aircraft.power_elec_chain.fid = 0.01
+    aircraft.pte1_power_elec_chain.mto = init.electric_shaft_power()       # Watts, electric motor power
+    aircraft.pte1_power_elec_chain.mcn = init.electric_shaft_power()       # Watts, electric motor power
+    aircraft.pte1_power_elec_chain.mcl = init.electric_shaft_power()       # Watts, electric motor power
+    aircraft.pte1_power_elec_chain.mcr = init.electric_shaft_power()       # Watts, electric motor power
+    aircraft.pte1_power_elec_chain.fid = 0.01
 
     aircraft.battery.strategy = init.battery_strategy()
     aircraft.battery.power_feed = init.battery_power_feed()
@@ -150,19 +150,19 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.battery.energy_density = init.battery_energy_density()
     aircraft.battery.power_density = init.battery_power_density()
 
-    aircraft.power_elec_chain.overall_efficiency = init.e_chain_efficiency()
-    aircraft.power_elec_chain.generator_pw_density = init.generator_power_density()
-    aircraft.power_elec_chain.rectifier_pw_density = init.rectifier_pw_density()
-    aircraft.power_elec_chain.wiring_pw_density = init.wiring_pw_density()
-    aircraft.power_elec_chain.cooling_pw_density = init.cooling_pw_density()
+    aircraft.pte1_power_elec_chain.overall_efficiency = init.e_chain_efficiency()
+    aircraft.pte1_power_elec_chain.generator_pw_density = init.generator_power_density()
+    aircraft.pte1_power_elec_chain.rectifier_pw_density = init.rectifier_pw_density()
+    aircraft.pte1_power_elec_chain.wiring_pw_density = init.wiring_pw_density()
+    aircraft.pte1_power_elec_chain.cooling_pw_density = init.cooling_pw_density()
 
-    aircraft.electric_nacelle.efficiency_fan = init.efficiency_fan()
-    aircraft.electric_nacelle.efficiency_prop = init.efficiency_prop()
-    aircraft.electric_nacelle.motor_efficiency = init.e_motor_efficiency()
-    aircraft.electric_nacelle.controller_efficiency = init.controller_efficiency()
-    aircraft.electric_nacelle.controller_pw_density = init.controller_pw_density()
-    aircraft.electric_nacelle.motor_pw_density = init.e_motor_pw_density()
-    aircraft.electric_nacelle.nacelle_pw_density = init.e_nacelle_pw_density()
+    aircraft.rear_electric_nacelle.efficiency_fan = init.efficiency_fan()
+    aircraft.rear_electric_nacelle.efficiency_prop = init.efficiency_prop()
+    aircraft.rear_electric_nacelle.motor_efficiency = init.e_motor_efficiency()
+    aircraft.rear_electric_nacelle.controller_efficiency = init.controller_efficiency()
+    aircraft.rear_electric_nacelle.controller_pw_density = init.controller_pw_density()
+    aircraft.rear_electric_nacelle.motor_pw_density = init.e_motor_pw_density()
+    aircraft.rear_electric_nacelle.nacelle_pw_density = init.e_nacelle_pw_density()
 
     aircraft.propulsion.bli_effect = init.boundary_layer_effect()
 

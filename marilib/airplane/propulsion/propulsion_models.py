@@ -19,7 +19,7 @@ from marilib.airplane.propulsion.turbofan.turbofan_models \
         turbofan_oei_drag
 
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_models \
-    import hybrid_sfc, hybrid_thrust, electric_nacelle_drag
+    import hybrid_sfc, hybrid_thrust, rear_electric_nacelle_drag
 
 
 #===========================================================================================================
@@ -85,8 +85,8 @@ def nacelle_drag(aircraft,Re,Mach):
         nacelle = aircraft.turbofan_nacelle
         t_nacelle_cxf,t_nacelle_nwa = turbofan_nacelle_drag(aircraft,nacelle,Re,Mach)
 
-        nacelle = aircraft.electric_nacelle
-        e_nacelle_cxf,e_nacelle_nwa = electric_nacelle_drag(aircraft,nacelle,Re,Mach)
+        nacelle = aircraft.rear_electric_nacelle
+        e_nacelle_cxf,e_nacelle_nwa = rear_electric_nacelle_drag(aircraft,nacelle,Re,Mach)
 
         nacelle_cxf = t_nacelle_cxf + e_nacelle_cxf
         nacelle_nwa = t_nacelle_nwa + e_nacelle_nwa
@@ -187,7 +187,7 @@ def tail_cone_drag_effect(aircraft):
     elif (propulsion.architecture=="PTE1"):
 
         dfus = aircraft.fuselage.width
-        dhub = aircraft.electric_nacelle.hub_width
+        dhub = aircraft.rear_electric_nacelle.hub_width
 
         fac = (1.-(dhub/dfus)**2)
 

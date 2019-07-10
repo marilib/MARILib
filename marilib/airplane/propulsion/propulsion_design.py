@@ -146,8 +146,8 @@ def eval_propulsion_mass(aircraft):
         pylon = aircraft.turbofan_pylon
         nacelle = aircraft.turbofan_nacelle
 
-        e_nacelle = aircraft.electric_nacelle
-        power_elec = aircraft.power_elec_chain
+        e_nacelle = aircraft.rear_electric_nacelle
+        power_elec = aircraft.pte1_power_elec_chain
 
         eval_turbofan_pylon_mass(aircraft)
         eval_hybrid_nacelle_mass(aircraft)

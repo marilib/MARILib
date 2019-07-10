@@ -39,9 +39,9 @@ def eval_hybrid_engine_design(aircraft):
     nacelle = aircraft.turbofan_nacelle
 
     battery = aircraft.battery
-    power_elec = aircraft.power_elec_chain
-    e_engine = aircraft.electric_engine
-    e_nacelle = aircraft.electric_nacelle
+    power_elec = aircraft.pte1_power_elec_chain
+    e_engine = aircraft.rear_electric_engine
+    e_nacelle = aircraft.rear_electric_nacelle
 
     low_speed = aircraft.low_speed
 
@@ -108,11 +108,13 @@ def eval_hybrid_engine_design(aircraft):
                                     + battery_power_feed[rating]
 
     # Storing results
-    e_engine.mto_e_power_ratio = e_power_ratio[MTO]
-    e_engine.mcn_e_power_ratio = e_power_ratio[MCN]
-    e_engine.mcl_e_power_ratio = e_power_ratio[MCL]
-    e_engine.mcr_e_power_ratio = e_power_ratio[MCR]
-    e_engine.fid_e_power_ratio = e_power_ratio[FID]
+    e_engine.n_engine = 1   # Only one electric fan at rear end of the fuselage
+
+    power_elec.mto_e_power_ratio = e_power_ratio[MTO]
+    power_elec.mcn_e_power_ratio = e_power_ratio[MCN]
+    power_elec.mcl_e_power_ratio = e_power_ratio[MCL]
+    power_elec.mcr_e_power_ratio = e_power_ratio[MCR]
+    power_elec.fid_e_power_ratio = e_power_ratio[FID]
 
     e_engine.mto_e_shaft_power = e_shaft_power[MTO]
     e_engine.mcn_e_shaft_power = e_shaft_power[MCN]
@@ -153,8 +155,8 @@ def eval_hybrid_nacelle_design(aircraft):
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
 
-    e_engine = aircraft.electric_engine
-    e_nacelle = aircraft.electric_nacelle
+    e_engine = aircraft.rear_electric_engine
+    e_nacelle = aircraft.rear_electric_nacelle
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
@@ -401,10 +403,10 @@ def eval_hybrid_nacelle_mass(aircraft):
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
 
-    e_engine = aircraft.electric_engine
-    e_nacelle = aircraft.electric_nacelle
+    e_engine = aircraft.rear_electric_engine
+    e_nacelle = aircraft.rear_electric_nacelle
 
-    power_elec = aircraft.power_elec_chain
+    power_elec = aircraft.pte1_power_elec_chain
 
     # Propulsion system mass is sized according max power
     # -----------------------------------------------------------------------
