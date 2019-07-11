@@ -16,7 +16,30 @@ from marilib.airplane.propulsion import jet_models as jet
 
 
 #===========================================================================================================
-def eval_electric_engine_design(aircraft):
+def eval_ef1_pylon_mass(aircraft):
+    """
+    Electrofan pylon mass & CG estimation
+    """
+
+    nacelle = aircraft.electrofan_nacelle
+    engine = aircraft.electrofan_engine
+
+    pylon = aircraft.electrofan_pylon
+
+    pylon.mass = 0.0031*engine.reference_thrust*engine.n_engine
+
+    if (engine.n_engine==2):
+        pylon.c_g = nacelle.x_ext + 0.75*nacelle.length
+    elif (engine.n_engine==4):
+        pylon.c_g = 0.5*(nacelle.x_int + nacelle.x_ext) + 0.75*nacelle.length
+    else:
+        raise Exception("Number of engine is not allowed")
+
+    return
+
+
+#===========================================================================================================
+def eval_ef1_engine_design(aircraft):
     """
     Thermal propulsive architecture design
     """
@@ -62,7 +85,7 @@ def eval_electric_engine_design(aircraft):
 
 
 #===========================================================================================================
-def eval_electric_nacelle_design(aircraft):
+def eval_ef1_nacelle_design(aircraft):
     """
     Hybrid propulsive architecture design
     """
@@ -188,7 +211,7 @@ def eval_efan_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width):
 
 
 #===========================================================================================================
-def eval_efan_nacelle_mass(aircraft):
+def eval_ef1_nacelle_mass(aircraft):
     """
     Hybridized propulsive nacelle mass estimations
     """
@@ -226,21 +249,21 @@ def eval_efan_nacelle_mass(aircraft):
 #===========================================================================================================
 def eval_wing_battery_data(aircraft):
     """
-    Wing battery predesign
+    Wing battery predesign using tank data structure
     """
 
+    propulsion = aircraft.propulsion
     fuselage = aircraft.fuselage
     wing = aircraft.wing
 
-    battery = aircraft.battery
+    battery = aircraft.ef1_battery
     tanks = aircraft.tanks
-
 
     tanks.cantilever_volume = 0.20 * (wing.area*wing.mac*(0.50*wing.t_o_c_r + 0.30*wing.t_o_c_k + 0.20*wing.t_o_c_t))
 
     tanks.central_volume = 1.3 * fuselage.width * wing.t_o_c_r * wing.mac**2
 
-    tanks.fuel_density = battery.density
+    tanks.fuel_density = earth.fuel_density(propulsion.fuel_type)
 
     tanks.mfw_volume_limited = (tanks.central_volume + tanks.cantilever_volume)*battery.density
 
@@ -253,16 +276,28 @@ def eval_wing_battery_data(aircraft):
     tanks.fuel_total_cg =  (tanks.fuel_cantilever_cg*tanks.cantilever_volume + tanks.fuel_central_cg*tanks.central_volume) \
                         / (tanks.central_volume + tanks.cantilever_volume)
 
-    battery.mass = tanks.mfw_volume_limited * battery.fill_factor
-    battery.c_g = tanks.fuel_total_cg
-
     # Batteries will not change their mass during flight
     tanks.fuel_max_fwd_cg = tanks.fuel_total_cg
-    tanks.fuel_max_fwd_mass = battery.mass
+    tanks.fuel_max_fwd_mass = tanks.mfw_volume_limited * battery.fill_factor
 
     tanks.fuel_max_bwd_cg = tanks.fuel_total_cg
-    tanks.fuel_max_bwd_mass = battery.mass
+    tanks.fuel_max_bwd_mass = tanks.mfw_volume_limited * battery.fill_factor
 
+    return
+
+
+#===========================================================================================================
+def eval_ef1_battery_mass(aircraft):
+    """
+    Wing battery predesign using tank data structure
+    """
+
+    tanks = aircraft.tanks
+
+    battery = aircraft.ef1_battery
+
+    battery.mass = tanks.mfw_volume_limited * battery.fill_factor
+    battery.c_g = tanks.fuel_total_cg
 
     return
 

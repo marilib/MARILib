@@ -23,7 +23,12 @@ def eval_turbofan_pylon_mass(aircraft):
 
     pylon.mass = 0.0031*engine.reference_thrust*engine.n_engine
 
-    pylon.c_g = nacelle.x_ext + nacelle.length
+    if (engine.n_engine==2):
+        pylon.c_g = nacelle.x_ext + 0.75*nacelle.length
+    elif (engine.n_engine==4):
+        pylon.c_g = 0.5*(nacelle.x_int + nacelle.x_ext) + 0.75*nacelle.length
+    else:
+        raise Exception("Number of engine is not allowed")
 
     return
 

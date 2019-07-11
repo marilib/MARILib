@@ -26,7 +26,7 @@ from marilib.airplane.propulsion.hybrid_pte1 import hybrid_pte1_models as hybrid
 
 
 #===========================================================================================================
-def eval_hybrid_engine_design(aircraft):
+def eval_pte1_engine_design(aircraft):
     """
     Thermal propulsive architecture design
     """
@@ -141,7 +141,7 @@ def eval_hybrid_engine_design(aircraft):
 
 
 #===========================================================================================================
-def eval_hybrid_nacelle_design(aircraft):
+def eval_pte1_nacelle_design(aircraft):
     """
     Hybrid propulsive architecture design
     """
@@ -212,7 +212,7 @@ def eval_hybrid_nacelle_design(aircraft):
     body_length = fuselage.length
     body_width = fuselage.width
 
-    eval_bli_nacelle_design(e_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_length,body_width)
+    eval_pte1_bli_nacelle_design(e_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_length,body_width)
 
     e_nacelle.x_axe = fuselage.length + 0.2*e_nacelle.width
     e_nacelle.y_axe = 0.
@@ -290,7 +290,7 @@ def resize_boundary_layer(body_width,hub_width):
 
 
 #===========================================================================================================
-def eval_bli_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_length,body_width):
+def eval_pte1_bli_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_length,body_width):
     """
     BLI nacelle design
     """
@@ -393,7 +393,7 @@ def eval_bli_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,bo
 
 
 #===========================================================================================================
-def eval_hybrid_nacelle_mass(aircraft):
+def eval_pte1_nacelle_mass(aircraft):
     """
     Hybridized propulsive nacelle mass estimations
     """
@@ -448,16 +448,28 @@ def eval_hybrid_nacelle_mass(aircraft):
 
 
 #===========================================================================================================
-def eval_fuselage_battery_cg(aircraft):
+def eval_pte1_battery_mass(aircraft):
     """
-    Body battery predesign
+    Battery predesign
     """
 
     fuselage = aircraft.fuselage
 
-    battery = aircraft.battery
+    battery = aircraft.pte1_battery
 
     battery.c_g = fuselage.c_g
+
+    if (battery.strategy==1):
+
+        battery.mass = (battery.power_feed*battery.time_feed + battery.energy_cruise)/battery.energy_density
+
+    elif (battery.strategy==2):
+
+        battery.energy_cruise = max(0.,battery.mass*battery.energy_density - battery.power_feed*battery.time_feed)
+
+    else:
+        raise Exception("battery.strategy index is out of range")
+
 
     return
 

@@ -9,6 +9,8 @@ Created on Thu Jan 24 23:22:21 2019
 
 import numpy
 
+from marilib.tools import units as unit
+
 from scipy.optimize import fsolve
 
 
@@ -408,12 +410,14 @@ def fuel_density(fuel_type):
     """
     Reference fuel density
     """
-    if (fuel_type==1):
+    if (fuel_type=="Kerosene"):
         fuel_density = 803. # Kerosene : between 775-840 kg/m3
-    elif (fuel_type==2):
+    elif (fuel_type=="Hydrogen"):
         fuel_density = 70.8 # Liquid hydrogene
-    elif (fuel_type==3):
+    elif (fuel_type=="Methane"):
         fuel_density = 422.6 # Liquid methane
+    elif (fuel_type=="Battery"):
+        fuel_density = 2800. # Lithium-ion
     else:
         raise Exception("fuel_type index is out of range")
     return fuel_density
@@ -423,12 +427,14 @@ def fuel_heat(fuel_type):
     """
     Reference fuel lower heating value
     """
-    if (fuel_type==1):
+    if (fuel_type=="Kerosene"):
         fuel_heat = 43.1e6 # J/kg, kerosene
-    elif (fuel_type==2):
+    elif (fuel_type=="Hydrogen"):
         fuel_heat = 121.0e6 # J/kg, Liquid hydrogene
-    elif (fuel_type==3):
+    elif (fuel_type=="Methane"):
         fuel_heat = 50.3e6 # J/kg, Liquid methane
+    elif (fuel_type=="Battery"):
+        fuel_heat = unit.J_kWh(0.200) # J/kg, best Lithium-ion
     else:
         raise Exception("fuel_type index is out of range")
     return fuel_heat

@@ -16,18 +16,18 @@ from marilib.airplane.propulsion.turbofan.turbofan_models import turbofan_thrust
 
 
 #===========================================================================================================
-def electric_sec(aircraft,pamb,tamb,mach,rating,nei):
+def electrofan_sec(aircraft,pamb,tamb,mach,rating,nei):
     """
     Specific Energy Consumption
     """
 
-    fn,sec = electric_thrust(aircraft,pamb,tamb,mach,rating,nei)
+    fn,sec = electrofan_thrust(aircraft,pamb,tamb,mach,rating,nei)
 
     return sec,fn
 
 
 #===========================================================================================================
-def electric_thrust(aircraft,pamb,tamb,mach,rating,nei):
+def electrofan_thrust(aircraft,pamb,tamb,mach,rating,nei):
 
     engine = aircraft.electrofan_engine
     nacelle = aircraft.electrofan_nacelle
@@ -52,7 +52,7 @@ def electric_thrust(aircraft,pamb,tamb,mach,rating,nei):
 
 
 #===========================================================================================================
-def electric_nacelle_drag(aircraft,nacelle,Re,Mach):
+def electrofan_nacelle_drag(aircraft,nacelle,Re,Mach):
     """
     Turbofan nacelle drag
     """
@@ -66,5 +66,18 @@ def electric_nacelle_drag(aircraft,nacelle,Re,Mach):
     nac_cxf =   1.15*((0.455/fac)*(numpy.log(10)/numpy.log(Re*nacelle.length))**2.58)*nac_nwa/wing.area
 
     return nac_cxf,nac_nwa
+
+
+#===========================================================================================================
+def electrofan_oei_drag(aircraft,nacelle,pamb,tamb):
+    """
+    Inoperative engine drag coefficient
+    """
+
+    wing = aircraft.wing
+
+    dCx = 0.12*nacelle.width**2 / wing.area
+
+    return dCx
 
 

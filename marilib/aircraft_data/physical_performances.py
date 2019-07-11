@@ -46,7 +46,7 @@ class Propulsion(object):
     """
     INFO = {\
     "architecture":{"unit":"int", "om":1.e0, "txt":"Propulsion architecture, 1:turbofan, 2:partial turbo electric n°1"},
-    "fuel_type":{"unit":"int", "om":1.e0, "txt":"Type of fuel, 1:kerosene, 2:hydrogene"},
+    "fuel_type":{"unit":"int", "om":1.e0, "txt":"Type of fuel, Kerosene, Hydrogene, Methane, Battery"},
     "reference_thrust_effective":{"unit":"daN", "om":1.e5, "txt":"Effective reference_thrust computed as max thrust(Mach = 0.25, ISA+15, Sea Level) / 0.8"},
     "sfc_cruise_ref":{"unit":"kg/daN/h", "om":1.e0, "txt":"Specific Fuel Consumption in cruise condition, isa, ref_cruise_altp, cruise_mach"},
     "sec_cruise_ref":{"unit":"kW/daN/h", "om":1.e0, "txt":"Specific Energy Consumption of the electric chain (if any) in cruise condition, isa, ref_cruise_altp, cruise_mach"},

@@ -18,8 +18,12 @@ from marilib.airplane.propulsion.turbofan.turbofan_design \
            eval_turbofan_pylon_mass, eval_turbofan_nacelle_mass
 
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_design \
-    import eval_hybrid_nacelle_design, eval_hybrid_engine_design, \
-           eval_hybrid_nacelle_mass, eval_fuselage_battery_cg
+    import eval_pte1_nacelle_design, eval_pte1_engine_design, \
+           eval_pte1_nacelle_mass, eval_pte1_battery_mass
+
+from marilib.airplane.propulsion.electric_ef1.electric1_design \
+    import eval_ef1_nacelle_design, eval_ef1_engine_design, eval_wing_battery_data, \
+           eval_ef1_pylon_mass, eval_ef1_nacelle_mass, eval_ef1_battery_mass
 
 from marilib.airplane.airframe.airframe_design import eval_wing_tank_data
 
@@ -43,8 +47,15 @@ def eval_propulsion_design(aircraft):
         engine = aircraft.turbofan_engine
 
         eval_turbofan_engine_design(aircraft)
-        eval_hybrid_engine_design(aircraft)
-        eval_hybrid_nacelle_design(aircraft)
+        eval_pte1_engine_design(aircraft)
+        eval_pte1_nacelle_design(aircraft)
+
+    elif (propulsion.architecture=="EF1"):
+
+        engine = aircraft.electric_engine
+
+        eval_ef1_engine_design(aircraft)
+        eval_ef1_nacelle_design(aircraft)
 
     else:
         raise Exception("propulsion.architecture index is out of range")
@@ -150,12 +161,23 @@ def eval_propulsion_mass(aircraft):
         power_elec = aircraft.pte1_power_elec_chain
 
         eval_turbofan_pylon_mass(aircraft)
-        eval_hybrid_nacelle_mass(aircraft)
+        eval_pte1_nacelle_mass(aircraft)
 
         propulsion.mass = pylon.mass + nacelle.mass + e_nacelle.mass + power_elec.mass
         propulsion.c_g = (  pylon.c_g*pylon.mass + nacelle.c_g*nacelle.mass \
                           + e_nacelle.c_g*e_nacelle.mass + power_elec.c_g*power_elec.mass \
                           )/propulsion.mass
+
+    elif (propulsion.architecture=="EF1"):
+
+        pylon = aircraft.electrofan_pylon
+        nacelle = aircraft.electrofan_nacelle
+
+        eval_ef1_pylon_mass(aircraft)
+        eval_ef1_nacelle_mass(aircraft)
+
+        propulsion.mass = pylon.mass + nacelle.mass
+        propulsion.c_g = (pylon.c_g*pylon.mass + nacelle.c_g*nacelle.mass)/propulsion.mass
 
     else:
         raise Exception("propulsion.architecture index is out of range")
@@ -171,10 +193,12 @@ def eval_tank_data(aircraft):
 
     propulsion = aircraft.propulsion
 
-    if (propulsion.fuel_type==1):
+    if (propulsion.fuel_type=="Kerosene"):
         eval_wing_tank_data(aircraft)
+    if (propulsion.fuel_type=="Battery"):
+        eval_wing_battery_data(aircraft)
     else:
-        raise Exception("propulsion.fuel_type <> 1 is not permitted")
+        raise Exception("propulsion.fuel_type is not allowed")
 
 
 #===========================================================================================================
@@ -183,49 +207,12 @@ def eval_battery_mass(aircraft):
     Battery mass and CG estimation
     """
 
-    battery = aircraft.battery
-    wing = aircraft.wing
-
-    if (battery.strategy==1):
-
-        battery.mass = (battery.power_feed*battery.time_feed + battery.energy_cruise)/battery.energy_density
-
-        eval_battery_cg(aircraft)
-
-    elif (battery.strategy==2):
-
-        battery.energy_cruise = max(0.,battery.mass*battery.energy_density - battery.power_feed*battery.time_feed)
-
-        eval_battery_cg(aircraft)
-
-    else:
-        raise Exception("battery.strategy index is out of range")
+    if (aircraft.propulsion.architecture=="PTE1"):
+       eval_pte1_battery_mass(aircraft)
+    elif (aircraft.propulsion.architecture=="EF1"):
+       eval_ef1_battery_mass(aircraft)
 
     return
 
-
-#===========================================================================================================
-def eval_battery_cg(aircraft):
-    """
-    Battery CG estimation
-    """
-
-    battery = aircraft.battery
-
-    propulsion = aircraft.propulsion
-
-    if (propulsion.architecture=="TF"):
-
-        battery.mass = 0.
-        battery.c_g = 0.
-
-    elif (propulsion.architecture=="PTE1"):
-
-        eval_fuselage_battery_cg(aircraft)
-
-    else:
-        raise Exception("propulsion.architecture index is not supported in this context")
-
-    return
 
 
