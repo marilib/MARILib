@@ -47,6 +47,7 @@ class Propulsion(object):
     INFO = {\
     "architecture":{"unit":"int", "om":1.e0, "txt":"Propulsion architecture, 1:turbofan, 2:partial turbo electric n°1"},
     "fuel_type":{"unit":"int", "om":1.e0, "txt":"Type of fuel, Kerosene, Hydrogene, Methane, Battery"},
+    "battery_energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
     "reference_thrust_effective":{"unit":"daN", "om":1.e5, "txt":"Effective reference_thrust computed as max thrust(Mach = 0.25, ISA+15, Sea Level) / 0.8"},
     "sfc_cruise_ref":{"unit":"kg/daN/h", "om":1.e0, "txt":"Specific Fuel Consumption in cruise condition, isa, ref_cruise_altp, cruise_mach"},
     "sec_cruise_ref":{"unit":"kW/daN/h", "om":1.e0, "txt":"Specific Energy Consumption of the electric chain (if any) in cruise condition, isa, ref_cruise_altp, cruise_mach"},
@@ -64,6 +65,7 @@ class Propulsion(object):
     }
     def __init__(self, architecture = None,
                        fuel_type = None,
+                       battery_energy_density = None,
                        reference_thrust_effective = None,
                        sfc_cruise_ref = None,
                        sec_cruise_ref = None,
@@ -80,6 +82,7 @@ class Propulsion(object):
                        c_g = None):
         self.architecture = architecture
         self.fuel_type = fuel_type
+        self.battery_energy_density = battery_energy_density
         self.reference_thrust_effective = reference_thrust_effective
         self.sfc_cruise_ref = sfc_cruise_ref
         self.sec_cruise_ref = sec_cruise_ref
@@ -109,7 +112,8 @@ class CharacteristicWeight(object):
     "mass_constraint_2":{"unit":"kg", "om":1.e4, "txt":"Constraint on MLW, must be kept positive"},
     "mtow":{"unit":"kg", "om":1.e4, "txt":"Maximum Take Off Weight"},
     "mass_constraint_3":{"unit":"kg", "om":1.e4, "txt":"Constraint on MTOW, must be kept positive"},
-    "mfw":{"unit":"kg", "om":1.e4, "txt":"Maximum Fuel Weight"}
+    "mfw":{"unit":"kg", "om":1.e4, "txt":"Maximum Fuel Weight"},
+    "battery":{"unit":"kg", "om":1.e4, "txt":"Battery mass"}
     }
     def __init__(self, mwe = None,
                        owe = None,
@@ -119,7 +123,8 @@ class CharacteristicWeight(object):
                        mass_constraint_2 = None,
                        mtow = None,
                        mass_constraint_3 = None,
-                       mfw = None):
+                       mfw = None,
+                       battery = None):
         self.mwe = mwe
         self.owe = owe
         self.mzfw = mzfw
@@ -129,6 +134,7 @@ class CharacteristicWeight(object):
         self.mtow = mtow
         self.mass_constraint_3 = mass_constraint_3
         self.mfw = mfw
+        self.battery = battery
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class CenterOfGravity(object):
@@ -139,6 +145,7 @@ class CenterOfGravity(object):
     "cg_range_optimization":{"unit":"int", "om":1.e0, "txt":"Wing position, HTP area and VTP area optimized according to HQ criteria, 0: no, 1:yes"},
     "mwe":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of MWE CG"},
     "owe":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of OWE CG"},
+    "battery":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of battery CG"},
     "max_fwd_mass":{"unit":"kg", "om":1.e4, "txt":"Aircraft mass at maximum forward CG"},
     "max_fwd_req_cg":{"unit":"m", "om":1.e1, "txt":"Required maximum forward aircraft CG"},
     "max_fwd_trim_cg":{"unit":"m", "om":1.e1, "txt":"Maximum trim-able forward CG"},
@@ -155,6 +162,7 @@ class CenterOfGravity(object):
     def __init__(self, cg_range_optimization = None,
                        mwe = None,
                        owe = None,
+                       battery = None,
                        max_fwd_mass = None,
                        max_fwd_req_cg = None,
 					   max_fwd_trim_cg = None,
@@ -170,6 +178,7 @@ class CenterOfGravity(object):
         self.cg_range_optimization = cg_range_optimization
         self.mwe = mwe
         self.owe = owe
+        self.battery = battery
         self.max_fwd_mass = max_fwd_mass
         self.max_fwd_req_cg = max_fwd_req_cg
         self.max_fwd_trim_cg = max_fwd_trim_cg

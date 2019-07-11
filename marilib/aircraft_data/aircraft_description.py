@@ -28,7 +28,7 @@ from marilib.airplane.propulsion.turbofan.turbofan_data \
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_data \
     import Pte1PowerElectricChain, Pte1Battery, RearElectricNacelle, RearElectricEngine
 
-from marilib.airplane.propulsion.electric_ef1.electric1_data \
+from marilib.airplane.propulsion.electric_ef1.electric_ef1_data \
     import Ef1PowerElectricChain, Ef1Battery, ElectrofanPylon, ElectrofanNacelle, ElectrofanEngine
 
 

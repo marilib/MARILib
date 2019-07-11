@@ -60,7 +60,6 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     cabin = aircraft.cabin
     propulsion = aircraft.propulsion
-    battery = aircraft.battery
     engine = aircraft.turbofan_engine
     weights = aircraft.weights
     cost_mission = aircraft.cost_mission
@@ -78,7 +77,7 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
     # Cash Operating Cost
     #-----------------------------------------------------------------------------------------------------------------------------------------------
     eco.fuel_cost =   (block_fuel*(eco.fuel_price*1e3)/fuel_density)
-    eco.elec_cost =  battery.mass * battery.energy_density * eco.elec_price
+    eco.elec_cost =  weights.battery * propulsion.battery_energy_density * eco.elec_price
 
     b_h = block_time/3600.
     t_t = b_h + 0.25
@@ -122,7 +121,7 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     frame_price = one_airframe_price(aircraft)
 
-    battery_price = eco.battery_mass_price*battery.mass
+    battery_price = eco.battery_mass_price*weights.battery
 
     aircraft_price = frame_price + engine_price * engine.n_engine + gear_price + battery_price
 

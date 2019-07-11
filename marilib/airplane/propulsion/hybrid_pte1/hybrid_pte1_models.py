@@ -17,7 +17,7 @@ from marilib.airplane.propulsion.turbofan.turbofan_models import turbofan_thrust
 
 
 #===========================================================================================================
-def hybrid_sfc(aircraft,pamb,tamb,mach,rating,nei):
+def pte1_sfc(aircraft,pamb,tamb,mach,rating,nei):
     """
     Bucket SFC for a turbofan
     """
@@ -58,13 +58,13 @@ def hybrid_sfc(aircraft,pamb,tamb,mach,rating,nei):
 
 
 #===========================================================================================================
-def hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
+def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     propulsion = aircraft.propulsion
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
 
-    battery = aircraft.battery
+    battery = aircraft.pte1_battery
     power_elec = aircraft.pte1_power_elec_chain
     e_engine = aircraft.rear_electric_engine
     e_nacelle = aircraft.rear_electric_nacelle

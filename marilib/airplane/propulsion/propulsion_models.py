@@ -19,7 +19,7 @@ from marilib.airplane.propulsion.turbofan.turbofan_models \
         turbofan_oei_drag
 
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_models \
-    import hybrid_sfc, hybrid_thrust, rear_electric_nacelle_drag
+    import pte1_sfc, pte1_thrust, rear_electric_nacelle_drag
 
 
 #===========================================================================================================
@@ -36,7 +36,7 @@ def sfc(aircraft,pamb,tamb,mach,rating,nei):
 
     elif (propulsion.architecture=="PTE1"):
 
-        sfc = hybrid_sfc(aircraft,pamb,tamb,mach,rating,nei)
+        sfc = pte1_sfc(aircraft,pamb,tamb,mach,rating,nei)
 
     else:
         raise Exception("propulsion.architecture index is out of range")
@@ -59,7 +59,7 @@ def thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     elif (propulsion.architecture=="PTE1"):
 
-        fn,sec,data = hybrid_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
+        fn,sec,data = pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
 
     else:
         raise Exception("propulsion.architecture index is out of range")

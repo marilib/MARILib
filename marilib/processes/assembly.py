@@ -172,7 +172,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.electrofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
     aircraft.electrofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.electrofan_nacelle.efficiency_prop = init.efficiency_prop()
-    aircraft.electrofan_nacelle.width = init.nacelle_width(9,aircraft.electrofan_nacelle.reference_thrust)
+    aircraft.electrofan_nacelle.width = init.nacelle_width(9,aircraft.electrofan_engine.reference_thrust)
     aircraft.turbofan_nacelle.y_ext = init.nacelle_y_ext(aircraft.electrofan_nacelle.attachment,
                                                          aircraft.fuselage.width,
                                                          aircraft.electrofan_nacelle.width)

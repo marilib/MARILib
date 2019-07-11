@@ -26,7 +26,6 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
 
     engine = aircraft.turbofan_engine
     propulsion = aircraft.propulsion
-    battery = aircraft.battery
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
@@ -45,7 +44,7 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
     sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
 
     if (propulsion.architecture=="PTE1"):
-        fn,sec,data = propu.hybrid_thrust(aircraft,pamb,tamb,mach,MCR,nei)
+        fn,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
@@ -61,7 +60,7 @@ def mission(aircraft,dist_range,tow,altp,mach,disa):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
     elif (propulsion.architecture=="PTE1"):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
-                        - (sfc/sec)*battery.energy_cruise
+                        - (sfc/sec)*aircraft.pte1_battery.energy_cruise
     else:
         raise Exception("propulsion.architecture index is out of range")
 

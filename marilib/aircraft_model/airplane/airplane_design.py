@@ -81,14 +81,13 @@ def eval_aircraft_weights(aircraft):
     systems = aircraft.systems
     propulsion = aircraft.propulsion
     tanks = aircraft.tanks
-    battery = aircraft.battery
 
     weights = aircraft.weights
 
     weights.mwe =  cabin.m_furnishing + fuselage.mass + wing.mass + htp.mass + vtp.mass \
                  + ldg.mass + systems.mass + propulsion.mass
 
-    weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + battery.mass
+    weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + weights.battery
 
     weights.mfw = min(tanks.mfw_volume_limited, weights.mtow - weights.owe)
 
@@ -143,7 +142,6 @@ def eval_aircraft_cg(aircraft):
     systems = aircraft.systems
     propulsion = aircraft.propulsion
     tanks = aircraft.tanks
-    battery = aircraft.battery
     weights = aircraft.weights
 
     c_g = aircraft.center_of_gravity
@@ -153,7 +151,7 @@ def eval_aircraft_cg(aircraft):
                + vtp.c_g*vtp.mass + systems.c_g*systems.mass \
                )/weights.mwe
 
-    c_g.owe = (  c_g.mwe*weights.mwe + cabin.cg_op_item*cabin.m_op_item + battery.c_g*battery.mass \
+    c_g.owe = (  c_g.mwe*weights.mwe + cabin.cg_op_item*cabin.m_op_item + c_g.battery*weights.battery \
                + payload.cg_container_pallet*payload.m_container_pallet \
                ) / weights.owe
 

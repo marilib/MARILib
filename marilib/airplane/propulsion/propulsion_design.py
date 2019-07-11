@@ -21,7 +21,7 @@ from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_design \
     import eval_pte1_nacelle_design, eval_pte1_engine_design, \
            eval_pte1_nacelle_mass, eval_pte1_battery_mass
 
-from marilib.airplane.propulsion.electric_ef1.electric1_design \
+from marilib.airplane.propulsion.electric_ef1.electric_ef1_design \
     import eval_ef1_nacelle_design, eval_ef1_engine_design, eval_wing_battery_data, \
            eval_ef1_pylon_mass, eval_ef1_nacelle_mass, eval_ef1_battery_mass
 
@@ -103,7 +103,7 @@ def eval_propulsion_design(aircraft):
 
     elif (propulsion.architecture=="PTE1"):
 
-        fn,sec,data = propu.hybrid_thrust(aircraft,pamb,tamb,mach,MCR,nei)
+        fn,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
 
     else:
         raise Exception("propulsion.architecture index is out of range")
@@ -195,7 +195,7 @@ def eval_tank_data(aircraft):
 
     if (propulsion.fuel_type=="Kerosene"):
         eval_wing_tank_data(aircraft)
-    if (propulsion.fuel_type=="Battery"):
+    elif (propulsion.fuel_type=="Battery"):
         eval_wing_battery_data(aircraft)
     else:
         raise Exception("propulsion.fuel_type is not allowed")
@@ -207,7 +207,11 @@ def eval_battery_mass(aircraft):
     Battery mass and CG estimation
     """
 
-    if (aircraft.propulsion.architecture=="PTE1"):
+    if (aircraft.propulsion.architecture=="TF"):
+       aircraft.propulsion.battery_energy_density = 0.
+       aircraft.center_of_gravity.battery = 0.
+       aircraft.weights.battery = 0.
+    elif (aircraft.propulsion.architecture=="PTE1"):
        eval_pte1_battery_mass(aircraft)
     elif (aircraft.propulsion.architecture=="EF1"):
        eval_ef1_battery_mass(aircraft)

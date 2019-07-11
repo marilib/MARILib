@@ -299,6 +299,10 @@ def eval_ef1_battery_mass(aircraft):
     battery.mass = tanks.mfw_volume_limited * battery.fill_factor
     battery.c_g = tanks.fuel_total_cg
 
+    aircraft.propulsion.battery.energy_density = 0.
+    aircraft.weights.battery = battery.mass
+    aircraft.center_of_gravity.battery = battery.c_g
+
     return
 
 
