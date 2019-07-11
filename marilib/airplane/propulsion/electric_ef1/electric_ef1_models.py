@@ -16,18 +16,18 @@ from marilib.airplane.propulsion.turbofan.turbofan_models import turbofan_thrust
 
 
 #===========================================================================================================
-def electrofan_sec(aircraft,pamb,tamb,mach,rating,nei):
+def ef1_sec(aircraft,pamb,tamb,mach,rating,nei):
     """
     Specific Energy Consumption
     """
 
-    fn,sec = electrofan_thrust(aircraft,pamb,tamb,mach,rating,nei)
+    fn,sec = ef1_thrust(aircraft,pamb,tamb,mach,rating,nei)
 
     return sec,fn
 
 
 #===========================================================================================================
-def electrofan_thrust(aircraft,pamb,tamb,mach,rating,nei):
+def ef1_thrust(aircraft,pamb,tamb,mach,rating,nei):
 
     engine = aircraft.electrofan_engine
     nacelle = aircraft.electrofan_nacelle
