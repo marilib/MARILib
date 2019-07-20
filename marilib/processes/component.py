@@ -12,70 +12,12 @@ Changed name from "solvers.py" to "component.py" on 21:05:2019
 
 from scipy.optimize import fsolve
 
-from marilib.aircraft_model.operations import mission as perfo, \
+from marilib.tools.math import maximize_1d, trinome, vander3
+
+from marilib.aircraft_model.operations import mission_b, mission_f, \
+                                              other_performances as perfo, \
                                               environmental_impact as environ, \
                                               pricing_and_costing as costing
-
-
-#===========================================================================================================
-def eval_nominal_mission(aircraft):
-    """
-    Compute nominal mission with range as input
-    """
-
-    disa = 0.
-    altp = aircraft.design_driver.ref_cruise_altp
-    mach = aircraft.design_driver.cruise_mach
-    nei = 0
-
-    aircraft.nominal_mission.payload = aircraft.payload.nominal
-    aircraft.nominal_mission.range = aircraft.design_driver.design_range
-    aircraft.nominal_mission.tow = aircraft.weights.mtow
-
-    range = aircraft.nominal_mission.range
-    tow = aircraft.nominal_mission.tow
-
-    block_fuel,block_time,total_fuel = perfo.mission(aircraft,range,tow,altp,mach,disa)
-
-    aircraft.nominal_mission.block_fuel = block_fuel
-    aircraft.nominal_mission.block_time = block_time
-    aircraft.nominal_mission.total_fuel = total_fuel
-
-    payload = aircraft.nominal_mission.payload
-    owe = aircraft.weights.owe
-
-    mtow = owe + payload + total_fuel
-
-    aircraft.weights.mass_constraint_3 = aircraft.weights.mtow - mtow
-
-    return
-
-
-#===========================================================================================================
-def eval_mission_coupling(aircraft):
-    """
-    Mass-Mission coupling
-    This relation is put apart from nominal_mission because GEMS does not manage functions that compute their own input
-    """
-
-    aircraft.weights.mtow = aircraft.weights.owe + aircraft.nominal_mission.payload + aircraft.nominal_mission.total_fuel
-
-    return
-
-
-#===========================================================================================================
-def mission_payload(aircraft,tow,range,altp,mach,disa):
-    """
-    Mission simulation (payload weight is output)
-    """
-
-    weights = aircraft.weights
-
-    [block_fuel,block_time,total_fuel] = perfo.mission(aircraft,range,tow,altp,mach,disa)
-
-    payload = tow - weights.owe - total_fuel
-
-    return payload,block_fuel,block_time,total_fuel
 
 
 #===========================================================================================================
@@ -84,115 +26,80 @@ def mission_tow(aircraft,payload,range,altp,mach,disa):
     Mission simulation (take off weight is output)
     """
 
-    weights = aircraft.weights
-
-    def fct_mission(tow,aircraft,payload,range,altp,mach,disa):
-    #=======================================================================================
-        weights = aircraft.weights
-        [block_fuel,block_time,total_fuel] = perfo.mission(aircraft,range,tow,altp,mach,disa)
-        Y = tow - weights.owe - payload - total_fuel
-        return Y
-    #---------------------------------------------------------------------------------------
-
-    tow_ini = weights.owe + payload + 2000.
-
-    fct_arg = (aircraft,payload,range,altp,mach,disa)
-
-    output_dict = fsolve(fct_mission, x0 = tow_ini, args=fct_arg, full_output=True)
-
-    tow = output_dict[0][0]
-
-    [block_fuel,block_time,total_fuel] = perfo.mission(aircraft,range,tow,altp,mach,disa)
-
-    return tow,block_fuel,block_time,total_fuel
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        tow,block_enrg,block_time,total_enrg = mission_b.b_mission_tow(aircraft,payload,range,altp,mach,disa)
+        return tow,block_enrg,block_time,total_enrg
+    else:
+        tow,block_fuel,block_time,total_fuel = mission_f.f_mission_tow(aircraft,payload,range,altp,mach,disa)
+        return tow,block_fuel,block_time,total_fuel
 
 
 #===========================================================================================================
-def mission_range(aircraft,tow,payload,altp,mach,disa):
-    """
-    Mission simulation (range is output)
-    """
+def specific_air_range(aircraft,altp,mass,mach,disa):
 
-    design_driver = aircraft.design_driver
-
-    def fct_mission(range,aircraft,tow,payload,altp,mach,disa):
-    #=======================================================================================
-        weights = aircraft.weights
-        [block_fuel,block_time,total_fuel] = perfo.mission(aircraft,range,tow,altp,mach,disa)
-        Y = tow - weights.owe - payload - total_fuel
-        return Y
-    #---------------------------------------------------------------------------------------
-
-    range_ini = design_driver.design_range
-
-    fct_arg = (aircraft,tow,payload,altp,mach,disa)
-
-    output_dict = fsolve(fct_mission, x0 = range_ini, args=fct_arg, full_output=True)
-
-    range = output_dict[0][0]
-
-    [block_fuel,block_time,total_fuel] = perfo.mission(aircraft,range,tow,altp,mach,disa)
-
-    return range,block_fuel,block_time,total_fuel
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        sar = mission_b.b_specific_air_range(aircraft,altp,mass,mach,disa)
+    else:
+        sar = mission_f.f_specific_air_range(aircraft,altp,mass,mach,disa)
+    return sar
 
 
 #===========================================================================================================
-def mission_fuel_limited(aircraft,tow,total_fuel,altp,mach,disa):
-    """
-    Mission fuel limited (range & payload are output)
-    """
+def sar_max(aircraft,mass,mach,disa):
 
-    design_driver = aircraft.design_driver
-    weights = aircraft.weights
-
-    def fct_mission(range,aircraft,tow,total_fuel,altp,mach,disa):
+    def fct_sar_max(altp,mass,mach,disa,aircraft):
     #=======================================================================================
-        weights = aircraft.weights
-        [block_fuel,block_time,fuel] = perfo.mission(aircraft,range,tow,altp,mach,disa)
-        Y = total_fuel - fuel
-        return Y
+        sar = specific_air_range(aircraft,altp,mass,mach,disa)
+        return sar
     #---------------------------------------------------------------------------------------
 
-    range_ini = design_driver.design_range
+    altp_ini = aircraft.design_driver.ref_cruise_altp
 
-    fct_arg = (aircraft,tow,total_fuel,altp,mach,disa)
+    d_altp = 250.
 
-    output_dict = fsolve(fct_mission, x0 = range_ini, args=fct_arg, full_output=True)
+    fct = [fct_sar_max, mass,mach,disa,aircraft]
 
-    range = output_dict[0][0]
+    (altp_sar_max,sar_max,rc) = maximize_1d(altp_ini,d_altp,fct)
 
-    block_fuel,block_time,total_fuel = perfo.mission(aircraft,range,tow,altp,mach,disa)
-
-    payload = tow - weights.owe - total_fuel
-
-    return range,payload,block_fuel,block_time
+    return sar_max,altp_sar_max
 
 
 #===========================================================================================================
-def eval_cost_mission(aircraft):
+def eval_climb_performances(aircraft):
     """
     Compute climb performances
     """
 
-    # Cost mission
-    #-----------------------------------------------------------------------------------------------------------------------------------------------
-    altp = aircraft.design_driver.ref_cruise_altp
+    # Ceilings
+    #------------------------------------------------------------------------------------------------------
+    toc = aircraft.design_driver.top_of_climb_altp
+    oei_ceil_req = aircraft.low_speed.req_oei_altp
+
+    vz_clb,vz_crz,oei_path,oei_mach = perfo.ceilings(aircraft,toc,oei_ceil_req)
+
+    aircraft.low_speed.eff_oei_path = oei_path
+    aircraft.high_speed.eff_vz_climb = vz_clb
+    aircraft.high_speed.eff_vz_cruise = vz_crz
+
+    aircraft.low_speed.perfo_constraint_3 = (oei_path - aircraft.low_speed.req_oei_path) / aircraft.low_speed.req_oei_path
+
+    aircraft.high_speed.perfo_constraint_1 = vz_clb - aircraft.high_speed.req_vz_climb
+    aircraft.high_speed.perfo_constraint_2 = vz_crz - aircraft.high_speed.req_vz_cruise
+
+    # Time to climb to requested altitude
+    #------------------------------------------------------------------------------------------------------
+    toc = aircraft.high_speed.req_toc_altp
+    disa = 0.
+    mass = aircraft.weights.mtow
+    vcas1 = aircraft.high_speed.cas1_ttc
+    vcas2 = aircraft.high_speed.cas2_ttc
     mach = aircraft.design_driver.cruise_mach
 
-    disa = aircraft.cost_mission.disa
-    range = aircraft.cost_mission.range
+    ttc = perfo.time_to_climb(aircraft,toc,disa,mass,vcas1,vcas2,mach)
 
-    payload = aircraft.payload.nominal
+    aircraft.high_speed.eff_ttc = ttc
 
-    aircraft.cost_mission.payload = payload
-
-    tow,block_fuel,block_time,total_fuel = mission_tow(aircraft,payload,range,altp,mach,disa)
-
-    aircraft.cost_mission.block_fuel = block_fuel
-    aircraft.cost_mission.block_time = block_time
-    aircraft.cost_mission.total_fuel = total_fuel
-
-    aircraft.cost_mission.block_CO2 = block_fuel * aircraft.environmental_impact.CO2_index
+    aircraft.high_speed.perfo_constraint_3 = (aircraft.high_speed.req_ttc - ttc) / aircraft.high_speed.req_ttc
 
     return
 

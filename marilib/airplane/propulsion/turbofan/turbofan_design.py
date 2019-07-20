@@ -70,7 +70,9 @@ def eval_turbofan_nacelle_design(aircraft):
     tan_phi0 = 0.25*(wing.c_kink-wing.c_tip)/(wing.y_tip-wing.y_kink) + numpy.tan(wing.sweep)
 
     if (nacelle.attachment == 1):
+
         if (engine.n_engine==2):
+
             nacelle.y_ext = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
             nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
@@ -80,6 +82,7 @@ def eval_turbofan_nacelle_design(aircraft):
                             - 0.5*nacelle.width
 
         elif (engine.n_engine==4):
+
             nacelle.y_int = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
             nacelle.x_int = wing.x_root + (nacelle.y_int-wing.y_root)*tan_phi0 - 0.7*nacelle.length
@@ -99,12 +102,15 @@ def eval_turbofan_nacelle_design(aircraft):
             raise Exception("engine.n_engine, number of engine not supported")
 
     elif (nacelle.attachment == 2):
+
         if (engine.n_engine==2):
+
             nacelle.y_ext = 0.5 * fuselage.width + 0.6 * nacelle.width      # statistical regression
 
             nacelle.x_ext = vtp.x_root - 0.5*nacelle.length
 
             nacelle.z_ext = 0.5 * fuselage.height
+
         else:
             raise Exception("engine.n_engine, number of engine not supported")
 

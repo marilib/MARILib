@@ -163,20 +163,26 @@ class MaxPayloadMission(object):
     "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the max payload mission"},
     "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the max payload mission"},
     "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the max payload mission"},
-    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the max payload mission"}
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the max payload mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the max payload mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the max payload mission"}
     }
     def __init__(self, range = None,
                        payload = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
-                       block_time = None):
+                       block_time = None,
+                       block_enrg = None,
+                       total_enrg = None):
         self.range = range
         self.payload = payload 
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time 
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class NominalMission(object):
@@ -189,20 +195,26 @@ class NominalMission(object):
     "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the nominal mission"},
     "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the nominal mission"},
     "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the nominal mission"},
-    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the nominal mission"}
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the nominal mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the nominal mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the nominal mission"}
     }
     def __init__(self, range = None,
                        payload = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
-                       block_time = None):
+                       block_time = None,
+                       block_enrg = None,
+                       total_enrg = None):
         self.range = range
         self.payload = payload 
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time 
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class MaxFuelMission(object):
@@ -215,20 +227,26 @@ class MaxFuelMission(object):
     "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the max fuel mission"},
     "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the max fuel mission"},
     "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the max fuel mission"},
-    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the max fuel mission"}
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the max fuel mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the max fuel mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the max fuel mission"}
     }
     def __init__(self, range = None,
                        payload = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
-                       block_time = None):
+                       block_time = None,
+                       block_enrg = None,
+                       total_enrg = None):
         self.range = range
         self.payload = payload 
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time 
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class ZeroPayloadMission(object):
@@ -240,18 +258,24 @@ class ZeroPayloadMission(object):
     "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the zero payload mission"},
     "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the zero payload mission"},
     "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the zero payload mission"},
-    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the zero payload mission"}
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the zero payload mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the zero payload mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the zero payload mission"}
     }
     def __init__(self, range = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
-                       block_time = None):
+                       block_time = None,
+                       block_enrg = None,
+                       total_enrg = None):
         self.range = range
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time 
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class CostMission(object):
@@ -266,6 +290,8 @@ class CostMission(object):
     "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the cost evaluation mission"},
     "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the cost evaluation mission"},
     "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the cost evaluation mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the cost evaluation mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the cost evaluation mission"},
     "block_CO2":{"unit":"kg", "om":1.e4, "txt":"Mass of carbon dioxide emitted during the mission"}
     }
     def __init__(self, disa = None,
@@ -275,6 +301,8 @@ class CostMission(object):
                        total_fuel = None,
                        block_fuel = None,
                        block_time = None,
+                       block_enrg = None,
+                       total_enrg = None,
                        block_CO2 = None):
         self.disa = disa
         self.range = range 
@@ -283,6 +311,8 @@ class CostMission(object):
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
         self.block_CO2 = block_CO2
 
 #--------------------------------------------------------------------------------------------------------------------------------

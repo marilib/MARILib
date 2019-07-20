@@ -119,7 +119,7 @@ class Aircraft(object):
 #--------------------------------------------------------------------------------------------------------------------------------
 def write_data_dict(data_dict, section, out_parser, user_format):
 
-    for key in sorted(data_dict.keys()):
+    for key in data_dict.keys():
         value = data_dict[key]
 
         if isinstance(value, dict):

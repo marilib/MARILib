@@ -97,6 +97,17 @@ def draw_3d_view(aircraft,window_title,plot_title):
             nac_x_int = aircraft.turbofan_nacelle.x_int
             nac_y_int = aircraft.turbofan_nacelle.y_int
             nac_z_int = aircraft.turbofan_nacelle.z_int
+    elif (aircraft.propulsion.architecture=="EF1"):
+        nac_length = aircraft.electrofan_nacelle.length
+        nac_height = aircraft.electrofan_nacelle.width
+        nac_width = aircraft.electrofan_nacelle.width
+        nac_x_ext = aircraft.electrofan_nacelle.x_ext
+        nac_y_ext = aircraft.electrofan_nacelle.y_ext
+        nac_z_ext = aircraft.electrofan_nacelle.z_ext
+        if (aircraft.electrofan_engine.n_engine==4):
+            nac_x_int = aircraft.electrofan_nacelle.x_int
+            nac_y_int = aircraft.electrofan_nacelle.y_int
+            nac_z_int = aircraft.electrofan_nacelle.z_int
     elif (aircraft.propulsion.architecture=="PTE1"):
         nac_length = aircraft.turbofan_nacelle.length
         nac_height = aircraft.turbofan_nacelle.width

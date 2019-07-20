@@ -18,6 +18,8 @@ def ref_cruise_altp(propulsive_architecture):
         ref_cruise_altp_i = unit.m_ft(35000.)
     elif (propulsive_architecture=="PTE1"):
         ref_cruise_altp_i = unit.m_ft(35000.)
+    elif (propulsive_architecture=="EF1"):
+        ref_cruise_altp_i = unit.m_ft(25000.)
     else:
         raise Exception("propulsion.architecture index is out of range")
     return ref_cruise_altp_i
@@ -28,6 +30,8 @@ def top_of_climb_altp(propulsive_architecture):
         top_of_climb_altp_i = unit.m_ft(31000.)
     elif (propulsive_architecture=="PTE1"):
         top_of_climb_altp_i = unit.m_ft(31000.)
+    elif (propulsive_architecture=="EF1"):
+        top_of_climb_altp_i = unit.m_ft(25000.)
     else:
         raise Exception("propulsion.architecture index is out of range")
     return top_of_climb_altp_i
@@ -172,8 +176,11 @@ def wing_mac(wing_area_i,wing_aspect_ratio_i):
 
 
 #===========================================================================================================
-def fuel_type():
-    fuel_type_i = "Kerosene"     # Kerosene, Hydrogene, Methane, Battery
+def fuel_type(propulsive_architecture):
+    if (propulsive_architecture=="EF1"):
+        fuel_type_i = "Battery"     # Kerosene, Hydrogene, Methane, Battery
+    else:
+        fuel_type_i = "Kerosene"     # Kerosene, Hydrogene, Methane, Battery
     return fuel_type_i
 
 #===========================================================================================================

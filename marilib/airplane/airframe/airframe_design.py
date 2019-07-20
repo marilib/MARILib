@@ -447,6 +447,7 @@ def eval_wing_tank_data(aircraft):
 
     tanks.central_volume = 1.3 * fuselage.width * wing.t_o_c_r * wing.mac**2
 
+    # IMPORTANT REMARK : if fuel is "Battery", fuel density will be battery density
     tanks.fuel_density = earth.fuel_density(propulsion.fuel_type)
 
     tanks.mfw_volume_limited = (tanks.central_volume + tanks.cantilever_volume)*tanks.fuel_density
@@ -456,6 +457,21 @@ def eval_wing_tank_data(aircraft):
                               + 0.10*(wing.x_tip + 0.40*wing.c_tip)
 
     tanks.fuel_central_cg = wing.x_root + 0.30*wing.c_root
+
+    tanks.fuel_total_cg = (  tanks.fuel_central_cg*tanks.central_volume \
+                           + tanks.fuel_cantilever_cg*tanks.cantilever_volume \
+                           ) / (tanks.central_volume + tanks.cantilever_volume)
+
+    return
+
+
+#===========================================================================================================
+def eval_fuel_cg_range(aircraft):
+    """
+    Fuel cg range estimation as long as liquid burnable fuel is used
+    """
+
+    tanks = aircraft.tanks
 
     tanks.fuel_max_fwd_cg = tanks.fuel_central_cg    # Fuel max forward CG, central tank is forward only within backward swept wing
     tanks.fuel_max_fwd_mass = tanks.central_volume*tanks.fuel_density

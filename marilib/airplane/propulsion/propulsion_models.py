@@ -30,6 +30,7 @@ from marilib.airplane.propulsion.electric_ef1.electric_ef1_models \
 def sfc(aircraft,pamb,tamb,mach,rating,nei):
     """
     Bucket SFC for a turbofan
+    IMPORTANT REMARK : for EF1 architecture, SFC is in Energy unit per Thrust unit (J/N)
     """
 
     propulsion = aircraft.propulsion
@@ -39,7 +40,7 @@ def sfc(aircraft,pamb,tamb,mach,rating,nei):
     elif (propulsion.architecture=="PTE1"):
         sfc = pte1_sfc(aircraft,pamb,tamb,mach,rating,nei)
     elif (propulsion.architecture=="EF1"):
-        sfc = ef1_sec(aircraft,pamb,tamb,mach,rating,nei)
+        sfc,fn = ef1_sec(aircraft,pamb,tamb,mach,rating,nei)
     else:
         raise Exception("propulsion.architecture index is out of range")
 
@@ -49,8 +50,7 @@ def sfc(aircraft,pamb,tamb,mach,rating,nei):
 #===========================================================================================================
 def thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
     """
-    Calculation of thrust for pure turbofan airplane
-    Warning : ALL engine thrust returned
+    Calculation of the total thrust of the architecture
     """
 
     propulsion = aircraft.propulsion

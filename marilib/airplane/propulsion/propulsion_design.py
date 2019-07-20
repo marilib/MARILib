@@ -22,10 +22,10 @@ from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_design \
            eval_pte1_nacelle_mass, eval_pte1_battery_mass
 
 from marilib.airplane.propulsion.electric_ef1.electric_ef1_design \
-    import eval_ef1_nacelle_design, eval_ef1_engine_design, eval_wing_battery_data, \
+    import eval_ef1_nacelle_design, eval_ef1_engine_design, eval_battery_cg_range, \
            eval_ef1_pylon_mass, eval_ef1_nacelle_mass, eval_ef1_battery_mass
 
-from marilib.airplane.airframe.airframe_design import eval_wing_tank_data
+from marilib.airplane.airframe.airframe_design import eval_wing_tank_data, eval_fuel_cg_range
 
 #===========================================================================================================
 def eval_propulsion_design(aircraft):
@@ -52,7 +52,7 @@ def eval_propulsion_design(aircraft):
 
     elif (propulsion.architecture=="EF1"):
 
-        engine = aircraft.electric_engine
+        engine = aircraft.electrofan_engine
 
         eval_ef1_engine_design(aircraft)
         eval_ef1_nacelle_design(aircraft)
@@ -104,6 +104,10 @@ def eval_propulsion_design(aircraft):
     elif (propulsion.architecture=="PTE1"):
 
         fn,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
+
+    elif (propulsion.architecture=="EF1"):
+
+        fn,sec = propu.ef1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
 
     else:
         raise Exception("propulsion.architecture index is out of range")
@@ -186,17 +190,19 @@ def eval_propulsion_mass(aircraft):
 
 
 #===========================================================================================================
-def eval_tank_data(aircraft):
+def eval_tank_mass(aircraft):
     """
     Tank predesign
     """
 
     propulsion = aircraft.propulsion
 
+    eval_wing_tank_data(aircraft)
+
     if (propulsion.fuel_type=="Kerosene"):
-        eval_wing_tank_data(aircraft)
+        eval_fuel_cg_range(aircraft)
     elif (propulsion.fuel_type=="Battery"):
-        eval_wing_battery_data(aircraft)
+        eval_battery_cg_range(aircraft)
     else:
         raise Exception("propulsion.fuel_type is not allowed")
 

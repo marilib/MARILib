@@ -47,7 +47,11 @@ def deg_rad(rad): return rad*180./numpy.pi   # Translate radians into degrees
 
 def J_kWh(kWh): return kWh*3.6e6   # Translate kWh into J
 
+def J_MWh(MWh): return MWh*3.6e9   # Translate MWh into J
+
 def kWh_J(J): return J/3.6e6   # Translate J into kWh
+
+def MWh_J(J): return J/3.6e9   # Translate J into MWh
 
 #=========================================================================================================================================
 def smart_round(X,S):

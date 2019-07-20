@@ -76,12 +76,12 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     # Cash Operating Cost
     #-----------------------------------------------------------------------------------------------------------------------------------------------
-    eco.fuel_cost =   (block_fuel*(eco.fuel_price*1e3)/fuel_density)
+    eco.fuel_cost =   (block_fuel*(eco.fuel_price*1.e3)/fuel_density)
     eco.elec_cost =  weights.battery * propulsion.battery_energy_density * eco.elec_price
 
     b_h = block_time/3600.
     t_t = b_h + 0.25
-    w_f = (10000. + weights.mwe-propulsion.mass)*1e-5
+    w_f = (10000. + weights.mwe-propulsion.mass)*1.e-5
 
     labor_frame = ((1.26+1.774*w_f-0.1071*w_f**2)*t_t + (1.614+0.7227*w_f+0.1204*w_f**2))*labor_cost
     matrl_frame = (12.39+29.8*w_f+0.1806*w_f**2)*t_t + (15.20+97.330*w_f-2.8620*w_f**2)

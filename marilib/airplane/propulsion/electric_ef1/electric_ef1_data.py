@@ -202,20 +202,17 @@ class Ef1Battery(object):
     "energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
     "power_density":{"unit":"kW/kg", "om":1.e0, "txt":"Battery power density (capability to release power per mass unit)"},
     "density":{"unit":"kg/m3", "om":1.e3, "txt":"Battery density (mass per volume unit)"},
-    "fill_factor":{"unit":"no_dim", "om":1.e0, "txt":"ratio of available volume used for batteries"},
-    "mass":{"unit":"kg", "om":1.e3, "txt":"Total battery mass"},
+    "mass_max":{"unit":"kg", "om":1.e3, "txt":"Maximum battery mass"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Global CG of batteries"}
     }
     def __init__(self, energy_density = None,
                        power_density = None,
                        density = None,
-                       fill_factor = None,
-                       mass = None,
+                       mass_max = None,
                        c_g = None):
         self.energy_density = energy_density
         self.power_density = power_density
         self.density = density
-        self.fill_factor = fill_factor
-        self.mass = mass
+        self.mass_max = mass_max
         self.c_g = c_g
 

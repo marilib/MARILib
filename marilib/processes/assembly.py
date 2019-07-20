@@ -13,16 +13,18 @@ from scipy.optimize import fsolve,minimize,SR1, NonlinearConstraint,BFGS
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth
-from marilib.aircraft_model.airplane import airplane_design as airplane, regulation as regul
+from marilib.aircraft_model.airplane import airplane_design as airplane, \
+                                            regulation as regul
 
 from marilib.airplane.airframe import airframe_design as airframe
 
 from marilib.airplane.propulsion import propulsion_design as propulsion
 
-from marilib.aircraft_model.operations import handling_qualities as h_q, \
-                                              mission as perfo
+from marilib.aircraft_model.operations import mission_b, mission_f, \
+                                            handling_qualities as h_q
 
-from marilib.processes import component as sub_proc, initialization as init
+from marilib.processes import component as sub_proc, \
+                              initialization as init
 
 
 #===========================================================================================================
@@ -33,7 +35,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.propulsion.architecture = propu_config
 
-    aircraft.propulsion.fuel_type = init.fuel_type()
+    aircraft.propulsion.fuel_type = init.fuel_type(propu_config)
 
     aircraft.name = "my_test_airplane"
     aircraft.design_driver.design_range = design_range        # TLR
@@ -94,9 +96,6 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.weights.mzfw = init.mzfw(n_pax_ref,design_range)
     aircraft.weights.mtow = init.mtow(n_pax_ref,design_range)
     aircraft.weights.mlw = init.mlw(n_pax_ref,aircraft.weights.mtow,aircraft.weights.mzfw)
-
-
-
 
     aircraft.cabin.n_pax_front = init.n_pax_front(n_pax_ref)
     aircraft.cabin.n_aisle = init.n_aisle(aircraft.cabin.n_pax_front)
@@ -172,6 +171,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.electrofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
     aircraft.electrofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.electrofan_nacelle.efficiency_prop = init.efficiency_prop()
+    aircraft.electrofan_nacelle.motor_efficiency = init.e_motor_efficiency()
+    aircraft.electrofan_nacelle.controller_efficiency = init.controller_efficiency()
+    aircraft.electrofan_nacelle.controller_pw_density = init.controller_pw_density()
+    aircraft.electrofan_nacelle.motor_pw_density = init.e_motor_pw_density()
+    aircraft.electrofan_nacelle.nacelle_pw_density = init.e_nacelle_pw_density()
     aircraft.electrofan_nacelle.width = init.nacelle_width(9,aircraft.electrofan_engine.reference_thrust)
     aircraft.turbofan_nacelle.y_ext = init.nacelle_y_ext(aircraft.electrofan_nacelle.attachment,
                                                          aircraft.fuselage.width,
@@ -442,8 +446,13 @@ def eval_aircraft_statistical_pre_design_2(aircraft):
 def eval_mass_breakdown(aircraft):
     """
     Estimate mass and CGs of the airplane
-    Takes MTOW,k MZFW & MLW as input
+    For burnable liquid fuel powered airplanes, takes MTOW, MZFW & MLW as input
+    For battery powered airplanes, takes only MTOW as input
     """
+
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        aircraft.weights.mzfw = aircraft.weights.mtow
+        aircraft.weights.mlw = aircraft.weights.mtow
 
     airframe.eval_cabin_mass(aircraft)
     airframe.eval_fuselage_mass(aircraft)
@@ -453,8 +462,8 @@ def eval_mass_breakdown(aircraft):
     airframe.eval_landing_gear_mass(aircraft)
 
     propulsion.eval_propulsion_mass(aircraft)
+    propulsion.eval_tank_mass(aircraft)
     propulsion.eval_battery_mass(aircraft)
-    propulsion.eval_tank_data(aircraft)
 
     airplane.eval_system_mass(aircraft)
     airplane.eval_payload_mass(aircraft)
@@ -486,15 +495,17 @@ def eval_mass_estimation(aircraft):
         return y_out
     #-----------------------------------------------------------------------------------------------------------
 
-    x_ini = np.array([aircraft.weights.mlw,
-                      aircraft.weights.mzfw])
+    if (aircraft.propulsion.fuel_type!="Battery"):
 
-    fct_arg = aircraft
+        x_ini = np.array([aircraft.weights.mlw,
+                          aircraft.weights.mzfw])
 
-    output_dict = fsolve(fct_mass, x0=x_ini, args=fct_arg, full_output=True)
+        fct_arg = aircraft
 
-    aircraft.weights.mlw = output_dict[0][0]                          # Coupling variable
-    aircraft.weights.mzfw = output_dict[0][1]                         # Coupling variable
+        output_dict = fsolve(fct_mass, x0=x_ini, args=fct_arg, full_output=True)
+
+        aircraft.weights.mlw = output_dict[0][0]                          # Coupling variable
+        aircraft.weights.mzfw = output_dict[0][1]                         # Coupling variable
 
     # Update mass
     #------------------------------------------------------------------------------------------------------
@@ -507,10 +518,29 @@ def eval_mass_estimation(aircraft):
 def eval_mass_mission_adaptation(aircraft):
     """
     Perform mass - mission adaptation and update mass and CGs
+    Solve couplings carried by MTOW, MZFW and MLW
     """
 
     #===========================================================================================================
-    def fct_mass_mission(x_in,aircraft):
+    def fct_b_mass_mission(x_in,aircraft):
+
+        aircraft.weights.mtow = x_in[0]             # Coupling variable
+
+        # Mass
+        #------------------------------------------------------------------------------------------------------
+        eval_mass_breakdown(aircraft)
+
+        # Mission
+        #------------------------------------------------------------------------------------------------------
+        mission_b.eval_nominal_b_mission(aircraft)
+
+        y_out = aircraft.weights.mass_constraint_3
+
+        return y_out
+    #-----------------------------------------------------------------------------------------------------------
+
+    #===========================================================================================================
+    def fct_f_mass_mission(x_in,aircraft):
 
         aircraft.weights.mtow = x_in[0]             # Coupling variable
         aircraft.weights.mlw = x_in[1]              # Coupling variable
@@ -522,7 +552,7 @@ def eval_mass_mission_adaptation(aircraft):
 
         # Mission
         #------------------------------------------------------------------------------------------------------
-        sub_proc.eval_nominal_mission(aircraft)
+        mission_f.eval_nominal_f_mission(aircraft)
 
         y_out = np.array([aircraft.weights.mass_constraint_1,
                           aircraft.weights.mass_constraint_2,
@@ -531,17 +561,29 @@ def eval_mass_mission_adaptation(aircraft):
         return y_out
     #-----------------------------------------------------------------------------------------------------------
 
-    x_ini = np.array([aircraft.weights.mtow,
-                      aircraft.weights.mlw,
-                      aircraft.weights.mzfw])
+    if (aircraft.propulsion.fuel_type=="Battery"):
 
-    fct_arg = aircraft
+        x_ini = aircraft.weights.mtow
 
-    output_dict = fsolve(fct_mass_mission, x0=x_ini, args=fct_arg, full_output=True)
+        fct_arg = aircraft
 
-    aircraft.weights.mtow = output_dict[0][0]                         # Coupling variable
-    aircraft.weights.mlw = output_dict[0][1]                          # Coupling variable
-    aircraft.weights.mzfw = output_dict[0][2]                         # Coupling variable
+        output_dict = fsolve(fct_b_mass_mission, x0=x_ini, args=fct_arg, full_output=True)
+
+        aircraft.weights.mtow = output_dict[0][0]                         # Coupling variable
+
+    else:
+
+        x_ini = np.array([aircraft.weights.mtow,
+                          aircraft.weights.mlw,
+                          aircraft.weights.mzfw])
+
+        fct_arg = aircraft
+
+        output_dict = fsolve(fct_f_mass_mission, x0=x_ini, args=fct_arg, full_output=True)
+
+        aircraft.weights.mtow = output_dict[0][0]                         # Coupling variable
+        aircraft.weights.mlw = output_dict[0][1]                          # Coupling variable
+        aircraft.weights.mzfw = output_dict[0][2]                         # Coupling variable
 
     # Update mass data
     #------------------------------------------------------------------------------------------------------
@@ -549,7 +591,10 @@ def eval_mass_mission_adaptation(aircraft):
 
     # Update mission data
     #------------------------------------------------------------------------------------------------------
-    sub_proc.eval_nominal_mission(aircraft)
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_nominal_b_mission(aircraft)
+    else:
+        mission_f.eval_nominal_f_mission(aircraft)
 
     return
 
@@ -559,93 +604,11 @@ def eval_payload_range_analysis(aircraft):
     """
     Compute Payload - Range diagram corner points
     """
-    disa = 0.
-    altp = aircraft.design_driver.ref_cruise_altp
-    mach = aircraft.design_driver.cruise_mach
 
-    # Max payload mission
-    #------------------------------------------------------------------------------------------------------
-    tow = aircraft.weights.mtow
-    payload = aircraft.payload.maximum
-
-    aircraft.max_payload_mission.tow = tow
-    aircraft.max_payload_mission.payload = payload
-
-    range,block_fuel,block_time,total_fuel = sub_proc.mission_range(aircraft,tow,payload,altp,mach,disa)
-
-    aircraft.max_payload_mission.range = range
-    aircraft.max_payload_mission.block_fuel = block_fuel
-    aircraft.max_payload_mission.block_time = block_time
-    aircraft.max_payload_mission.total_fuel = total_fuel
-
-    # Max fuel mission
-    #------------------------------------------------------------------------------------------------------
-    tow = aircraft.weights.mtow
-    total_fuel = aircraft.weights.mfw
-
-    aircraft.max_fuel_mission.tow = tow
-    aircraft.max_fuel_mission.total_fuel = total_fuel
-
-    range,payload,block_fuel,block_time = sub_proc.mission_fuel_limited(aircraft,tow,total_fuel,altp,mach,disa)
-
-    aircraft.max_fuel_mission.payload = payload
-    aircraft.max_fuel_mission.range = range
-    aircraft.max_fuel_mission.block_fuel = block_fuel
-    aircraft.max_fuel_mission.block_time = block_time
-
-    # zero fuel mission
-    #------------------------------------------------------------------------------------------------------
-    total_fuel = aircraft.weights.mfw
-    tow = aircraft.weights.owe + total_fuel
-
-    aircraft.zero_payload_mission.tow = tow
-    aircraft.zero_payload_mission.total_fuel = total_fuel
-
-    range,payload,block_fuel,block_time = sub_proc.mission_fuel_limited(aircraft,tow,total_fuel,altp,mach,disa)
-
-    aircraft.zero_payload_mission.range = range
-    aircraft.zero_payload_mission.block_fuel = block_fuel
-    aircraft.zero_payload_mission.block_time = block_time
-
-    return
-
-
-#===========================================================================================================
-def eval_climb_performances(aircraft):
-    """
-    Compute climb performances
-    """
-
-    # Ceilings
-    #------------------------------------------------------------------------------------------------------
-    toc = aircraft.design_driver.top_of_climb_altp
-    oei_ceil_req = aircraft.low_speed.req_oei_altp
-
-    vz_clb,vz_crz,oei_path,oei_mach = perfo.ceilings(aircraft,toc,oei_ceil_req)
-
-    aircraft.low_speed.eff_oei_path = oei_path
-    aircraft.high_speed.eff_vz_climb = vz_clb
-    aircraft.high_speed.eff_vz_cruise = vz_crz
-
-    aircraft.low_speed.perfo_constraint_3 = (oei_path - aircraft.low_speed.req_oei_path) / aircraft.low_speed.req_oei_path
-
-    aircraft.high_speed.perfo_constraint_1 = vz_clb - aircraft.high_speed.req_vz_climb
-    aircraft.high_speed.perfo_constraint_2 = vz_crz - aircraft.high_speed.req_vz_cruise
-
-    # Time to climb to requested altitude
-    #------------------------------------------------------------------------------------------------------
-    toc = aircraft.high_speed.req_toc_altp
-    disa = 0.
-    mass = aircraft.weights.mtow
-    vcas1 = aircraft.high_speed.cas1_ttc
-    vcas2 = aircraft.high_speed.cas2_ttc
-    mach = aircraft.design_driver.cruise_mach
-
-    ttc = perfo.time_to_climb(aircraft,toc,disa,mass,vcas1,vcas2,mach)
-
-    aircraft.high_speed.eff_ttc = ttc
-
-    aircraft.high_speed.perfo_constraint_3 = (aircraft.high_speed.req_ttc - ttc) / aircraft.high_speed.req_ttc
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_b_payload_range_analysis(aircraft)
+    else:
+        mission_f.eval_f_payload_range_analysis(aircraft)
 
     return
 
@@ -658,7 +621,10 @@ def eval_performance_analysis(aircraft):
 
     # Nominal mission
     #------------------------------------------------------------------------------------------------------
-    sub_proc.eval_nominal_mission(aircraft)
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_nominal_b_mission(aircraft)
+    else:
+        mission_f.eval_nominal_f_mission(aircraft)
 
     # Take off field length
     #------------------------------------------------------------------------------------------------------
@@ -670,7 +636,7 @@ def eval_performance_analysis(aircraft):
 
     # Climb performances
     #------------------------------------------------------------------------------------------------------
-    eval_climb_performances(aircraft)
+    sub_proc.eval_climb_performances(aircraft)
 
     # Environment
     #------------------------------------------------------------------------------------------------------
@@ -678,7 +644,10 @@ def eval_performance_analysis(aircraft):
 
     # Cost mission
     #-----------------------------------------------------------------------------------------------------------------------------------------------
-    sub_proc.eval_cost_mission(aircraft)
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_cost_b_mission(aircraft)
+    else:
+        mission_f.eval_cost_f_mission(aircraft)
 
     # Economics
     #------------------------------------------------------------------------------------------------------

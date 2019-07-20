@@ -19,135 +19,6 @@ from marilib.aircraft_model.operations import flight_mechanics as flight
 
 
 #===========================================================================================================
-def mission(aircraft,dist_range,tow,altp,mach,disa):
-    """
-    Mission computation using breguet equation, fixed L/D and fixed sfc
-    """
-
-    engine = aircraft.turbofan_engine
-    propulsion = aircraft.propulsion
-
-    (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
-
-    g = earth.gravity()
-
-    pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
-    vsnd = earth.sound_speed(tamb)
-    tas = vsnd*mach
-
-    lod_max, cz_lod_max = airplane_aero.lod_max(aircraft, pamb, tamb, mach)
-
-    lod_cruise = 0.95 * lod_max
-
-    nei = 0
-
-    sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
-
-    if (propulsion.architecture=="PTE1"):
-        fn,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
-
-    # Departure ground phases
-    #-----------------------------------------------------------------------------------------------------------
-    fuel_taxi_out = (34. + 2.3e-4*engine.reference_thrust)*engine.n_engine
-    time_taxi_out = 540.
-
-    fuel_take_off = 1e-4*(2.8+2.3/engine.bpr)*tow
-    time_take_off = 220.*tow/(engine.reference_thrust*engine.n_engine)
-
-    # Mission leg
-    #-----------------------------------------------------------------------------------------------------------
-    if (propulsion.architecture=="TF"):
-        fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
-    elif (propulsion.architecture=="PTE1"):
-        fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
-                        - (sfc/sec)*aircraft.pte1_battery.energy_cruise
-    else:
-        raise Exception("propulsion.architecture index is out of range")
-
-    time_mission = 1.09*(dist_range/tas)
-
-    l_w = tow - fuel_mission
-
-    # Arrival ground phases
-    #-----------------------------------------------------------------------------------------------------------
-    fuel_landing = 1e-4*(0.5+2.3/engine.bpr)*l_w
-    time_landing = 180.
-
-    fuel_taxi_in = (26. + 1.8e-4*engine.reference_thrust)*engine.n_engine
-    time_taxi_in = 420.
-
-    # Block fuel and time
-    #-----------------------------------------------------------------------------------------------------------
-    block_fuel = fuel_taxi_out + fuel_take_off + fuel_mission + fuel_landing + fuel_taxi_in
-    time_block = time_taxi_out + time_take_off + time_mission + time_landing + time_taxi_in
-
-    # Diversion and holding reserve fuel
-    #-----------------------------------------------------------------------------------------------------------
-    fuel_diversion = l_w*(1.-numpy.exp(-(sfc*g*regul.diversion_range())/(tas*lod_cruise)))
-
-    fuel_holding = sfc*(l_w*g/lod_max)*regul.holding_time()
-
-    # Total
-    #-----------------------------------------------------------------------------------------------------------
-    design_range = aircraft.design_driver.design_range
-
-    fuel_total = fuel_mission*(1.+regul.reserve_fuel_ratio(design_range)) + fuel_diversion + fuel_holding
-
-    #-----------------------------------------------------------------------------------------------------------
-    return block_fuel,time_block,fuel_total
-
-
-#===========================================================================================================
-def specific_air_range(aircraft,altp,mass,mach,disa):
-
-    propulsion = aircraft.propulsion
-
-    (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
-
-    g = earth.gravity()
-
-    pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
-
-    vsnd = earth.sound_speed(tamb)
-
-    Cz = flight.lift_from_speed(aircraft,pamb,mach,mass)
-
-    [Cx,LoD] = airplane_aero.drag(aircraft,pamb,tamb,mach,Cz)
-
-    nei = 0
-
-    sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
-
-    sar = (vsnd*mach*LoD)/(mass*g*sfc)
-
-    return sar
-
-
-#===========================================================================================================
-def sar_max(aircraft,mass,mach,disa):
-
-    #=======================================================================================
-    def fct_sar_max(altp,mass,mach,disa,aircraft):
-        sar = specific_air_range(aircraft,altp,mass,mach,disa)
-        return sar
-    #---------------------------------------------------------------------------------------
-    design_driver = aircraft.design_driver
-
-    altp_ini = design_driver.ref_cruise_altp
-
-    d_altp = 250.
-
-    fct = [fct_sar_max, mass,mach,disa,aircraft]
-
-    (altp_sar_max,sar_max,rc) = maximize_1d(altp_ini,d_altp,fct)
-
-    return sar_max,altp_sar_max
-
-
-
-
-
-#===========================================================================================================
 def ceilings(aircraft,toc,oei_ceil):
 
     design_driver = aircraft.design_driver
@@ -198,6 +69,7 @@ def ceilings(aircraft,toc,oei_ceil):
 def time_to_climb(aircraft,toc,disa,mass,vcas1,vcas2,mach):
     """
     Time to climb to initial cruise altitude
+    For simplicity reasons, airplane mass is supposed constant
     """
 
     propulsion = aircraft.propulsion

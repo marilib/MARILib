@@ -91,16 +91,23 @@ def eval_aircraft_weights(aircraft):
 
     weights.mfw = min(tanks.mfw_volume_limited, weights.mtow - weights.owe)
 
-    mzfw = weights.owe + payload.maximum
+    if (propulsion.fuel_type=="Battery"):
 
-    weights.mass_constraint_1 = weights.mzfw - mzfw
+        weights.mass_constraint_1 = 0.
+        weights.mass_constraint_2 = 0.
 
-    if (cabin.n_pax_ref>100):
-        mlw = min(weights.mtow , (1.07*weights.mzfw))
     else:
-        mlw = weights.mtow
 
-    weights.mass_constraint_2 = weights.mlw - mlw
+        mzfw = weights.owe + payload.maximum
+
+        weights.mass_constraint_1 = weights.mzfw - mzfw
+
+        if (cabin.n_pax_ref>100):
+            mlw = min(weights.mtow , (1.07*weights.mzfw))
+        else:
+            mlw = weights.mtow
+
+        weights.mass_constraint_2 = weights.mlw - mlw
 
     return
 
@@ -116,12 +123,14 @@ def eval_mass_coupling(aircraft):
     payload = aircraft.payload
     weights = aircraft.weights
 
-    weights.mzfw = weights.owe + payload.maximum
+    if (aircraft.propulsion.fuel_type!="Battery"):
 
-    if (cabin.n_pax_ref>100):
-        weights.mlw = min(weights.mtow , (1.07*weights.mzfw))
-    else:
-        weights.mlw = weights.mtow
+        weights.mzfw = weights.owe + payload.maximum
+
+        if (cabin.n_pax_ref>100):
+            weights.mlw = min(weights.mtow , (1.07*weights.mzfw))
+        else:
+            weights.mlw = weights.mtow
 
     return
 

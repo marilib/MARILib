@@ -93,6 +93,7 @@ def eval_ef1_nacelle_design(aircraft):
     design_driver = aircraft.design_driver
     fuselage = aircraft.fuselage
     wing = aircraft.wing
+    vtp = aircraft.vertical_tail
 
     propulsion = aircraft.propulsion
 
@@ -117,23 +118,53 @@ def eval_ef1_nacelle_design(aircraft):
 
     tan_phi0 = 0.25*(wing.c_kink-wing.c_tip)/(wing.y_tip-wing.y_kink) + numpy.tan(wing.sweep)
 
-    if (nacelle.attachment == 1) :  # Nacelles are attached under the wing
+    if (nacelle.attachment == 1):
 
-        nacelle.y_ext = 0.7 * fuselage.width + 1.4 * nacelle.width      # statistical regression
+        if (engine.n_engine==2):
 
-        nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
+            nacelle.y_ext = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
-        nacelle.z_ext = - 0.5 * fuselage.height \
-                    + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
-                    - 0.5*nacelle.width
+            nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
 
-    elif (nacelle.attachment == 2) :    # Nacelles are attached on rear fuselage
+            nacelle.z_ext = - 0.5 * fuselage.height \
+                            + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
+                            - 0.5*nacelle.width
 
-        nacelle.y_ext = 0.5 * fuselage.width + 0.6 * nacelle.width      # statistical regression
+        elif (engine.n_engine==4):
 
-        nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
+            nacelle.y_int = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
-        nacelle.z_ext = 0.5 * fuselage.height
+            nacelle.x_int = wing.x_root + (nacelle.y_int-wing.y_root)*tan_phi0 - 0.7*nacelle.length
+
+            nacelle.z_int = - 0.5 * fuselage.height \
+                            + (nacelle.y_int - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
+                            - 0.5*nacelle.width
+
+            nacelle.y_ext = 2.0 * fuselage.width + 1.5 * nacelle.width      # statistical regression
+
+            nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
+
+            nacelle.z_ext = - 0.5 * fuselage.height \
+                            + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
+                            - 0.5*nacelle.width
+        else:
+            raise Exception("engine.n_engine, number of engine not supported")
+
+    elif (nacelle.attachment == 2):
+
+        if (engine.n_engine==2):
+
+            nacelle.y_ext = 0.5 * fuselage.width + 0.6 * nacelle.width      # statistical regression
+
+            nacelle.x_ext = vtp.x_root - 0.5*nacelle.length
+
+            nacelle.z_ext = 0.5 * fuselage.height
+
+        else:
+            raise Exception("engine.n_engine, number of engine not supported")
+
+    else:
+        raise Exception("nacelle.attachment, index is out of range")
 
     return
 
@@ -221,7 +252,7 @@ def eval_ef1_nacelle_mass(aircraft):
     engine = aircraft.electrofan_engine
     nacelle = aircraft.electrofan_nacelle
 
-    power_elec = aircraft.pte1_power_elec_chain
+    power_elec = aircraft.ef1_power_elec_chain
 
     # Propulsion system mass is sized according max power
     # -----------------------------------------------------------------------
@@ -247,41 +278,20 @@ def eval_ef1_nacelle_mass(aircraft):
 
 
 #===========================================================================================================
-def eval_wing_battery_data(aircraft):
+def eval_battery_cg_range(aircraft):
     """
     Wing battery predesign using tank data structure
     """
 
-    propulsion = aircraft.propulsion
-    fuselage = aircraft.fuselage
-    wing = aircraft.wing
-
-    battery = aircraft.ef1_battery
     tanks = aircraft.tanks
 
-    tanks.cantilever_volume = 0.20 * (wing.area*wing.mac*(0.50*wing.t_o_c_r + 0.30*wing.t_o_c_k + 0.20*wing.t_o_c_t))
+    # Need to take account of any possible battery loading
+    # WARNING : in early design steps, it may occur that the resulting weight of the airplane would be higher than MTOW
+    tanks.fuel_max_fwd_cg = tanks.fuel_central_cg    # Battery max forward CG, central volume is forward only within backward swept wing
+    tanks.fuel_max_fwd_mass = tanks.central_volume*tanks.fuel_density
 
-    tanks.central_volume = 1.3 * fuselage.width * wing.t_o_c_r * wing.mac**2
-
-    tanks.fuel_density = earth.fuel_density(propulsion.fuel_type)
-
-    tanks.mfw_volume_limited = (tanks.central_volume + tanks.cantilever_volume)*battery.density
-
-    tanks.fuel_cantilever_cg =  0.25*(wing.x_root + 0.40*wing.c_root) \
-                              + 0.65*(wing.x_kink + 0.40*wing.c_kink) \
-                              + 0.10*(wing.x_tip + 0.40*wing.c_tip)
-
-    tanks.fuel_central_cg = wing.x_root + 0.30*wing.c_root
-
-    tanks.fuel_total_cg =  (tanks.fuel_cantilever_cg*tanks.cantilever_volume + tanks.fuel_central_cg*tanks.central_volume) \
-                        / (tanks.central_volume + tanks.cantilever_volume)
-
-    # Batteries will not change their mass during flight
-    tanks.fuel_max_fwd_cg = tanks.fuel_total_cg
-    tanks.fuel_max_fwd_mass = tanks.mfw_volume_limited * battery.fill_factor
-
-    tanks.fuel_max_bwd_cg = tanks.fuel_total_cg
-    tanks.fuel_max_bwd_mass = tanks.mfw_volume_limited * battery.fill_factor
+    tanks.fuel_max_bwd_cg = tanks.fuel_cantilever_cg    # Battery max Backward CG
+    tanks.fuel_max_bwd_mass = tanks.cantilever_volume*tanks.fuel_density
 
     return
 
@@ -289,18 +299,20 @@ def eval_wing_battery_data(aircraft):
 #===========================================================================================================
 def eval_ef1_battery_mass(aircraft):
     """
-    Wing battery predesign using tank data structure
+    For EF1 architecture, battery mass is not accounted into OWE
+    Nevertheless, for simplicity reason, battery CG is supposed constant
     """
 
     tanks = aircraft.tanks
-
+    propulsion = aircraft.propulsion
     battery = aircraft.ef1_battery
 
-    battery.mass = tanks.mfw_volume_limited * battery.fill_factor
+    propulsion.battery_energy_density = battery.energy_density
+
+    battery.mass_max = tanks.mfw_volume_limited
     battery.c_g = tanks.fuel_total_cg
 
-    aircraft.propulsion.battery.energy_density = 0.
-    aircraft.weights.battery = battery.mass
+    aircraft.weights.battery = 0.
     aircraft.center_of_gravity.battery = battery.c_g
 
     return
