@@ -145,11 +145,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.rear_electric_nacelle.motor_pw_density = init.e_motor_pw_density()
     aircraft.rear_electric_nacelle.nacelle_pw_density = init.e_nacelle_pw_density()
 
-    aircraft.pte1_power_elec_chain.mto = init.electric_shaft_power()       # Watts, electric motor power
-    aircraft.pte1_power_elec_chain.mcn = init.electric_shaft_power()       # Watts, electric motor power
-    aircraft.pte1_power_elec_chain.mcl = init.electric_shaft_power()       # Watts, electric motor power
-    aircraft.pte1_power_elec_chain.mcr = init.electric_shaft_power()       # Watts, electric motor power
-    aircraft.pte1_power_elec_chain.fid = 0.01
+    aircraft.pte1_power_elec_chain.mto = init.electric_shaft_power()       # Watts, rear fan shaft power
+    aircraft.pte1_power_elec_chain.mcn = init.electric_shaft_power()       # Watts, rear fan shaft power
+    aircraft.pte1_power_elec_chain.mcl = init.electric_shaft_power()       # Watts, rear fan shaft power
+    aircraft.pte1_power_elec_chain.mcr = init.electric_shaft_power()       # Watts, rear fan shaft power
+    aircraft.pte1_power_elec_chain.fid = init.idle_electric_shaft_power()
 
     aircraft.pte1_power_elec_chain.overall_efficiency = init.e_chain_efficiency()
     aircraft.pte1_power_elec_chain.generator_pw_density = init.generator_power_density()
@@ -180,6 +180,12 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.turbofan_nacelle.y_ext = init.nacelle_y_ext(aircraft.electrofan_nacelle.attachment,
                                                          aircraft.fuselage.width,
                                                          aircraft.electrofan_nacelle.width)
+
+    aircraft.ef1_power_elec_chain.mto = 0.       # Watts, rear fan shaft power
+    aircraft.ef1_power_elec_chain.mcn = 0.       # Watts, rear fan shaft power
+    aircraft.ef1_power_elec_chain.mcl = 0.       # Watts, rear fan shaft power
+    aircraft.ef1_power_elec_chain.mcr = 0.       # Watts, rear fan shaft power
+    aircraft.ef1_power_elec_chain.fid = 0.
 
     aircraft.ef1_power_elec_chain.overall_efficiency = init.e_chain_efficiency()
     aircraft.ef1_power_elec_chain.generator_pw_density = init.generator_power_density()
@@ -867,17 +873,11 @@ def eval_optim_data(x_in,ac,crit_index,crit_ref,mda_type):
     """
 
     if (ac.propulsion.architecture=="TF"):
-
         ac.turbofan_engine.reference_thrust = x_in[0]
-
     elif (ac.propulsion.architecture=="PTE1"):
-
         ac.turbofan_engine.reference_thrust = x_in[0]
-
-    elif (ac.propulsion.architecture=="TP"):
-
-        ac.turboprop_engine.reference_thrust = x_in[0]
-
+    elif (ac.propulsion.architecture=="EF1"):
+        ac.electrofan_engine.reference_thrust = x_in[0]
     else:
         raise Exception("propulsion.architecture index is out of range")
 
@@ -961,8 +961,8 @@ def mdf_process(aircraft,search_domain,criterion,mda_type):
         start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
     elif (aircraft.propulsion.architecture=="PTE1"):
         start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture=="TP"):
-        start_value = (aircraft.turboprop_engine.reference_thrust,aircraft.wing.area)
+    elif (aircraft.propulsion.architecture=="EF1"):
+        start_value = (aircraft.electrofan_engine.reference_thrust,aircraft.wing.area)
     else:
         raise Exception("propulsion.architecture index is out of range")
 

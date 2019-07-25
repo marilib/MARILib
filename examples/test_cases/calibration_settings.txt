@@ -114,7 +114,7 @@
         NOx_index = +
         CO_index = +
         HC_index = +
-        sulphuric_acid_index = +
+        sulfuric_acid_index = +
         nitrous_acid_index = +
         nitric_acid_index = +
         soot_index = +

@@ -52,9 +52,11 @@ def eval_ef1_engine_design(aircraft):
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
-    engine.rating_factor = {"MTO":1.00, "MCN":0.90, "MCL":0.90, "MCR":0.80, "FID":0.05}
+    engine.rating_factor = {"MTO":1.00, "MCN":0.80, "MCL":0.80, "MCR":0.80, "FID":0.05}
 
     # Propulsion architecture design, definition of e-fan power in each flight phase
+    #-----------------------------------------------------------------------------------------------------------
+    # Main engines
     #-----------------------------------------------------------------------------------------------------------
     disa = 15.
     altp = 0.
@@ -64,7 +66,10 @@ def eval_ef1_engine_design(aircraft):
     Vsnd = earth.sound_speed(tamb)
     Vair = mach*Vsnd
 
-    ref_shaft_power = engine.reference_thrust * Vair / nacelle.efficiency_prop
+    # reference_thrust is driving the design through ref_shat_power but actual thrust is computed later
+    ref_shaft_power = 0.8 * engine.reference_thrust * Vair / nacelle.efficiency_prop
+
+    engine.reference_power = ref_shaft_power
 
     engine.mto_e_shaft_power = ref_shaft_power * engine.rating_factor[MTO]
     engine.mcn_e_shaft_power = ref_shaft_power * engine.rating_factor[MCN]
@@ -72,6 +77,8 @@ def eval_ef1_engine_design(aircraft):
     engine.mcr_e_shaft_power = ref_shaft_power * engine.rating_factor[MCR]
     engine.fid_e_shaft_power = ref_shaft_power * engine.rating_factor[FID]
 
+    # Rear engine, if any
+    #-----------------------------------------------------------------------------------------------------------
     e_shaft_power = numpy.array([engine.mto_e_shaft_power,
                                  engine.mcn_e_shaft_power,
                                  engine.mcl_e_shaft_power,
@@ -299,7 +306,6 @@ def eval_battery_cg_range(aircraft):
 #===========================================================================================================
 def eval_ef1_battery_mass(aircraft):
     """
-    For EF1 architecture, battery mass is not accounted into OWE
     Nevertheless, for simplicity reason, battery CG is supposed constant
     """
 

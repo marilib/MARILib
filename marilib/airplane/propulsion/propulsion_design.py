@@ -70,7 +70,7 @@ def eval_propulsion_design(aircraft):
 
     (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
-    (Fn,Data) = propu.thrust(aircraft,pamb,tamb,mach,MTO,nei)
+    Fn,Data = propu.thrust(aircraft,pamb,tamb,mach,MTO,nei)
 
     propulsion.reference_thrust_effective = (Fn/engine.n_engine)/0.80
     propulsion.mto_thrust_ref = Fn/engine.n_engine
@@ -95,24 +95,20 @@ def eval_propulsion_design(aircraft):
 
     (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
-    propulsion.sfc_cruise_ref = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
-
     if (propulsion.architecture=="TF"):
-
-        sec = 0.
-
+        propulsion.sfc_cruise_ref = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
+        propulsion.sec_cruise_ref = 0.
     elif (propulsion.architecture=="PTE1"):
-
+        propulsion.sfc_cruise_ref = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
         fn,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
-
+        propulsion.sec_cruise_ref = sec
     elif (propulsion.architecture=="EF1"):
-
+        propulsion.sfc_cruise_ref = 0.
         fn,sec = propu.ef1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
-
+        propulsion.sec_cruise_ref = sec
     else:
         raise Exception("propulsion.architecture index is out of range")
 
-    propulsion.sec_cruise_ref = sec
 
     (Fn,Data) = propu.thrust(aircraft,pamb,tamb,mach,FID,nei)
 
@@ -161,15 +157,15 @@ def eval_propulsion_mass(aircraft):
         pylon = aircraft.turbofan_pylon
         nacelle = aircraft.turbofan_nacelle
 
-        e_nacelle = aircraft.rear_electric_nacelle
+        r_nacelle = aircraft.rear_electric_nacelle
         power_elec = aircraft.pte1_power_elec_chain
 
         eval_turbofan_pylon_mass(aircraft)
         eval_pte1_nacelle_mass(aircraft)
 
-        propulsion.mass = pylon.mass + nacelle.mass + e_nacelle.mass + power_elec.mass
+        propulsion.mass = pylon.mass + nacelle.mass + r_nacelle.mass + power_elec.mass
         propulsion.c_g = (  pylon.c_g*pylon.mass + nacelle.c_g*nacelle.mass \
-                          + e_nacelle.c_g*e_nacelle.mass + power_elec.c_g*power_elec.mass \
+                          + r_nacelle.c_g*r_nacelle.mass + power_elec.c_g*power_elec.mass \
                           )/propulsion.mass
 
     elif (propulsion.architecture=="EF1"):

@@ -87,16 +87,17 @@ def eval_aircraft_weights(aircraft):
     weights.mwe =  cabin.m_furnishing + fuselage.mass + wing.mass + htp.mass + vtp.mass \
                  + ldg.mass + systems.mass + propulsion.mass
 
-    weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + weights.battery
-
-    weights.mfw = min(tanks.mfw_volume_limited, weights.mtow - weights.owe)
-
     if (propulsion.fuel_type=="Battery"):
+
+        # For EF1 architecture : battery mass is not accounted into OWE
+        weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet
 
         weights.mass_constraint_1 = 0.
         weights.mass_constraint_2 = 0.
 
     else:
+
+        weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + weights.battery
 
         mzfw = weights.owe + payload.maximum
 
@@ -108,6 +109,9 @@ def eval_aircraft_weights(aircraft):
             mlw = weights.mtow
 
         weights.mass_constraint_2 = weights.mlw - mlw
+
+    # WARNING : for EF1 architecture, MFW corresponds to max battery weight
+    weights.mfw = min(tanks.mfw_volume_limited, weights.mtow - weights.owe)
 
     return
 

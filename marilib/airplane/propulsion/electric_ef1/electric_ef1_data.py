@@ -12,9 +12,14 @@ class Ef1PowerElectricChain(object):
     Electric chain data
     """
     INFO = {\
-    "max_power":{"unit":"kW", "om":1.e4, "txt":"E-fan motor maximum power"},
-    "max_power_rating":{"unit":"int", "om":1.e0, "txt":"Engine rating of e-fan motor maximum power"},
-    "overall_efficiency":{"unit":"no_dim", "om":1.e0, "txt":"Power efficiency of the electric chain"},
+    "mto":{"unit":"uc", "om":1.e0, "txt":"Take off shaft power of optional rear engine"},
+    "mcn":{"unit":"uc", "om":1.e0, "txt":"Maxi continuous shaft power of optional rear engine"},
+    "mcl":{"unit":"uc", "om":1.e0, "txt":"Max climb shaft power of optional rear engine"},
+    "mcr":{"unit":"uc", "om":1.e0, "txt":"Max cruise shaft power of optional rear engine"},
+    "fid":{"unit":"uc", "om":1.e0, "txt":"Flight idle shaft power of optional rear engine"},
+    "max_power":{"unit":"kW", "om":1.e4, "txt":"Maximum shaft power of optional rear engine"},
+    "max_power_rating":{"unit":"int", "om":1.e0, "txt":"Rating of maximum shaft power of optional rear engine"},
+    "overall_efficiency":{"unit":"no_dim", "om":1.e0, "txt":"Overall power efficiency of the electric chain"},
     "generator_pw_density":{"unit":"kW/kg", "om":1.e0, "txt":"Power density of electric generation"},
     "rectifier_pw_density":{"unit":"kW/kg", "om":1.e0, "txt":"Power density of rectifiers"},
     "wiring_pw_density":{"unit":"kW/kg", "om":1.e0, "txt":"Power density of wiring"},
@@ -22,7 +27,12 @@ class Ef1PowerElectricChain(object):
     "mass":{"unit":"kg", "om":1.e2, "txt":"Mass of the electric chain (generator, rectifier, wires, cooling)"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the electric chain"}
     }
-    def __init__(self, max_power = None,
+    def __init__(self, mto = None,
+                       mcn = None,
+                       mcl = None,
+                       mcr = None,
+                       fid = None,
+                       max_power = None,
                        max_power_rating = None,
                        overall_efficiency = None,
                        generator_pw_density = None,
@@ -31,6 +41,11 @@ class Ef1PowerElectricChain(object):
                        cooling_pw_density = None,
                        mass = None,
                        c_g = None):
+        self.mto = mto
+        self.mcn = mcn
+        self.mcl = mcl
+        self.mcr = mcr
+        self.fid = fid
         self.max_power = max_power
         self.max_power_rating = max_power_rating
         self.overall_efficiency = overall_efficiency
@@ -150,22 +165,24 @@ class ElectrofanEngine(object):
     """
     INFO = {\
     "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of electric engine"},
-    "reference_thrust":{"unit":"daN", "om":1.e4, "txt":"Design Reference Thrust of the engines"},
+    "reference_thrust":{"unit":"daN", "om":1.e4, "txt":"Design Reference Thrust of main engines"},
+    "reference_power":{"unit":"kW", "om":1.e3, "txt":"Design Reference Shaft Power of main engines"},
     "rating_factor":{"unit":"int", "om":1.e0, "txt":"Array of rating factors versus reference thrust"},
     "mto_e_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in take off rating (one engine), Sea Level, ISA+15, Mach 0,25"},
-    "mto_e_fan_thrust ":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25"},
+    "mto_e_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25"},
     "mcn_e_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in maxi continuous rating (one engine), required ceiling altitude, ISA, cruise Mach"},
-    "mcn_e_fan_thrust ":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in maxi continuous rating (one engine), required ceiling altitude, ISA, cruise Mach"},
+    "mcn_e_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in maxi continuous rating (one engine), required ceiling altitude, ISA, cruise Mach"},
     "mcl_e_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in max climb rating (one engine), required Top of Climb altitude, ISA, cruise Mach"},
-    "mcl_e_fan_thrust ":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in max climb rating (one engine), required Top of Climb altitude, ISA, cruise Mach"},
+    "mcl_e_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in max climb rating (one engine), required Top of Climb altitude, ISA, cruise Mach"},
     "mcr_e_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in max cruise rating (one engine), reference cruise altitude, ISA, cruise Mach"},
-    "mcr_e_fan_thrust ":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in max cruise rating (one engine), reference cruise altitude, ISA, cruise Mach"},
+    "mcr_e_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in max cruise rating (one engine), reference cruise altitude, ISA, cruise Mach"},
     "fid_e_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
-    "fid_e_fan_thrust ":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
-    "flight_data ":{"unit":"dict", "txt":"Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}"}
+    "fid_e_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
+    "flight_data":{"unit":"dict", "txt":"Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}"}
     }
     def __init__(self, n_engine = None,
                        reference_thrust = None,
+                       reference_power = None,
                        rating_factor = None,
                        mto_e_shaft_power = None,
                        mto_e_fan_thrust = None,
@@ -180,6 +197,7 @@ class ElectrofanEngine(object):
                        flight_data = None):
         self.n_engine = n_engine
         self.reference_thrust = reference_thrust
+        self.reference_power = reference_power
         self.rating_factor = rating_factor
         self.mto_e_shaft_power = mto_e_shaft_power
         self.mto_e_fan_thrust = mto_e_fan_thrust

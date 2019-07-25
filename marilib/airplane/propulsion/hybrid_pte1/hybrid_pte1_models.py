@@ -27,8 +27,8 @@ def pte1_sfc(aircraft,pamb,tamb,mach,rating,nei):
     nacelle = aircraft.turbofan_nacelle
 
     power_elec = aircraft.pte1_power_elec_chain
-    e_engine = aircraft.rear_electric_engine
-    e_nacelle = aircraft.rear_electric_nacelle
+    r_engine = aircraft.rear_electric_engine
+    r_nacelle = aircraft.rear_electric_nacelle
 
     power_ratio = {"MTO":power_elec.mto_e_power_ratio,
                    "MCN":power_elec.mcn_e_power_ratio,
@@ -47,7 +47,7 @@ def pte1_sfc(aircraft,pamb,tamb,mach,rating,nei):
     kW = power_ratio[rating]
 
     eff_prop = nacelle.efficiency_prop
-    eff_e_prop = e_nacelle.efficiency_prop
+    eff_e_prop = r_nacelle.efficiency_prop
     eff_chain = power_elec.overall_efficiency
 
     eff_h = kC + (1.-kC)*( kW*kBLIe*(eff_e_prop/eff_prop)*eff_chain + (1.-kW) )
@@ -66,8 +66,8 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     battery = aircraft.pte1_battery
     power_elec = aircraft.pte1_power_elec_chain
-    e_engine = aircraft.rear_electric_engine
-    e_nacelle = aircraft.rear_electric_nacelle
+    r_engine = aircraft.rear_electric_engine
+    r_nacelle = aircraft.rear_electric_nacelle
 
     power_ratio = {"MTO":power_elec.mto_e_power_ratio,
                    "MCN":power_elec.mcn_e_power_ratio,
@@ -76,7 +76,7 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
                    "FID":power_elec.fid_e_power_ratio}
 
     # Battery power feed is used in temporary phases only
-    power_factor = battery.power_feed * e_nacelle.controller_efficiency * e_nacelle.motor_efficiency
+    power_factor = battery.power_feed * r_nacelle.controller_efficiency * r_nacelle.motor_efficiency
     battery_power_feed = {"MTO":power_factor,
                           "MCN":0.,
                           "MCL":power_factor,
@@ -98,18 +98,18 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     # Effective eFan shaft power
     pw_shaft2 =   shaft_power2 * power_elec.overall_efficiency \
-                + e_nacelle.motor_efficiency * e_nacelle.controller_efficiency * battery_power_feed[rating]
+                + r_nacelle.motor_efficiency * r_nacelle.controller_efficiency * battery_power_feed[rating]
 
     if (pw_shaft2 > 0.):
 
         if (propulsion.bli_effect>0):
-            (fn_fan2,q1,dVbli) = jet.fan_thrust_with_bli(e_nacelle,Pamb,Tamb,Mach,pw_shaft2)
+            (fn_fan2,q1,dVbli) = jet.fan_thrust_with_bli(r_nacelle,Pamb,Tamb,Mach,pw_shaft2)
             dVbli_o_V = dVbli/Vair
         else:
-            (fn_fan2,q0) = jet.fan_thrust(e_nacelle,Pamb,Tamb,Mach,pw_shaft2)
+            (fn_fan2,q0) = jet.fan_thrust(r_nacelle,Pamb,Tamb,Mach,pw_shaft2)
             dVbli_o_V = 0.
 
-        sec = (pw_shaft2/(e_nacelle.motor_efficiency*e_nacelle.controller_efficiency))/fn_fan2
+        sec = (pw_shaft2/(r_nacelle.motor_efficiency*r_nacelle.controller_efficiency))/fn_fan2
 
     else:
 

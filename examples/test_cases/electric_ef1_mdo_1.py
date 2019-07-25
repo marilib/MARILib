@@ -8,17 +8,13 @@ Created on Thu Jan 24 23:22:21 2019
 
 from marilib.tools import units as unit
 
+from marilib.aircraft_model.airplane import viewer as show
+
 from marilib.aircraft_data.aircraft_description import Aircraft
 
 from marilib.processes import assembly as run, initialization as init
 
 from marilib.aircraft_model.operations import handling_qualities as h_q
-
-from marilib.earth import environment as earth
-
-from marilib.airplane.propulsion import jet_models as jet
-
-from marilib.aircraft_model.airplane import viewer as show
 
 #======================================================================================================
 # Initialization
@@ -35,45 +31,76 @@ cruise_mach = 0.50
 #------------------------------------------------------------------------------------------------------
 run.aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propulsive_architecture, number_of_engine)
 
+print("-------------------------------------------")
+print("Initialization : done")
+
 #======================================================================================================
 # Modify initial values here
 #======================================================================================================
 
+
 #======================================================================================================
 # Design process
 #======================================================================================================
+# Global design parameter n°1 : aircraft.turbofan_engine.reference_thrust, bounds = (50000,150000)
+# Global design parameter n°2 : aircraft.wing.area, bounds = (50,200)
+#
+# Geometrical coupling on : aircraft.horizontal_tail.area     (statistical sizing of HTP area)
+# Geometrical coupling on : aircraft.vertical_tail.area       (statistical sizing of VTP area)
+#
+# Geometrical coupling on : aircraft.turbofan_nacelle.width
+# Geometrical coupling on : aircraft.turbofan_nacelle.y_ext
+#
+# Mass design parameter n°1 : aircraft.weights.mtow
+# Mass design parameter n°2 : aircraft.weights.mlw
+# Mass design parameter n°3 : aircraft.weights.mzfw
+# Mass constraint n°1 : aircraft.weights.mass_constraint_1 ==> 0
+# Mass constraint n°2 : aircraft.weights.mass_constraint_2 ==> 0
+# Mass constraint n°3 : aircraft.weights.mass_constraint_3 ==> 0
+#
+# Perfo constraint n°1 : aircraft.high_speed.perfo_constraint_1 >= 0
+# Perfo constraint n°2 : aircraft.high_speed.perfo_constraint_2 >= 0
+# Perfo constraint n°3 : aircraft.low_speed.perfo_constraint_3 >= 0
+# Perfo constraint n°4 : aircraft.high_speed.perfo_constraint_3 >= 0
+# Perfo constraint n°5 : aircraft.low_speed.perfo_constraint_1 >= 0
+# Perfo constraint n°6 : aircraft.low_speed.perfo_constraint_2 >= 0
+#
+# Possible criterion : aircraft.weights.mtow
+# Possible criterion : aircraft.cost_mission.block_fuel
+# Possible criterion : aircraft.environmental_impact.CO2_metric
+# Possible criterion : aircraft.economics.cash_operating_cost
+# Possible criterion : aircraft.economics.direct_operating_cost
 
-# Solve the geometric coupling between airframe and engines
 #------------------------------------------------------------------------------------------------------
-run.eval_aircraft_pre_design(aircraft)
+thrust_bnd = (50000,150000)
+area_bnd = (50,200)
+search_domain = (thrust_bnd,area_bnd)
 
-# Estimate all mass and CGs
+# Perform MDF optimization
 #------------------------------------------------------------------------------------------------------
-run.eval_mass_estimation(aircraft)
-#run.eval_mass_mission_adaptation(aircraft)
+criterion = "MTOW"
+mda_type = "MDA2"
 
-# Calculate Payload-Range diagram
-#------------------------------------------------------------------------------------------------------
-run.eval_payload_range_analysis(aircraft)
+run.mdf_process(aircraft,search_domain,criterion,mda_type)
 
-# Calculate all airplane performances
-#------------------------------------------------------------------------------------------------------
-run.eval_performance_analysis(aircraft)
-
-# Handling quality analysis
-#------------------------------------------------------------------------------------------------------
-run.eval_handling_quality_analysis(aircraft)
+print("-------------------------------------------")
+print("Optimization : done")
 
 
+#======================================================================================================
+# Print some results
+#======================================================================================================
 print("-------------------------------------------")
 print("Number of passengers = ","%.0f"%aircraft.cabin.n_pax_ref," int")
 print("Design range = ","%.0f"%unit.NM_m(aircraft.design_driver.design_range)," NM")
 print("Cruise Mach number = ","%.2f"%aircraft.design_driver.cruise_mach," Mach")
 print("-------------------------------------------")
-print("Reference thrust turbofan = ","%.0f"%aircraft.turbofan_engine.reference_thrust," N")
+print("Reference thrust electrofan = ","%.0f"%aircraft.electrofan_engine.reference_thrust," N")
+print("Reference shaft power electrofan = ","%.1f"%(aircraft.electrofan_engine.reference_power/1000.)," kW")
 print("Reference thrust effective = ","%.0f"%aircraft.propulsion.reference_thrust_effective," N")
 print("Electrofan mass = ","%.0f"%aircraft.electrofan_nacelle.mass," kg")
 print("Cruise SFC = ","%.4f"%(aircraft.propulsion.sfc_cruise_ref*36000)," kg/daN/h")
+print("Cruise SEC = ","%.4f"%(aircraft.propulsion.sec_cruise_ref/100)," kW/daN")
 print("Cruise LoD = ","%.4f"%(aircraft.aerodynamics.cruise_lod_max)," no_dim")
 print("-------------------------------------------")
 print("Wing area = ","%.2f"%aircraft.wing.area," m2")
@@ -84,6 +111,9 @@ print("Fuselage width = ","%.2f"%aircraft.fuselage.width," m")
 print("-------------------------------------------")
 print("MTOW = ","%.2f"%aircraft.weights.mtow," kg")
 print("MLW = ","%.2f"%aircraft.weights.mlw," kg")
+print("Nominal mission total energy = ","%.3f"%unit.MWh_J(aircraft.nominal_mission.total_enrg)," MWh")
+print("Nominal mission battery mass = ","%.3f"%aircraft.nominal_mission.battery_mass," kg")
+print("Battery = ","%.2f"%aircraft.weights.battery," kg")
 print("OWE = ","%.2f"%aircraft.weights.owe," kg")
 print("MWE = ","%.2f"%aircraft.weights.mwe," kg")
 print("-------------------------------------------")
@@ -108,10 +138,13 @@ print("")
 print("Time to climb required = "+"%.1f"%unit.min_s(aircraft.high_speed.req_ttc)+" min")
 print("Time to climb effective = "+"%.1f"%unit.min_s(aircraft.high_speed.eff_ttc)+" min")
 print("-------------------------------------------")
-print("Evaluation mission range = ","%.0f"%unit.NM_m(aircraft.cost_mission.range)," NM")
-print("Evaluation mission block energy = ","%.0f"%unit.MWh_J(aircraft.cost_mission.block_enrg)," MWh")
+print("Evaluation mission range = ","%.1f"%unit.NM_m(aircraft.cost_mission.range)," NM")
+print("Evaluation mission block energy = ","%.3f"%unit.MWh_J(aircraft.cost_mission.block_enrg)," MWh")
+print("Evaluation mission total energy = ","%.3f"%unit.MWh_J(aircraft.cost_mission.total_enrg)," MWh")
+print("Evaluation mission battery mass = ","%.3f"%aircraft.cost_mission.battery_mass," kg")
 print("Evaluation mission cash op cost = ","%.0f"%aircraft.economics.cash_operating_cost," $")
 print("CO2 metric = ","%.4f"%(aircraft.environmental_impact.CO2_metric*1000)," kg/km/m0.48")
+
 
 # airplane 3D view
 #------------------------------------------------------------------------------------------------------

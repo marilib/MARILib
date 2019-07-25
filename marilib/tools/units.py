@@ -59,37 +59,11 @@ def smart_round(X,S):
 	return round(X*Fac)#Fac
 
 
-#=========================================================================================================================================
-def user_format(value):
-    from numpy import max, ceil, log10, floor, float64, arange
-
-    if isinstance(value, tuple):
-        lst = list(value)
-        for i in arange(len(lst)):
-            lst[i] = user_format(lst[i])
-        return lst
-
-    if isinstance(value, (float, float64)):
-        if value == 0. or value == -0.:
-            return format(value, "".join((".4f")))
-
-        else:
-            V = abs(value)
-            if abs(value) > 1:
-                nb_dec = int(max((0,5-ceil(log10(V+1e-4)))))
-            else:
-                nb_dec = int(3 - floor(log10(V)))
-            return format(value, "".join((".",str(nb_dec),"f")))
-
-    else:
-        return value
-
-
-#==========================================================================================================================
+#=========================================================================
 #
 #	Generic unit converter
 #
-#==========================================================================================================================
+#=========================================================================
 UNIT = {}
 
 # dim = "Distance"
@@ -176,6 +150,9 @@ UNIT["lb"] = 0.4535924
 UNIT["lbm"] = 0.4535924
 UNIT["t"] = 1000.
 
+# dim = "MassIndex"
+UNIT["g/kg"] = 1.
+
 # dim = "MasstoForceratio"
 UNIT["kg/N"] = 1.
 UNIT["g/N"] = 0.001
@@ -237,7 +214,7 @@ UNIT["lb/ft3"] = 16.018499
 # dim = "MassSensitivity"
 UNIT["1/kg"] = 1.
 UNIT["%/kg"] = 0.01
-UNIT["%/ton"] = 0.01*0.001
+UNIT["%/ton"] = 0.01 * 0.001
 
 # dim = "VolumetricMassFlow"
 UNIT["kg/m3/s"] = 1.
@@ -276,6 +253,9 @@ UNIT["litre/h"] = 3.6
 UNIT["l/h"] = 3.6
 UNIT["ft3/h"] = 101.94048
 
+# dim = "VolumeCoefficient"
+UNIT["m2/kN"] = 1.
+
 # dim = "MachNumber"
 UNIT["Mach"] = 1.
 UNIT["mach"] = 1.
@@ -287,7 +267,7 @@ UNIT["dc"] = 0.0001
 # dim = "DragSensitivity"
 UNIT["1/cx"] = 1.
 UNIT["%/cx"] = 0.01
-UNIT["%/dc"] = 0.01*10000.
+UNIT["%/dc"] = 0.01 * 10000.
 
 # dim = "MachNumbervariationrate"
 UNIT["Mach/s"] = 1.
@@ -313,6 +293,9 @@ UNIT["shp"] = 745.70001
 # dim = "PowerDensity"
 UNIT["W/kg"] = 1.
 UNIT["kW/kg"] = 1.e3
+
+# dim = "PowerDensityPerTime"
+UNIT["kW/daN/h"] = 1 / 36.
 
 # dim = "Euro"
 UNIT["E"] = 1.
@@ -431,38 +414,45 @@ UNIT["btu/lb"] = 2325.9612
 
 # dim = "FuelCost"
 UNIT["$/l"] = 1.
+UNIT["$/gal"] = 0.264173
 UNIT["$/USgal"] = 0.264173
 UNIT["$/USbrl"] = 0.00838644
 
+# dim = "BatteryMassCost"
+UNIT["$/kg"] = 1.
+
+# dim = "BatteryEnergyCost"
+UNIT["$/kWh"] = 1. / UNIT['kWh']
+
 # dim = "nodimension"
-UNIT["sd"] = 1.
-UNIT["no_dim"] = 1.
+UNIT["sd"] = 1
+UNIT["no_dim"] = 1
 UNIT["%"] = 0.01
 UNIT["%/%"] = 1.
 
 # dim = "integer"
-UNIT["integer"] = 1.
-UNIT["int"] = 1.
-UNIT["entier"] = 1.
-UNIT["numeric"] = 1.
+UNIT["integer"] = 1
+UNIT["int"] = 1
+UNIT["entier"] = 1
+UNIT["numeric"] = 1
 
 # dim = "variouscounts"
-UNIT["aircraft"] = 1.
-UNIT["engine"] = 1.
-UNIT["pilot"] = 1.
-UNIT["attendant"] = 1.
-UNIT["trolley"] = 1.
-UNIT["toilet"] = 1.
-UNIT["seat"] = 1.
-UNIT["door"] = 1.
-UNIT["wheel"] = 1.
+UNIT["aircraft"] = 1
+UNIT["engine"] = 1
+UNIT["pilot"] = 1
+UNIT["attendant"] = 1
+UNIT["trolley"] = 1
+UNIT["toilet"] = 1
+UNIT["seat"] = 1
+UNIT["door"] = 1
+UNIT["wheel"] = 1
 
 # dim = "string"
-UNIT["string"] = 1.
-UNIT["text"] = 1.
+UNIT["string"] = 1
+UNIT["text"] = 1
 
 # dim = "textdate"
-UNIT["text_date"] = 1.
+UNIT["text_date"] = 1
 
 # dim = "GlobalWarmingEnergy"
 UNIT["W/m2/km/year"] = 1.
@@ -479,6 +469,8 @@ UNIT["l/seat/100km"] = 0.01
 
 # dim = "CO2metric"
 UNIT["kg/NM/m^0.48"] = 1.
+UNIT["kg/km/m^0.48"] = 1.852
+UNIT["kg/km/m0.48"] = 1.852
 UNIT["kg/m/m^0.48"] = 1852.
 
 # dim = "GlobalWarmingTemperature"
@@ -487,17 +479,44 @@ UNIT["1e-6.K/m2/km/year"] = 1.e-6
 UNIT["1e-12.K/m2/km/year"] = 1.e-12
 
 # dim = "DataStructure"
-UNIT["structure"] = 1.
+UNIT["structure"] = 1
+UNIT["dict"] = 1
 
 # Conversion functions
-#-------------------------------------------------------------------------------------------------------------------------
-def convert_from(ulab,val):
-# Convert val expressed in ulab to corresponding standard unit
-    return val*UNIT[ulab]
-
-def convert_to(ulab,val):
-# Convert val expressed in standard unit to ulab
+#-------------------------------------------------------------------------
 
 
-    return val/UNIT[ulab]
+def convert_from(ulab, val):
+    # Convert val expressed in ulab to corresponding standard unit
+    if isinstance(val, (type(None), str)):
+        return val
+    if isinstance(val, list):
+        return [convert_to(ulab, v) for v in val]
+    if isinstance(val, tuple):
+        return (convert_to(ulab, v) for v in val)
+    if isinstance(val, numpy.ndarray):
+        return numpy.array([convert_to(ulab, v) for v in val])
+    if isinstance(val, dict):
+        dic_val = deepcopy(val)
+        for k, v in dic_val.iteritems():
+            dic_val[k] = dic_val.iteritems()
+        return dic_val
+    return val * UNIT[ulab]
 
+
+def convert_to(ulab, val):
+    # Convert val expressed in standard unit to ulab
+    if isinstance(val, (type(None), str)):
+        return val
+    if isinstance(val, list):
+        return [convert_to(ulab, v) for v in val]
+    if isinstance(val, tuple):
+        return tuple([convert_to(ulab, v) for v in val])
+    if isinstance(val, numpy.ndarray):
+        return numpy.array([convert_to(ulab, v) for v in val])
+    if isinstance(val, dict):
+        dic_val = deepcopy(val)
+        for k, v in dic_val.iteritems():
+            dic_val[k] = convert_to(ulab, v)
+        return dic_val
+    return val / UNIT[ulab]

@@ -286,6 +286,11 @@ def electric_shaft_power():
     return electric_shaft_power_i
 
 #===========================================================================================================
+def idle_electric_shaft_power():
+    idle_electric_shaft_power_i = 1.e4    # Watts, electric motor power
+    return idle_electric_shaft_power_i
+
+#===========================================================================================================
 def battery_strategy():
     battery_strategy_i = 1    # Battery sizing strategy, 1: power_feed & energy_cruise driven, 2: battery mass driven
     return battery_strategy_i
@@ -307,12 +312,12 @@ def battery_energy_cruise():
 
 #===========================================================================================================
 def battery_energy_density():
-    battery_energy_density_i = unit.J_kWh(0.2)    # Battery energy density (kWh/kg)
+    battery_energy_density_i = unit.J_kWh(0.5)    # Battery energy density (kWh/kg)
     return battery_energy_density_i
 
 #===========================================================================================================
 def battery_power_density():
-    battery_power_density_i = 1.e3    # Battery power density (capability to release power per mass unit
+    battery_power_density_i = 1.e3    # Battery power density (capability to release power per mass unit (W/kg)
     return battery_power_density_i
 
 #===========================================================================================================
@@ -432,7 +437,9 @@ def disa_tofl():
 
 #===========================================================================================================
 def req_tofl(design_range):
-    if(design_range <= unit.m_NM(3500.)):
+    if(design_range <= unit.m_NM(1500.)):
+        req_tofl_i = 1500.
+    elif(design_range <= unit.m_NM(3500.)):
         req_tofl_i = 2000.
     elif(design_range <= unit.m_NM(5500.)):
         req_tofl_i = 2500.
@@ -507,7 +514,10 @@ def cost_mission_disa():
 
 #===========================================================================================================
 def cost_mission_range(design_range):
-    if(design_range < unit.m_NM(4500.)): cost_mission_range_i = unit.m_NM(800.)
+    if(design_range < unit.m_NM(400.)): cost_mission_range_i = unit.m_NM(100.)
+    elif(design_range < unit.m_NM(1000.)): cost_mission_range_i = unit.m_NM(200.)
+    elif(design_range < unit.m_NM(2500.)): cost_mission_range_i = unit.m_NM(400.)
+    elif(design_range < unit.m_NM(4500.)): cost_mission_range_i = unit.m_NM(800.)
     elif(design_range < unit.m_NM(6500.)): cost_mission_range_i = unit.m_NM(2000.)
     else:                               cost_mission_range_i = unit.m_NM(4000.)
     return cost_mission_range_i

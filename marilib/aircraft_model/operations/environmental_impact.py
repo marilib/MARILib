@@ -71,7 +71,7 @@ def fuel_efficiency_metric(aircraft):
 
     CO2_metric = (1/rgf**0.24)*(1/sar_max_hw + 1/sar_max_mw + 1/sar_max_lw)/3        # kg/m/m2
 
-    return CO2_metric,rgf
+    return CO2_metric
 
 
 #===========================================================================================================

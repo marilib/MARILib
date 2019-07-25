@@ -40,7 +40,7 @@ def sfc(aircraft,pamb,tamb,mach,rating,nei):
     elif (propulsion.architecture=="PTE1"):
         sfc = pte1_sfc(aircraft,pamb,tamb,mach,rating,nei)
     elif (propulsion.architecture=="EF1"):
-        sfc,fn = ef1_sec(aircraft,pamb,tamb,mach,rating,nei)
+        sfc = ef1_sec(aircraft,pamb,tamb,mach,rating,nei)
     else:
         raise Exception("propulsion.architecture index is out of range")
 
@@ -60,7 +60,7 @@ def thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
     elif (propulsion.architecture=="PTE1"):
         fn,sec,data = pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
     elif (propulsion.architecture=="EF1"):
-        fn,data = ef1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
+        fn,sec,data = ef1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
     else:
         raise Exception("propulsion.architecture index is out of range")
 

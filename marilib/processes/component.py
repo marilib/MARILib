@@ -181,9 +181,16 @@ def eval_co2_metric(aircraft):
     Compute climb performances
     """
 
+    cabin = aircraft.cabin
+
+    rgf = cabin.projected_area      # Reference Geometric Factor (Pressurized floor area)
+
     # Environment
     #------------------------------------------------------------------------------------------------------
-    CO2_metric,rgf = environ.fuel_efficiency_metric(aircraft)
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        CO2_metric = 0.
+    else:
+        CO2_metric = environ.fuel_efficiency_metric(aircraft)
 
     aircraft.environmental_impact.rgf = rgf
     aircraft.environmental_impact.CO2_metric = CO2_metric

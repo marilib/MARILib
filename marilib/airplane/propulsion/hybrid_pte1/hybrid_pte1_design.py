@@ -40,8 +40,8 @@ def eval_pte1_engine_design(aircraft):
 
     battery = aircraft.pte1_battery
     power_elec = aircraft.pte1_power_elec_chain
-    e_engine = aircraft.rear_electric_engine
-    e_nacelle = aircraft.rear_electric_nacelle
+    r_engine = aircraft.rear_electric_engine
+    r_nacelle = aircraft.rear_electric_nacelle
 
     low_speed = aircraft.low_speed
 
@@ -62,7 +62,7 @@ def eval_pte1_engine_design(aircraft):
     fd_mach = {"MTO":0.25, "MCN":crm/2, "MCL":crm, "MCR":crm, "FID":crm}
     fd_nei  = {"MTO":0.  , "MCN":1.   , "MCL":0. , "MCR":0. , "FID":0. }
 
-    e_engine.flight_data = {"disa":fd_disa, "altp":fd_altp, "mach":fd_mach, "nei":fd_nei}
+    r_engine.flight_data = {"disa":fd_disa, "altp":fd_altp, "mach":fd_mach, "nei":fd_nei}
 
     e_fan_power = {"MTO":power_elec.mto,
                    "MCN":power_elec.mcn,
@@ -71,7 +71,7 @@ def eval_pte1_engine_design(aircraft):
                    "FID":power_elec.fid}
 
     # Battery power feed is used in temporary phases only (take off and climb)
-    power_factor = battery.power_feed * e_nacelle.controller_efficiency * e_nacelle.motor_efficiency
+    power_factor = battery.power_feed * r_nacelle.controller_efficiency * r_nacelle.motor_efficiency
     battery_power_feed = {"MTO":power_factor,
                           "MCN":0.,
                           "MCL":power_factor,
@@ -108,7 +108,7 @@ def eval_pte1_engine_design(aircraft):
                                     + battery_power_feed[rating]
 
     # Storing results
-    e_engine.n_engine = 1   # Only one electric fan at rear end of the fuselage
+    r_engine.n_engine = 1   # Only one electric fan at rear end of the fuselage
 
     power_elec.mto_e_power_ratio = e_power_ratio[MTO]
     power_elec.mcn_e_power_ratio = e_power_ratio[MCN]
@@ -116,11 +116,11 @@ def eval_pte1_engine_design(aircraft):
     power_elec.mcr_e_power_ratio = e_power_ratio[MCR]
     power_elec.fid_e_power_ratio = e_power_ratio[FID]
 
-    e_engine.mto_e_shaft_power = e_shaft_power[MTO]
-    e_engine.mcn_e_shaft_power = e_shaft_power[MCN]
-    e_engine.mcl_e_shaft_power = e_shaft_power[MCL]
-    e_engine.mcr_e_shaft_power = e_shaft_power[MCR]
-    e_engine.fid_e_shaft_power = e_shaft_power[FID]
+    r_engine.mto_e_shaft_power = e_shaft_power[MTO]
+    r_engine.mcn_e_shaft_power = e_shaft_power[MCN]
+    r_engine.mcl_e_shaft_power = e_shaft_power[MCL]
+    r_engine.mcr_e_shaft_power = e_shaft_power[MCR]
+    r_engine.fid_e_shaft_power = e_shaft_power[FID]
 
     # Engine performance update
     #-----------------------------------------------------------------------------------------------------------
@@ -148,15 +148,13 @@ def eval_pte1_nacelle_design(aircraft):
 
     design_driver = aircraft.design_driver
     fuselage = aircraft.fuselage
+    vtp = aircraft.vertical_tail
     wing = aircraft.wing
 
     propulsion = aircraft.propulsion
 
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
-
-    e_engine = aircraft.rear_electric_engine
-    e_nacelle = aircraft.rear_electric_nacelle
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
@@ -180,47 +178,80 @@ def eval_pte1_nacelle_design(aircraft):
 
     tan_phi0 = 0.25*(wing.c_kink-wing.c_tip)/(wing.y_tip-wing.y_kink) + numpy.tan(wing.sweep)
 
-    if (nacelle.attachment == 1) :  # Nacelles are attached under the wing
+    if (nacelle.attachment == 1):
 
-        nacelle.y_ext = 0.7 * fuselage.width + 1.4 * nacelle.width      # statistical regression
+        if (engine.n_engine==2):
 
-        nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
+            nacelle.y_ext = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
-        nacelle.z_ext = - 0.5 * fuselage.height \
-                    + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
-                    - 0.5*nacelle.width
+            nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
 
-    elif (nacelle.attachment == 2) :    # Nacelles are attached on rear fuselage
+            nacelle.z_ext = - 0.5 * fuselage.height \
+                            + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
+                            - 0.5*nacelle.width
 
-        nacelle.y_ext = 0.5 * fuselage.width + 0.6 * nacelle.width      # statistical regression
+        elif (engine.n_engine==4):
 
-        nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
+            nacelle.y_int = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
-        nacelle.z_ext = 0.5 * fuselage.height
+            nacelle.x_int = wing.x_root + (nacelle.y_int-wing.y_root)*tan_phi0 - 0.7*nacelle.length
+
+            nacelle.z_int = - 0.5 * fuselage.height \
+                            + (nacelle.y_int - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
+                            - 0.5*nacelle.width
+
+            nacelle.y_ext = 2.0 * fuselage.width + 1.5 * nacelle.width      # statistical regression
+
+            nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
+
+            nacelle.z_ext = - 0.5 * fuselage.height \
+                            + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
+                            - 0.5*nacelle.width
+        else:
+            raise Exception("engine.n_engine, number of engine not supported")
+
+    elif (nacelle.attachment == 2):
+
+        if (engine.n_engine==2):
+
+            nacelle.y_ext = 0.5 * fuselage.width + 0.6 * nacelle.width      # statistical regression
+
+            nacelle.x_ext = vtp.x_root - 0.5*nacelle.length
+
+            nacelle.z_ext = 0.5 * fuselage.height
+
+        else:
+            raise Exception("engine.n_engine, number of engine not supported")
+
+    else:
+        raise Exception("nacelle.attachment, index is out of range")
 
     # Electric nacelle is design by cruise conditions
     #-----------------------------------------------------------------------------------------------------------
+    r_engine = aircraft.rear_electric_engine
+    r_nacelle = aircraft.rear_electric_nacelle
+
     dISA = 0.
     Altp = design_driver.ref_cruise_altp
     Mach = design_driver.cruise_mach
 
     (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(Altp,dISA)
 
-    shaft_power = e_engine.mcr_e_shaft_power
+    shaft_power = r_engine.mcr_e_shaft_power
     hub_width = 0.5     # Diameter of the e fan hub
 
     body_length = fuselage.length
     body_width = fuselage.width
 
-    eval_pte1_bli_nacelle_design(e_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_length,body_width)
+    jet.rear_nacelle_design(r_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_length,body_width)
 
-    e_nacelle.x_axe = fuselage.length + 0.2*e_nacelle.width
-    e_nacelle.y_axe = 0.
-    e_nacelle.z_axe = 0.91*fuselage.height - 0.55*fuselage.height
+    r_nacelle.x_axe = fuselage.length + 0.2*r_nacelle.width
+    r_nacelle.y_axe = 0.
+    r_nacelle.z_axe = 0.91*fuselage.height - 0.55*fuselage.height
 
     # Engine performance update
     #-----------------------------------------------------------------------------------------------------------
-    fd = e_engine.flight_data
+    fd = r_engine.flight_data
 
     e_fan_thrust = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
 
@@ -237,157 +268,19 @@ def eval_pte1_nacelle_design(aircraft):
 
         e_fan_thrust[rating] = fn_fan2
 
-    e_engine.mto_e_fan_thrust = e_fan_thrust[MTO]
-    e_engine.mcn_e_fan_thrust = e_fan_thrust[MCN]
-    e_engine.mcl_e_fan_thrust = e_fan_thrust[MCL]
-    e_engine.mcr_e_fan_thrust = e_fan_thrust[MCR]
-    e_engine.fid_e_fan_thrust = e_fan_thrust[FID]
+    r_engine.mto_e_fan_thrust = e_fan_thrust[MTO]
+    r_engine.mcn_e_fan_thrust = e_fan_thrust[MCN]
+    r_engine.mcl_e_fan_thrust = e_fan_thrust[MCL]
+    r_engine.mcr_e_fan_thrust = e_fan_thrust[MCR]
+    r_engine.fid_e_fan_thrust = e_fan_thrust[FID]
 
-    Vair = Mach*earth.sound_speed(Tamb)
+    (eFanFnBli,q1,dVbli) = jet.fan_thrust_with_bli(r_nacelle,Pamb,Tamb,Mach,shaft_power)
 
-    (eFanFnBli,q1,dVbli) = jet.fan_thrust_with_bli(e_nacelle,Pamb,Tamb,Mach,shaft_power)
-
-    (eFanFn,q0) = jet.fan_thrust(e_nacelle,Pamb,Tamb,Mach,shaft_power)
+    (eFanFn,q0) = jet.fan_thrust(r_nacelle,Pamb,Tamb,Mach,shaft_power)
 
     propulsion.bli_e_thrust_factor = eFanFnBli / eFanFn     # Thrust increase due to BLI at iso shaft power for the e-fan
 
     propulsion.bli_thrust_factor = 1.     # Thrust increase due to BLI at iso shaft power for the turbofans (provision)
-
-    return
-
-
-#===========================================================================================================
-def resize_boundary_layer(body_width,hub_width):
-    """
-    Compute the relation between d0 and d1
-    d0 : boundary layer thickness around a tube of constant diameter
-    d1 : boundary layer thickness around a the tapered part of the tube
-    """
-
-    r0 = 0.5 * body_width   # Radius of the fuselage, supposed constant
-    r1 = 0.5 * hub_width    # Radius of the hub of the efan nacelle
-
-    #===========================================================================================================
-    def fct_specific_flows(d1,r1,d0,r0):
-        (q0s0,q1s0,q2s0,v1s0,dvs0) = jet.specific_air_flows(r0,d0,d0)
-        (q0s1,q1s1,q2s1,v1s1,dvs1) = jet.specific_air_flows(r1,d1,d1)
-        y = q2s0 - q2s1
-        return y
-    #-----------------------------------------------------------------------------------------------------------
-
-    n = 25
-    yVein = numpy.linspace(0.001,1.50,n)
-
-    body_bnd_layer = numpy.zeros((n,2))
-
-    for j in range (0, n-1):
-        fct1s = (r1,yVein[j],r0)
-        # computation of d1 theoretical thickness of the boundary layer that passes the same air flow around the hub
-        body_bnd_layer[j,0] = yVein[j]
-        body_bnd_layer[j,1] = fsolve(fct_specific_flows,yVein[j],fct1s)
-
-    return body_bnd_layer
-
-
-#===========================================================================================================
-def eval_pte1_bli_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_length,body_width):
-    """
-    BLI nacelle design
-    """
-
-    gam = earth.heat_ratio()
-    r = earth.gaz_constant()
-    Cp = earth.heat_constant(gam,r)
-
-    (rho,sig) = earth.air_density(Pamb,Tamb)
-    Vsnd = earth.sound_speed(Tamb)
-    Re = earth.reynolds_number(Pamb,Tamb,Mach)
-    Vair = Vsnd*Mach
-
-    # Precalculation of the relation between d0 and d1
-    #-----------------------------------------------------------------------------------------------------------
-
-    body_bnd_layer = resize_boundary_layer(body_width,hub_width)
-
-    # Electrical nacelle geometry : e-nacelle diameter is size by cruise conditions
-    #-----------------------------------------------------------------------------------------------------------
-    r0 = 0.5*body_width     # Radius of the fuselage, supposed constant
-    d0 = jet.boundary_layer(Re,body_length)     # theoritical thickness of the boundary layer without taking account of fuselage tapering
-    r1 = 0.5*hub_width        # Radius of the hub of the efan nacelle
-    d1 = lin_interp_1d(d0,body_bnd_layer[:,0],body_bnd_layer[:,1])       # Thickness of the BL around the hub
-
-    deltaV = 2.*Vair*(this_nacelle.efficiency_fan/this_nacelle.efficiency_prop - 1.)      # speed variation produced by the fan
-
-    PwInput = this_nacelle.efficiency_fan*shaft_power     # kinetic energy produced by the fan
-
-    #===========================================================================================================
-    def fct_power_1(y,PwInput,deltaV,rho,Vair,r1,d1):
-        (q0,q1,q2,v1,dVbli) = jet.air_flows(rho,Vair,r1,d1,y)
-        Vinlet = Vair - dVbli
-        Vjet = Vinlet + deltaV
-        Pw = 0.5*q1*(Vjet**2 - Vinlet**2)
-        y = PwInput - Pw
-        return y
-    #-----------------------------------------------------------------------------------------------------------
-
-    fct_arg = (PwInput,deltaV,rho,Vair,r1,d1)
-
-    # Computation of y1 : thickness of the vein swallowed by the inlet
-    output_dict = fsolve(fct_power_1, x0=d1, args=fct_arg, full_output=True)
-
-    y1 = output_dict[0][0]
-
-    (q0,q1,q2,v1,dVbli) = jet.air_flows(rho,Vair,r1,d1,y1)
-
-    MachInlet = v1/Vsnd     # Mean Mach number at inlet position
-
-    Ptot = earth.total_pressure(Pamb,MachInlet)        # Stagnation pressure at inlet position
-
-    Ttot = earth.total_temperature(Tamb,MachInlet)     # Stagnation temperature at inlet position
-
-    MachFan = 0.5       # required Mach number at fan position
-
-    CQoA1 = jet.corrected_air_flow(Ptot,Ttot,MachFan)        # Corrected air flow per area at fan position
-
-    eFanArea = q1/CQoA1     # Fan area around the hub
-
-    fan_width = numpy.sqrt(hub_width**2 + 4*eFanArea/numpy.pi)        # Fan diameter
-
-    Vjet = v1 + deltaV      # Jet velocity
-
-    TtotJet = Ttot + shaft_power/(q1*Cp)        # Stagnation pressure increases due to introduced work
-
-    Tstat = TtotJet - 0.5*Vjet**2/Cp        # static temperature
-
-    VsndJet = numpy.sqrt(gam*r*Tstat) # Sound velocity at nozzle exhaust
-
-    MachJet = Vjet/VsndJet # Mach number at nozzle output
-
-    PtotJet = earth.total_pressure(Pamb,MachJet)       # total pressure at nozzle exhaust (P = Pamb)
-
-    CQoA2 = jet.corrected_air_flow(PtotJet,TtotJet,MachJet)     # Corrected air flow per area at nozzle output
-
-    nozzle_area = q1/CQoA2        # Fan area around the hub
-
-    nozzle_width = numpy.sqrt(4*nozzle_area/numpy.pi)       # Nozzle diameter
-
-    this_nacelle.hub_width = hub_width
-
-    this_nacelle.fan_width = fan_width
-
-    this_nacelle.nozzle_width = nozzle_width
-
-    this_nacelle.nozzle_area = nozzle_area
-
-    this_nacelle.width = 1.20*fan_width      # Surrounding structure
-
-    this_nacelle.length = 1.50*this_nacelle.width
-
-    this_nacelle.net_wetted_area = numpy.pi*this_nacelle.width*this_nacelle.length        # Nacelle wetted area
-
-    this_nacelle.bnd_layer = body_bnd_layer
-
-    this_nacelle.body_length = body_length
 
     return
 
@@ -403,18 +296,18 @@ def eval_pte1_nacelle_mass(aircraft):
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
 
-    e_engine = aircraft.rear_electric_engine
-    e_nacelle = aircraft.rear_electric_nacelle
+    r_engine = aircraft.rear_electric_engine
+    r_nacelle = aircraft.rear_electric_nacelle
 
     power_elec = aircraft.pte1_power_elec_chain
 
     # Propulsion system mass is sized according max power
     # -----------------------------------------------------------------------
-    e_shaft_power = numpy.array([e_engine.mto_e_shaft_power,
-                                 e_engine.mcn_e_shaft_power,
-                                 e_engine.mcl_e_shaft_power,
-                                 e_engine.mcr_e_shaft_power,
-                                 e_engine.fid_e_shaft_power])
+    e_shaft_power = numpy.array([r_engine.mto_e_shaft_power,
+                                 r_engine.mcn_e_shaft_power,
+                                 r_engine.mcl_e_shaft_power,
+                                 r_engine.mcr_e_shaft_power,
+                                 r_engine.fid_e_shaft_power])
 
     shaftPowerMax = max(e_shaft_power)
 
@@ -432,8 +325,8 @@ def eval_pte1_nacelle_mass(aircraft):
                        + 1./power_elec.wiring_pw_density + 1./power_elec.cooling_pw_density \
                        ) * shaftPowerMax
 
-    e_nacelle.mass = (  1./e_nacelle.controller_pw_density + 1./e_nacelle.motor_pw_density \
-                      + 1./e_nacelle.nacelle_pw_density \
+    r_nacelle.mass = (  1./r_nacelle.controller_pw_density + 1./r_nacelle.motor_pw_density \
+                      + 1./r_nacelle.nacelle_pw_density \
                       ) * shaftPowerMax
 
     # Propulsion system CG
@@ -442,7 +335,7 @@ def eval_pte1_nacelle_mass(aircraft):
 
     power_elec.c_g = 0.70*nacelle.c_g + 0.30*fuselage.length
 
-    e_nacelle.c_g = fuselage.length + 0.5*e_nacelle.length
+    r_nacelle.c_g = fuselage.length + 0.5*r_nacelle.length
 
     return
 

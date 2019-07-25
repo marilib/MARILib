@@ -329,10 +329,10 @@ class VerticalTail(object):
     "x_root":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the vertical tail root chord"},
     "z_root":{"unit":"m", "om":1.e1, "txt":"Vertical position of the vertical tail root chord"},
     "c_root":{"unit":"m", "om":1.e1, "txt":"Vertical tail root chord"},
-    "x_tip ":{"unit":"m", "om":1.e2, "txt":"Longitudinal position of the vertical tail tip chord"},
-    "z_tip ":{"unit":"m", "om":1.e1, "txt":"Vertical position of the vertical tail tip chord"},
-    "c_tip ":{"unit":"m", "om":1.e1, "txt":"Vertical tail tip chord"},
-    "x_mac ":{"unit":"m", "om":1.e2, "txt":"Longitudinal position of the vertical tail mean aerodynamic chord"}
+    "x_tip":{"unit":"m", "om":1.e2, "txt":"Longitudinal position of the vertical tail tip chord"},
+    "z_tip":{"unit":"m", "om":1.e1, "txt":"Vertical position of the vertical tail tip chord"},
+    "c_tip":{"unit":"m", "om":1.e1, "txt":"Vertical tail tip chord"},
+    "x_mac":{"unit":"m", "om":1.e2, "txt":"Longitudinal position of the vertical tail mean aerodynamic chord"}
     }
     def __init__(self, sweep = None,
                        taper_ratio = None,

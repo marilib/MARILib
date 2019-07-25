@@ -348,7 +348,7 @@ def draw_3d_view(aircraft,window_title,plot_title):
         plt.plot(xTopView+htp_xy[0:,0], yTopView+htp_xy[0:,1], "grey", zorder=9)      # htp_ top view (T-tail)
 
     if (aircraft.propulsion.architecture=="PTE1"):
-        plt.plot(xTopView+e_nac_xy[0:,0], yTopView+e_nac_xy[0:,1], color="grey", zorder=7)        # e_nacelle top view
+        plt.plot(xTopView+e_nac_xy[0:,0], yTopView+e_nac_xy[0:,1], color="grey", zorder=7)        # r_nacelle top view
 
     # Draw side view
     #-----------------------------------------------------------------------------------------------------------
@@ -358,8 +358,8 @@ def draw_3d_view(aircraft,window_title,plot_title):
     plt.plot(xSideView+fus_side[0:,0], ySideView+fus_side[0:,1], color="grey", zorder=3)  # fuselage side view
 
     if (aircraft.propulsion.architecture=="PTE1"):
-        plt.fill(xSideView+e_nac_xz[0:,0], ySideView+e_nac_xz[0:,1], color="white", zorder=4)   # e_nacelle side view
-        plt.plot(xSideView+e_nac_xz[0:,0], ySideView+e_nac_xz[0:,1], color="grey", zorder=5)    # e_nacelle side view
+        plt.fill(xSideView+e_nac_xz[0:,0], ySideView+e_nac_xz[0:,1], color="white", zorder=4)   # r_nacelle side view
+        plt.plot(xSideView+e_nac_xz[0:,0], ySideView+e_nac_xz[0:,1], color="grey", zorder=5)    # r_nacelle side view
 
     if (aircraft.propulsion.architecture!="TP"):
         plt.fill(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="white", zorder=4)   # wing_ side view
@@ -386,7 +386,7 @@ def draw_3d_view(aircraft,window_title,plot_title):
     plt.plot(xFrontView+wing_yz[0:,0], yFrontView+wing_yz[0:,1], color="grey", zorder=2)   # wing_ front view
 
     if (aircraft.propulsion.architecture=="PTE1"):
-        plt.plot(xFrontView+e_nac_yz[0:,0], yFrontView+e_nac_yz[0:,1], color="grey", zorder=3)    # e_nacelle front view
+        plt.plot(xFrontView+e_nac_yz[0:,0], yFrontView+e_nac_yz[0:,1], color="grey", zorder=3)    # r_nacelle front view
         plt.plot(xFrontView+e_fan_yz[0:,0], yFrontView+e_fan_yz[0:,1], color="grey", zorder=3)    # e inlet front view
 
     plt.fill(xFrontView+fus_front[0:,0], yFrontView+fus_front[0:,1], color="white", zorder=4)   # fuselage front view

@@ -204,6 +204,8 @@ def eval_b_payload_range_analysis(aircraft):
     aircraft.max_payload_mission.block_time = block_time
     aircraft.max_payload_mission.total_enrg = total_enrg
 
+    aircraft.max_payload_mission.battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
+
     # Max fuel mission
     #------------------------------------------------------------------------------------------------------
     tow = aircraft.weights.mtow
@@ -219,6 +221,8 @@ def eval_b_payload_range_analysis(aircraft):
     aircraft.max_fuel_mission.block_fuel = block_fuel
     aircraft.max_fuel_mission.block_time = block_time
 
+    aircraft.max_fuel_mission.battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
+
     # zero payload mission
     #------------------------------------------------------------------------------------------------------
     battery_mass = min(tow-aircraft.weights.owe, aircraft.weights.mfw)
@@ -233,6 +237,8 @@ def eval_b_payload_range_analysis(aircraft):
     aircraft.zero_payload_mission.range = range
     aircraft.zero_payload_mission.block_enrg = block_enrg
     aircraft.zero_payload_mission.block_time = block_time
+
+    aircraft.zero_payload_mission.battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
 
     return
 
@@ -262,6 +268,8 @@ def eval_cost_b_mission(aircraft):
     aircraft.cost_mission.total_enrg = total_enrg
     aircraft.cost_mission.block_enrg = block_enrg
     aircraft.cost_mission.block_time = block_time
+
+    aircraft.cost_mission.battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
 
     aircraft.cost_mission.block_CO2 = 0.
 

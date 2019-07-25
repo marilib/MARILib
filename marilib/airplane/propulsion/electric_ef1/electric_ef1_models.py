@@ -21,9 +21,9 @@ def ef1_sec(aircraft,pamb,tamb,mach,rating,nei):
     Specific Energy Consumption
     """
 
-    fn,sec = ef1_thrust(aircraft,pamb,tamb,mach,rating,nei)
+    fn,sec,data = ef1_thrust(aircraft,pamb,tamb,mach,rating,nei)
 
-    return sec,fn
+    return sec
 
 
 #===========================================================================================================
@@ -48,7 +48,9 @@ def ef1_thrust(aircraft,pamb,tamb,mach,rating,nei):
 
     fn = fn_fan*(engine.n_engine - nei)
 
-    return fn,sec
+    data = (fn_fan,pw_elec,pw_shaft,q0)
+
+    return fn,sec,data
 
 
 #===========================================================================================================
