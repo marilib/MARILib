@@ -68,9 +68,11 @@ def eval_propulsion_design(aircraft):
     mach = 0.25
     nei = 0.
 
+    throttle = 1.
+
     (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
-    Fn,Data = propu.thrust(aircraft,pamb,tamb,mach,MTO,nei)
+    Fn,SFC,SEC,Data = propu.thrust(aircraft,pamb,tamb,mach,MTO,throttle,nei)
 
     propulsion.reference_thrust_effective = (Fn/engine.n_engine)/0.80
     propulsion.mto_thrust_ref = Fn/engine.n_engine
@@ -81,9 +83,11 @@ def eval_propulsion_design(aircraft):
     mach = 0.5*aircraft.design_driver.cruise_mach
     nei = 1.
 
+    throttle = 1.
+
     (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
-    (Fn,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCN,nei)
+    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCN,throttle,nei)
 
     propulsion.mcn_thrust_ref = Fn/(engine.n_engine-nei)
 
@@ -95,22 +99,26 @@ def eval_propulsion_design(aircraft):
 
     (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
+    throttle = 1.
+
+    # WARNING : SFC & SEC cruise reference corresponds to MCR thrust, actual values may be lower
     if (propulsion.architecture=="TF"):
-        propulsion.sfc_cruise_ref = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
+        fn,sfc,data = propu.turbofan_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+        propulsion.sfc_cruise_ref = sfc
         propulsion.sec_cruise_ref = 0.
     elif (propulsion.architecture=="PTE1"):
-        propulsion.sfc_cruise_ref = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
-        fn,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
+        fn,sfc,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+        propulsion.sfc_cruise_ref = sfc
         propulsion.sec_cruise_ref = sec
     elif (propulsion.architecture=="EF1"):
+        fn,sec,data = propu.ef1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
         propulsion.sfc_cruise_ref = 0.
-        fn,sec = propu.ef1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
         propulsion.sec_cruise_ref = sec
     else:
         raise Exception("propulsion.architecture index is out of range")
 
 
-    (Fn,Data) = propu.thrust(aircraft,pamb,tamb,mach,FID,nei)
+    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,FID,throttle,nei)
 
     propulsion.fid_thrust_ref = Fn/engine.n_engine
 
@@ -120,13 +128,15 @@ def eval_propulsion_design(aircraft):
     mach = aircraft.design_driver.cruise_mach
     nei = 0.
 
+    throttle = 1.
+
     (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
-    (Fn,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCL,nei)
+    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCL,throttle,nei)
 
     propulsion.mcl_thrust_ref = Fn/engine.n_engine
 
-    (Fn,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCR,nei)
+    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
 
     propulsion.mcr_thrust_ref = Fn/engine.n_engine
 

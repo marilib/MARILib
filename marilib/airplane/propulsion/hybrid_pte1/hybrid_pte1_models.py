@@ -8,6 +8,7 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 import numpy
+from scipy.optimize import fsolve
 
 from marilib.earth import environment as earth
 
@@ -17,7 +18,31 @@ from marilib.airplane.propulsion.turbofan.turbofan_models import turbofan_thrust
 
 
 #===========================================================================================================
-def pte1_sfc(aircraft,pamb,tamb,mach,rating,nei):
+def pte1_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei):
+    """
+    SFC for PTE1 architecture
+    """
+
+    #===========================================================================================================
+    def fct_sfc(throttle,aircraft,pamb,tamb,mach,rating,thrust,nei):
+        fn,sfc,sec,data = pte1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
+        return (thrust - fn)
+
+    x_ini = 0.8
+
+    fct_arg = (aircraft,pamb,tamb,mach,rating,thrust,nei)
+
+    output_dict = fsolve(fct_sfc, x0=x_ini, args=fct_arg, full_output=True)
+
+    throttle = output_dict[0][0]
+
+    fn,sfc,sec,data = pte1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
+
+    return sfc
+
+
+#===========================================================================================================
+def pte1_sfc_old(aircraft,pamb,tamb,mach,rating,nei):
     """
     Bucket SFC for a turbofan
     """
@@ -58,7 +83,7 @@ def pte1_sfc(aircraft,pamb,tamb,mach,rating,nei):
 
 
 #===========================================================================================================
-def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
+def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     propulsion = aircraft.propulsion
     engine = aircraft.turbofan_engine
@@ -83,7 +108,7 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
                           "MCR":0.,
                           "FID":0.}
 
-    fn,data = turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
+    fn,sfc0,data = turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
     (fn_core,fn_fan0,fn0,shaft_power0) = data
 
     Vsnd = earth.sound_speed(Tamb)
@@ -117,11 +142,13 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
         fn_fan2 = 0.
         sec = 0.
 
+    sfc = sfc0 * (fn0*(engine.n_engine - nei)) / ((fn_core + fn_fan1)*(engine.n_engine - nei) + fn_fan2)
+
     fn = (fn_core + fn_fan1)*(engine.n_engine - nei) + fn_fan2
 
     data = (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0)
 
-    return (fn,sec,data)
+    return fn,sfc,sec,data
 
 
 #===========================================================================================================

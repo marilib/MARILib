@@ -27,7 +27,7 @@ from marilib.airplane.propulsion.electric_ef1.electric_ef1_models \
 
 
 #===========================================================================================================
-def sfc(aircraft,pamb,tamb,mach,rating,nei):
+def sfc(aircraft,pamb,tamb,mach,rating,thrust,nei):
     """
     Bucket SFC for a turbofan
     IMPORTANT REMARK : for EF1 architecture, SFC is in Energy unit per Thrust unit (J/N)
@@ -36,11 +36,11 @@ def sfc(aircraft,pamb,tamb,mach,rating,nei):
     propulsion = aircraft.propulsion
 
     if (propulsion.architecture=="TF"):
-        sfc = turbofan_sfc(aircraft,pamb,tamb,mach,rating,nei)
+        sfc = turbofan_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei)
     elif (propulsion.architecture=="PTE1"):
-        sfc = pte1_sfc(aircraft,pamb,tamb,mach,rating,nei)
+        sfc = pte1_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei)
     elif (propulsion.architecture=="EF1"):
-        sfc = ef1_sec(aircraft,pamb,tamb,mach,rating,nei)
+        sfc = ef1_sec(aircraft,pamb,tamb,mach,rating,thrust,nei)
     else:
         raise Exception("propulsion.architecture index is out of range")
 
@@ -48,7 +48,7 @@ def sfc(aircraft,pamb,tamb,mach,rating,nei):
 
 
 #===========================================================================================================
-def thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
+def thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
     """
     Calculation of the total thrust of the architecture
     """
@@ -56,15 +56,17 @@ def thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
     propulsion = aircraft.propulsion
 
     if (propulsion.architecture=="TF"):
-        fn,data = turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
+        fn,sfc,data = turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
+        sec = 0.
     elif (propulsion.architecture=="PTE1"):
-        fn,sec,data = pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
+        fn,sfc,sec,data = pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
     elif (propulsion.architecture=="EF1"):
-        fn,sec,data = ef1_thrust(aircraft,Pamb,Tamb,Mach,rating,nei)
+        sfc = 0.
+        fn,sec,data = ef1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
     else:
         raise Exception("propulsion.architecture index is out of range")
 
-    return fn,data
+    return fn,sfc,sec,data
 
 
 #===========================================================================================================

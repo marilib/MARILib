@@ -75,7 +75,9 @@ def acceleration(aircraft,nei,altp,disa,speed_mode,speed,mass,rating):
 
     mach = get_mach(pamb,speed_mode,speed)
 
-    fn, Data = propu.thrust(aircraft,pamb,tamb,mach,rating,nei)
+    throttle = 1.
+
+    fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
     cz = lift_from_speed(aircraft,pamb,mach,mass)
 
@@ -102,7 +104,9 @@ def air_path(aircraft,nei,altp,disa,speed_mode,speed,mass,rating):
 
     mach = get_mach(pamb,speed_mode,speed)
 
-    fn, data = propu.thrust(aircraft,pamb,tamb,mach,rating,nei)
+    throttle = 1.
+
+    fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
     cz = lift_from_speed(aircraft,pamb,mach,mass)
 

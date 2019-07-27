@@ -140,12 +140,13 @@ def vertical_tail_sizing(aircraft):
 
     altp = 0.
     disa = 15.
-  
+
+    throttle = 1.
     nei = 1
 
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
   
-    fn,data = propu.thrust(aircraft,pamb,tamb,mach_mca,MTO,nei)
+    fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach_mca,MTO,throttle,nei)
 
     dcx_oei = propu.oei_drag(aircraft,pamb,tamb)
 

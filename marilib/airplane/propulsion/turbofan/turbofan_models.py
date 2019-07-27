@@ -8,25 +8,37 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 import numpy
+from scipy.optimize import fsolve
 
 from marilib.earth import environment as earth
 
 
 #===========================================================================================================
-def turbofan_sfc(aircraft,pamb,tamb,mach,rating,nei):
+def turbofan_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei):
     """
-    Bucket SFC for a turbofan
+    SFC for a turbofan
     """
 
-    engine = aircraft.turbofan_engine
+    #===========================================================================================================
+    def fct_sfc(throttle,aircraft,pamb,tamb,mach,rating,thrust,nei):
+        fn,sfc,data = turbofan_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
+        return (thrust - fn)
 
-    sfc = ( 0.4 + 1./engine.bpr**0.895 )/36000.
+    x_ini = 0.8
+
+    fct_arg = (aircraft,pamb,tamb,mach,rating,thrust,nei)
+
+    output_dict = fsolve(fct_sfc, x0=x_ini, args=fct_arg, full_output=True)
+
+    throttle = output_dict[0][0]
+
+    fn,sfc,data = turbofan_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
     return sfc
 
 
 #===========================================================================================================
-def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
+def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
     """
     Calculation of thrust for pure turbofan airplane
     Warning : ALL engine thrust returned
@@ -34,6 +46,8 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
+
+    sfc = ( 0.4 + 1./engine.bpr**0.895 )/36000.
 
     factor = engine.rating_factor       # [MTO,MCN,MCL,MCR,FID]
 
@@ -43,7 +57,7 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     (rho,sig) = earth.air_density(Pamb,Tamb)
 
-    fn0 = factor[rating]*kth*engine.reference_thrust*sig**0.75
+    fn0 = throttle*factor[rating]*kth*engine.reference_thrust*sig**0.75
 
     fn_core = fn0 * engine.core_thrust_ratio        # Core thrust
 
@@ -58,7 +72,7 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,nei):
 
     data = (fn_core,fn_fan0,fn0,shaft_power0)   # Data for ONE turbofan engine
 
-    return fn,data
+    return fn,sfc,data
 
 
 #===========================================================================================================

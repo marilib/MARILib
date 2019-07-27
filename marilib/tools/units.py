@@ -8,6 +8,8 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 import numpy
+from copy import deepcopy
+
       
 def s_min(min): return min*60.   # Translate minutes into seconds
 
@@ -516,7 +518,7 @@ def convert_to(ulab, val):
         return numpy.array([convert_to(ulab, v) for v in val])
     if isinstance(val, dict):
         dic_val = deepcopy(val)
-        for k, v in dic_val.iteritems():
+        for k, v in dic_val.items():
             dic_val[k] = convert_to(ulab, v)
         return dic_val
     return val / UNIT[ulab]

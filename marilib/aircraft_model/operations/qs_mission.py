@@ -108,7 +108,7 @@ def state_dot(xin,state,rating,nei,aircraft):
     path_d = ((0.5*rho*vair**2)*area*cz - mass*g*numpy.cos(path))/(mass*vair)    # Lift equation
     vgnd_d = (fn - mass*g*numpy.sin(path) - (0.5*rho*vair**2)*area*cx)/mass      # Drag equation
 
-    sfc = propu.sfc(aircraft,pamb,tamb,mach,rating,nei)     # Propulsion consumption model
+    sfc = propu.sfc(aircraft,pamb,tamb,mach,rating,fn,nei)     # Propulsion consumption model
 
     mass_d = -sfc*fn
 
@@ -157,7 +157,9 @@ def fct_thrust(aircraft,state,rating,nei):
 
     mach = vair/vsnd
 
-    fn,prop_data = propu.thrust(aircraft,pamb,tamb,mach,rating,nei)
+    throttle = 1.
+
+    fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
     return fn
 

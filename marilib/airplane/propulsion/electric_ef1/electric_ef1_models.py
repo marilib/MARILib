@@ -16,18 +16,31 @@ from marilib.airplane.propulsion.turbofan.turbofan_models import turbofan_thrust
 
 
 #===========================================================================================================
-def ef1_sec(aircraft,pamb,tamb,mach,rating,nei):
+def ef1_sec(aircraft,pamb,tamb,mach,rating,thrust,nei):
     """
-    Specific Energy Consumption
+    SFC for EF1 architecture
     """
 
-    fn,sec,data = ef1_thrust(aircraft,pamb,tamb,mach,rating,nei)
+    #===========================================================================================================
+    def fct_sec(throttle,aircraft,pamb,tamb,mach,rating,thrust,nei):
+        fn,sec,data = ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
+        return (thrust - fn)
+
+    x_ini = 0.8
+
+    fct_arg = (aircraft,pamb,tamb,mach,rating,thrust,nei)
+
+    output_dict = fsolve(fct_sec, x0=x_ini, args=fct_arg, full_output=True)
+
+    throttle = output_dict[0][0]
+
+    fn,sec,data = ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
     return sec
 
 
 #===========================================================================================================
-def ef1_thrust(aircraft,pamb,tamb,mach,rating,nei):
+def ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei):
 
     engine = aircraft.electrofan_engine
     nacelle = aircraft.electrofan_nacelle
@@ -38,7 +51,7 @@ def ef1_thrust(aircraft,pamb,tamb,mach,rating,nei):
                    "MCR":engine.mcr_e_shaft_power,
                    "FID":engine.fid_e_shaft_power}
 
-    pw_shaft = shaft_power[rating]
+    pw_shaft = throttle*shaft_power[rating]
 
     (fn_fan,q0) = jet.fan_thrust(nacelle,pamb,tamb,mach,pw_shaft)
 

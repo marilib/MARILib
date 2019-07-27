@@ -326,11 +326,6 @@ def battery_density():
     return battery_density_i
 
 #===========================================================================================================
-def battery_fill_factor():
-    battery_fill_factor_i = 0.35    # Ratio of available wing box volume used for batteries
-    return battery_fill_factor_i
-
-#===========================================================================================================
 def e_chain_efficiency():
     e_chain_efficiency_i = 0.90    # Overall efficiency of the electric chain, from generator to motor
     return e_chain_efficiency_i

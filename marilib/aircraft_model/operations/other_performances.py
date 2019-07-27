@@ -216,9 +216,11 @@ def take_off(aircraft,kvs1g,altp,disa,mass,hld_conf):
 
     mach = flight.speed_from_lift(aircraft,pamb,cz_to,mass)
 
+    throttle = 1.
+
     nei = 0    # For Magic Line factor computation
 
-    fn, trash = propu.thrust(aircraft,pamb,tamb,mach,rating,nei)
+    fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
     ml_factor = mass**2 / (cz_to*fn*wing.area*sig**0.8 )  # Magic Line factor
 

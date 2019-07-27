@@ -263,16 +263,15 @@ def write_data_dict(obj, my_dict, data_dict, out_parser,
     info_dict = None
     if hasattr(obj, "INFO") and any((write_unit, write_om, write_detail)):
         info_dict = obj.INFO
-    dict_type = type(my_dict)
     for key, value in data_dict.items():
         subobj = getattr(obj, key)
-        if isinstance(value, dict_type):
+        if is_basetype(subobj):
+            write_data_line(value, key, out_parser, info_dict,
+                            user_format, write_unit, write_om, write_detail)
+        else:
             new_dict = deepcopy(my_dict)
             out_parser[key] = new_dict
             write_data_dict(subobj, my_dict, value, out_parser[key],
-                            user_format, write_unit, write_om, write_detail)
-        else:
-            write_data_line(value, key, out_parser, info_dict,
                             user_format, write_unit, write_om, write_detail)
 
 

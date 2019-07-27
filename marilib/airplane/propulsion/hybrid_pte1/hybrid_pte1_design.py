@@ -81,9 +81,11 @@ def eval_pte1_engine_design(aircraft):
     e_power_ratio = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
     e_shaft_power = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
 
+    throttle = 1.
+
     for rating in propulsion.rating_code:
         (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(fd_altp[rating],fd_disa[rating])
-        (fn,data) = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[rating],rating,fd_nei[rating])
+        (fn,sfc,data) = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[rating],rating,throttle,fd_nei[rating])
         (fn_core,fn_fan0,fn0,shaft_power0) = data
 
         if e_fan_power[rating]>1:       # required eFan shaft power is given, turbofan shaft power ratio is deduced
@@ -125,7 +127,7 @@ def eval_pte1_engine_design(aircraft):
     # Engine performance update
     #-----------------------------------------------------------------------------------------------------------
     (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(fd_altp[MTO],fd_disa[MTO])
-    (fn,data) = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[MTO],MTO,fd_nei[MTO])
+    (fn,sfc,data) = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[MTO],MTO,throttle,fd_nei[MTO])
     (fn_core,fn_fan0,fn0,shaft_power0) = data
 
     shaft_power1 = (1.-e_power_ratio[MTO])*shaft_power0     # Shaft power dedicated to the fan at take off
@@ -262,8 +264,10 @@ def eval_pte1_nacelle_design(aircraft):
         mach = fd.get("mach")[rating]
         nei = fd.get("nei")[rating]
 
+        throttle = 1.
+
         (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(altp,disa)
-        (fn,sec,data) = pte1_thrust(aircraft,Pamb,Tamb,mach,rating,nei)
+        (fn,sfc,sec,data) = pte1_thrust(aircraft,Pamb,Tamb,mach,rating,throttle,nei)
         (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0) = data
 
         e_fan_thrust[rating] = fn_fan2

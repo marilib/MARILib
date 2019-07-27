@@ -48,12 +48,16 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     lod_cruise = 0.95 * lod_max
 
+    throttle = 1.
     nei = 0
 
     e_factor = 0.25 * earth.fuel_heat("Kerosene")
 
     #WARNING : for EF1 architecture SFC is returned in Energy unit per Thrust unit
-    sec = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
+    if (propulsion.architecture=="EF1"):
+        fn,sec,data = propu.ef1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+    else:
+        raise Exception("mission_b, propulsive architecture not allowed")
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
@@ -120,10 +124,15 @@ def b_specific_air_range(aircraft,altp,mass,mach,disa):
 
     [Cx,LoD] = airplane_aero.drag(aircraft,pamb,tamb,mach,Cz)
 
+    thrust = mass*g / LoD
+
     nei = 0
 
-    #WARNING : for EF1 architecture SFC is returned in Energy unit per Thrust unit
-    sec = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
+     #WARNING : for EF1 architecture SFC is returned in Energy unit per Thrust unit
+    if (propulsion.architecture=="EF1"):
+        sec = propu.ef1_sec(aircraft,pamb,tamb,mach,MCR,thrust,nei)
+    else:
+        raise Exception("b_specific_air_range, propulsive architecture not allowed")
 
     sar = (vsnd*mach*LoD)/(mass*g*sec)
 

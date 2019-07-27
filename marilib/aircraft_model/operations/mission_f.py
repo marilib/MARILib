@@ -44,12 +44,15 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     lod_cruise = 0.95 * lod_max
 
+    throttle = 1.
     nei = 0
 
-    sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
-
-    if (propulsion.architecture=="PTE1"):
-        fn,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,nei)
+    if (propulsion.architecture=="TF"):
+        fn,sfc,data = propu.turbofan_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+    elif (propulsion.architecture=="PTE1"):
+        fn,sfc,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+    else:
+        raise Exception("mission_f, propulsive architecture not allowed")
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
@@ -119,9 +122,11 @@ def f_specific_air_range(aircraft,altp,mass,mach,disa):
 
     [Cx,LoD] = airplane_aero.drag(aircraft,pamb,tamb,mach,Cz)
 
+    thrust = mass*g / LoD
+
     nei = 0
 
-    sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,nei)
+    sfc = propu.sfc(aircraft,pamb,tamb,mach,MCR,thrust,nei)
 
     sar = (vsnd*mach*LoD)/(mass*g*sfc)
 

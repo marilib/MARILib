@@ -196,7 +196,6 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.ef1_battery.energy_density = init.battery_energy_density()
     aircraft.ef1_battery.power_density = init.battery_power_density()
     aircraft.ef1_battery.density = init.battery_density()
-    aircraft.ef1_battery.fill_factor = init.battery_fill_factor()
 
 
     if (propu_config=="TF" or propu_config=="PTE1"):
