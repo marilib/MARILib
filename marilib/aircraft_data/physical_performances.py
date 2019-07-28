@@ -52,9 +52,10 @@ class Propulsion(object):
     "sfc_cruise_ref":{"unit":"kg/daN/h", "om":1.e0, "txt":"Specific Fuel Consumption in cruise condition, isa, ref_cruise_altp, cruise_mach"},
     "sec_cruise_ref":{"unit":"kW/daN/h", "om":1.e0, "txt":"Specific Energy Consumption of the electric chain (if any) in cruise condition, isa, ref_cruise_altp, cruise_mach"},
     "bli_effect":{"unit":"int", "om":1.e0, "txt":"BLI effect switch, 0: without, 1: with"},
-    "bli_e_thrust_factor":{"unit":"no_dim", "om":1.e0, "txt":"Thrust factor at constant power due to boundary layer ingestion of the e-fan in cruise condition"},
+    "bli_r_thrust_factor":{"unit":"no_dim", "om":1.e0, "txt":"Thrust factor at constant power due to boundary layer ingestion of the e-fan in cruise condition"},
     "bli_thrust_factor":{"unit":"no_dim", "om":1.e0, "txt":"Thrust factor at constant power due to boundary layer ingestion of other fans in cruise condition"},
     "rating_code":{"unit":"int", "om":1.e0, "txt":"Array of rating codes [0:MTO, 1:MCN, 2:MCL, 3:MCR, 4:FID]"},
+    "flight_data":{"unit":"dict", "txt":"Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}"},
     "mto_thrust_ref":{"unit":"daN", "om":1.e4, "txt":"Turbofan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25"},
     "mcn_thrust_ref":{"unit":"daN", "om":1.e4, "txt":"Turbofan thrust in maxi continuous rating (one engine), Required ceiling altitude, ISA, cruise Mach"},
     "mcl_thrust_ref":{"unit":"daN", "om":1.e4, "txt":"Turbofan thrust in max climb rating (one engine), Required Top of Climb altitude, ISA, cruise Mach"},
@@ -70,9 +71,10 @@ class Propulsion(object):
                        sfc_cruise_ref = None,
                        sec_cruise_ref = None,
                        bli_effect = None,
-                       bli_e_thrust_factor = None,
+                       bli_r_thrust_factor = None,
                        bli_thrust_factor = None,
                        rating_code = None,
+                       flight_data = None,
                        mto_thrust_ref = None,
                        mcn_thrust_ref = None,
                        mcl_thrust_ref = None,
@@ -87,9 +89,10 @@ class Propulsion(object):
         self.sfc_cruise_ref = sfc_cruise_ref
         self.sec_cruise_ref = sec_cruise_ref
         self.bli_effect = bli_effect
-        self.bli_e_thrust_factor = bli_e_thrust_factor
+        self.bli_r_thrust_factor = bli_r_thrust_factor
         self.bli_thrust_factor = bli_thrust_factor
         self.rating_code = rating_code
+        self.flight_data = flight_data
         self.mto_thrust_ref = mto_thrust_ref
         self.mcn_thrust_ref = mcn_thrust_ref
         self.mcl_thrust_ref = mcl_thrust_ref

@@ -44,6 +44,8 @@ def eval_ef1_engine_design(aircraft):
     Thermal propulsive architecture design
     """
 
+    design_driver = aircraft.design_driver
+    low_speed = aircraft.low_speed
     propulsion = aircraft.propulsion
 
     power_elec = aircraft.ef1_power_elec_chain
@@ -54,13 +56,30 @@ def eval_ef1_engine_design(aircraft):
 
     engine.rating_factor = {"MTO":1.00, "MCN":0.80, "MCL":0.80, "MCR":0.80, "FID":0.05}
 
+    # Propulsion architecture design, definition reference conditions for engine performances
+    #-----------------------------------------------------------------------------------------------------------
+
+    # Initialisation
+    crm = design_driver.cruise_mach
+    toc = design_driver.top_of_climb_altp
+    rca = design_driver.ref_cruise_altp
+    roa = low_speed.req_oei_altp
+
+    #                      MTO   MCN    MCL  MCR  FID
+    fd_disa = {"MTO":15. , "MCN":0.   , "MCL":0. , "MCR":0. , "FID":0. }
+    fd_altp = {"MTO":0.  , "MCN":roa  , "MCL":toc, "MCR":rca, "FID":rca}
+    fd_mach = {"MTO":0.25, "MCN":crm/2, "MCL":crm, "MCR":crm, "FID":crm}
+    fd_nei  = {"MTO":0.  , "MCN":1.   , "MCL":0. , "MCR":0. , "FID":0. }
+
+    propulsion.flight_data = {"disa":fd_disa, "altp":fd_altp, "mach":fd_mach, "nei":fd_nei}
+
     # Propulsion architecture design, definition of e-fan power in each flight phase
     #-----------------------------------------------------------------------------------------------------------
     # Main engines
     #-----------------------------------------------------------------------------------------------------------
-    disa = 15.
-    altp = 0.
-    mach = 0.25
+    disa = fd_disa[MTO]
+    altp = fd_altp[MTO]
+    mach = fd_mach[MTO]
 
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
     Vsnd = earth.sound_speed(tamb)
@@ -77,16 +96,16 @@ def eval_ef1_engine_design(aircraft):
     engine.mcr_e_shaft_power = ref_shaft_power * engine.rating_factor[MCR]
     engine.fid_e_shaft_power = ref_shaft_power * engine.rating_factor[FID]
 
-    # Rear engine, if any
+    # Max rear fan shaft power, if any
     #-----------------------------------------------------------------------------------------------------------
-    e_shaft_power = numpy.array([engine.mto_e_shaft_power,
-                                 engine.mcn_e_shaft_power,
-                                 engine.mcl_e_shaft_power,
-                                 engine.mcr_e_shaft_power,
-                                 engine.fid_e_shaft_power])
+    r_shaft_power = numpy.array([engine.mto_r_shaft_power,
+                                 engine.mcn_r_shaft_power,
+                                 engine.mcl_r_shaft_power,
+                                 engine.mcr_r_shaft_power,
+                                 engine.fid_r_shaft_power])
 
-    power_elec.max_power = max(e_shaft_power)
-    power_elec.max_power_rating = numpy.argmax(e_shaft_power)
+    power_elec.max_power = max(r_shaft_power)
+    power_elec.max_power_rating = numpy.argmax(r_shaft_power)
 
     return
 
@@ -121,7 +140,7 @@ def eval_ef1_nacelle_design(aircraft):
 
     hub_width = 0.2
 
-    eval_efan_nacelle_design(nacelle,Pamb,Tamb,mach,shaft_power,hub_width)
+    jet.efan_nacelle_design(nacelle,Pamb,Tamb,mach,shaft_power,hub_width)
 
     tan_phi0 = 0.25*(wing.c_kink-wing.c_tip)/(wing.y_tip-wing.y_kink) + numpy.tan(wing.sweep)
 
@@ -172,78 +191,6 @@ def eval_ef1_nacelle_design(aircraft):
 
     else:
         raise Exception("nacelle.attachment, index is out of range")
-
-    return
-
-
-#===========================================================================================================
-def eval_efan_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width):
-    """
-    Electrofan nacelle design
-    """
-
-    gam = earth.heat_ratio()
-    r = earth.gaz_constant()
-    Cp = earth.heat_constant(gam,r)
-
-    Vsnd = earth.sound_speed(Tamb)
-    Vair = Vsnd*Mach
-
-    # Electrical nacelle geometry : e-nacelle diameter is size by cruise conditions
-    #-----------------------------------------------------------------------------------------------------------
-
-    deltaV = 2.*Vair*(this_nacelle.efficiency_fan/this_nacelle.efficiency_prop - 1.)      # speed variation produced by the fan
-
-    PwInput = this_nacelle.efficiency_fan*shaft_power     # kinetic energy produced by the fan
-
-    Vinlet = Vair
-    Vjet = Vinlet + deltaV
-
-    q1 = 2.*PwInput / (Vjet**2 - Vinlet**2)
-
-    MachInlet = Mach     # The inlet is in free stream
-
-    Ptot = earth.total_pressure(Pamb,MachInlet)        # Stagnation pressure at inlet position
-
-    Ttot = earth.total_temperature(Tamb,MachInlet)     # Stagnation temperature at inlet position
-
-    MachFan = 0.5       # required Mach number at fan position
-
-    CQoA1 = jet.corrected_air_flow(Ptot,Ttot,MachFan)        # Corrected air flow per area at fan position
-
-    eFanArea = q1/CQoA1     # Fan area around the hub
-
-    fan_width = numpy.sqrt(hub_width**2 + 4*eFanArea/numpy.pi)        # Fan diameter
-
-    TtotJet = Ttot + shaft_power/(q1*Cp)        # Stagnation pressure increases due to introduced work
-
-    Tstat = TtotJet - 0.5*Vjet**2/Cp        # static temperature
-
-    VsndJet = numpy.sqrt(gam*r*Tstat) # Sound velocity at nozzle exhaust
-
-    MachJet = Vjet/VsndJet # Mach number at nozzle output
-
-    PtotJet = earth.total_pressure(Pamb,MachJet)       # total pressure at nozzle exhaust (P = Pamb)
-
-    CQoA2 = jet.corrected_air_flow(PtotJet,TtotJet,MachJet)     # Corrected air flow per area at nozzle output
-
-    nozzle_area = q1/CQoA2        # Fan area around the hub
-
-    nozzle_width = numpy.sqrt(4*nozzle_area/numpy.pi)       # Nozzle diameter
-
-    this_nacelle.hub_width = hub_width
-
-    this_nacelle.fan_width = fan_width
-
-    this_nacelle.nozzle_width = nozzle_width
-
-    this_nacelle.nozzle_area = nozzle_area
-
-    this_nacelle.width = 1.20*fan_width      # Surrounding structure
-
-    this_nacelle.length = 1.50*this_nacelle.width
-
-    this_nacelle.net_wetted_area = numpy.pi*this_nacelle.width*this_nacelle.length        # Nacelle wetted area
 
     return
 

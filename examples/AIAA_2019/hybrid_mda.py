@@ -17,6 +17,7 @@ from marilib.aircraft_model.operations import handling_qualities as h_q
 from marilib.earth import environment as earth
 
 from marilib.airplane.propulsion import jet_models as jet
+from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_models import pte1_thrust
 
 from marilib.aircraft_model.airplane import viewer as show
 
@@ -44,10 +45,10 @@ aircraft.wing.area = 152.9
 
 e_power = 1.0e6       # Watts, electric motor power
 
-aircraft.pte1_power_elec_chain.mto = e_power
-aircraft.pte1_power_elec_chain.mcn = e_power
-aircraft.pte1_power_elec_chain.mcl = e_power
-aircraft.pte1_power_elec_chain.mcr = e_power
+aircraft.rear_electric_engine.mto_r_shaft_power = e_power
+aircraft.rear_electric_engine.mcn_r_shaft_power = e_power
+aircraft.rear_electric_engine.mcl_r_shaft_power = e_power
+aircraft.rear_electric_engine.mcr_r_shaft_power = e_power
 
 aircraft.propulsion.bli_effect = 1                      #init.boundary_layer_effect()
 aircraft.pte1_power_elec_chain.overall_efficiency = 0.90     # 0.90 from init.e_chain_efficiency()
@@ -101,20 +102,7 @@ global_e_mass = (1/gen_pwd + 1/rec_pwd + 1/wire_pwd + 1/cool_pwd + 1/cont_pwd + 
 #------------------------------------------------------------------------------------------------------
 if (propulsive_architecture=="PTE1"):
 
-    kC = aircraft.turbofan_engine.core_thrust_ratio
-    kW = aircraft.pte1_power_elec_chain.mcr_e_power_ratio
-
-    eff_prop = aircraft.turbofan_nacelle.efficiency_prop
-    eff_e_prop = aircraft.rear_electric_nacelle.efficiency_prop
-    eff_chain = aircraft.pte1_power_elec_chain.overall_efficiency
-
-    kBLIe = aircraft.propulsion.bli_e_thrust_factor  # Thrust increase due to BLI at iso shaft power for the e-fan
-
-    eff_h = kC + (1-kC)*( kW*kBLIe*(eff_e_prop/eff_prop)*eff_chain + (1-kW) )
-    sfc_factor = 1./eff_h   # factor on cruise SFC due to rear fuselage electric nacelle with bli
-
-    #------------------------------------------------------------------------------------------------------
-    shaft_power = aircraft.rear_electric_engine.mcr_e_shaft_power
+    shaft_power = aircraft.rear_electric_engine.mcr_r_shaft_power
 
     disa = 0.
     altp = aircraft.design_driver.ref_cruise_altp
@@ -128,6 +116,18 @@ if (propulsive_architecture=="PTE1"):
 
     kVbli = dv_bli / vair
 
+    #------------------------------------------------------------------------------------------------------
+    (MTO,MCN,MCL,MCR,FID) = aircraft.propulsion.rating_code
+
+    throttle = 1.
+    nei = 0
+
+    fn,sfc,sec,data = pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+
+    (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0,sfc0) = data
+
+    sfc_factor = sfc/sfc0   # factor on cruise SFC due to rear fuselage electric nacelle with bli
+
     # Print some results
     #------------------------------------------------------------------------------------------------------
     print("-------------------------------------------")
@@ -136,7 +136,7 @@ if (propulsive_architecture=="PTE1"):
     print("Electric fan diameter = ","%.2f"%aircraft.rear_electric_nacelle.fan_width," m")
     print("Electric nozzle diameter = ","%.2f"%aircraft.rear_electric_nacelle.nozzle_width," m")
     print("relative decrease of e-fan inlet velocity in cruise = ","%.3f"%kVbli," no_dim")
-    print("Factor on e-fan thrust due to BLI in cruise = ","%.3f"%aircraft.propulsion.bli_e_thrust_factor," no_dim")
+    print("Factor on e-fan thrust due to BLI in cruise = ","%.3f"%aircraft.propulsion.bli_r_thrust_factor," no_dim")
     print("Global factor on SFC in cruise = ","%.4f"%sfc_factor," no_dim")
 
 print("-------------------------------------------")

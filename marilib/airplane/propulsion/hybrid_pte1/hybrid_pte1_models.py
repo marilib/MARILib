@@ -64,7 +64,7 @@ def pte1_sfc_old(aircraft,pamb,tamb,mach,rating,nei):
     sfc0 = ( 0.4 + 1./engine.bpr**0.895 )/36000.
 
     if (propulsion.bli_effect>0):
-        kBLIe = propulsion.bli_e_thrust_factor
+        kBLIe = propulsion.bli_r_thrust_factor
     else:
         kBLIe = 1.
 
@@ -94,11 +94,11 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
     r_engine = aircraft.rear_electric_engine
     r_nacelle = aircraft.rear_electric_nacelle
 
-    power_ratio = {"MTO":power_elec.mto_e_power_ratio,
-                   "MCN":power_elec.mcn_e_power_ratio,
-                   "MCL":power_elec.mcl_e_power_ratio,
-                   "MCR":power_elec.mcr_e_power_ratio,
-                   "FID":power_elec.fid_e_power_ratio}
+    rear_shaft_power = {"MTO":r_engine.mto_r_shaft_power,
+                        "MCN":r_engine.mcn_r_shaft_power,
+                        "MCL":r_engine.mcl_r_shaft_power,
+                        "MCR":r_engine.mcr_r_shaft_power,
+                        "FID":r_engine.fid_r_shaft_power}
 
     # Battery power feed is used in temporary phases only
     power_factor = battery.power_feed * r_nacelle.controller_efficiency * r_nacelle.motor_efficiency
@@ -115,11 +115,13 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     Vair = Vsnd*Mach
 
-    shaft_power1 = (1-power_ratio[rating])*shaft_power0     # Shaft power dedicated to the fan
+    power_offtake = throttle * rear_shaft_power[rating]/(engine.n_engine-nei) / power_elec.overall_efficiency
+
+    shaft_power1 = shaft_power0 - power_offtake     # Shaft power dedicated to the fan
 
     fn_fan1 = nacelle.efficiency_prop*shaft_power1/Vair     # Effective fan thrust
 
-    shaft_power2 = power_ratio[rating]*shaft_power0*(engine.n_engine - nei)     # Shaft power dedicated to electric generator
+    shaft_power2 = power_offtake * (engine.n_engine - nei)     # Shaft power dedicated to electric generator
 
     # Effective eFan shaft power
     pw_shaft2 =   shaft_power2 * power_elec.overall_efficiency \
@@ -146,7 +148,7 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     fn = (fn_core + fn_fan1)*(engine.n_engine - nei) + fn_fan2
 
-    data = (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0)
+    data = (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0,sfc0)
 
     return fn,sfc,sec,data
 

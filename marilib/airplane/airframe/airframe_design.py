@@ -264,7 +264,7 @@ def eval_vtp_design(aircraft):
     vtp.c_root = 2*vtp.area/(vtp.height*(1+vtp.taper_ratio))
     vtp.c_tip = vtp.taper_ratio*vtp.c_root
 
-    vtp_x_wise_anchor = 0.825       # Locate VTP versus end fuselage length
+    vtp_x_wise_anchor = 0.85       # Locate VTP versus end fuselage length
 
     vtp.x_root = fuselage.length*(1-fuselage.tail_cone_length/fuselage.length*(1-vtp_x_wise_anchor)) - vtp.c_root
     vtp.x_tip = vtp.x_root + 0.25*(vtp.c_root-vtp.c_tip) + vtp.height*numpy.tan(vtp.sweep)

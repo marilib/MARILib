@@ -39,9 +39,30 @@ def eval_turbofan_engine_design(aircraft):
     Thermal propulsive architecture design
     """
 
+    design_driver = aircraft.design_driver
+    low_speed = aircraft.low_speed
+
     engine = aircraft.turbofan_engine
+    propulsion = aircraft.propulsion
 
     engine.rating_factor = {"MTO":0.800, "MCN":0.688, "MCL":0.624, "MCR":0.560, "FID":0.100}
+
+    # Propulsion architecture design, definition reference conditions for engine performances
+    #-----------------------------------------------------------------------------------------------------------
+
+    # Initialisation
+    crm = design_driver.cruise_mach
+    toc = design_driver.top_of_climb_altp
+    rca = design_driver.ref_cruise_altp
+    roa = low_speed.req_oei_altp
+
+    #                      MTO   MCN    MCL  MCR  FID
+    fd_disa = {"MTO":15. , "MCN":0.   , "MCL":0. , "MCR":0. , "FID":0. }
+    fd_altp = {"MTO":0.  , "MCN":roa  , "MCL":toc, "MCR":rca, "FID":rca}
+    fd_mach = {"MTO":0.25, "MCN":crm/2, "MCL":crm, "MCR":crm, "FID":crm}
+    fd_nei  = {"MTO":0.  , "MCN":1.   , "MCL":0. , "MCR":0. , "FID":0. }
+
+    propulsion.flight_data = {"disa":fd_disa, "altp":fd_altp, "mach":fd_mach, "nei":fd_nei}
 
     return
 

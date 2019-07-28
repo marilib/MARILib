@@ -63,10 +63,11 @@ def eval_propulsion_design(aircraft):
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
-    disa = 15.
-    altp = 0.
-    mach = 0.25
-    nei = 0.
+    #-----------------------------------------------------------------------------------------------------------
+    disa = propulsion.flight_data["disa"][MTO]
+    altp = propulsion.flight_data["altp"][MTO]
+    mach = propulsion.flight_data["mach"][MTO]
+    nei = propulsion.flight_data["nei"][MTO]
 
     throttle = 1.
 
@@ -77,11 +78,11 @@ def eval_propulsion_design(aircraft):
     propulsion.reference_thrust_effective = (Fn/engine.n_engine)/0.80
     propulsion.mto_thrust_ref = Fn/engine.n_engine
 
-
-    disa = aircraft.low_speed.disa_oei
-    altp = aircraft.low_speed.req_oei_altp
-    mach = 0.5*aircraft.design_driver.cruise_mach
-    nei = 1.
+    #-----------------------------------------------------------------------------------------------------------
+    disa = propulsion.flight_data["disa"][MCN]
+    altp = propulsion.flight_data["altp"][MCN]
+    mach = propulsion.flight_data["mach"][MCN]
+    nei = propulsion.flight_data["nei"][MCN]
 
     throttle = 1.
 
@@ -91,15 +92,29 @@ def eval_propulsion_design(aircraft):
 
     propulsion.mcn_thrust_ref = Fn/(engine.n_engine-nei)
 
+    #-----------------------------------------------------------------------------------------------------------
+    disa = propulsion.flight_data["disa"][MCL]
+    altp = propulsion.flight_data["altp"][MCL]
+    mach = propulsion.flight_data["mach"][MCL]
+    nei = propulsion.flight_data["nei"][MCL]
 
-    disa = 0.
-    altp = aircraft.design_driver.ref_cruise_altp
-    mach = aircraft.design_driver.cruise_mach
-    nei = 0.
+    throttle = 1.
 
     (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
+    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCL,throttle,nei)
+
+    propulsion.mcl_thrust_ref = Fn/engine.n_engine
+
+    #-----------------------------------------------------------------------------------------------------------
+    disa = propulsion.flight_data["disa"][MCR]
+    altp = propulsion.flight_data["altp"][MCR]
+    mach = propulsion.flight_data["mach"][MCR]
+    nei = propulsion.flight_data["nei"][MCR]
+
     throttle = 1.
+
+    (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
     # WARNING : SFC & SEC cruise reference corresponds to MCR thrust, actual values may be lower
     if (propulsion.architecture=="TF"):
@@ -117,28 +132,23 @@ def eval_propulsion_design(aircraft):
     else:
         raise Exception("propulsion.architecture index is out of range")
 
+    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
 
-    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,FID,throttle,nei)
+    propulsion.mcr_thrust_ref = Fn/engine.n_engine
 
-    propulsion.fid_thrust_ref = Fn/engine.n_engine
-
-
-    disa = 0.
-    altp = aircraft.design_driver.top_of_climb_altp
-    mach = aircraft.design_driver.cruise_mach
-    nei = 0.
+    #-----------------------------------------------------------------------------------------------------------
+    disa = propulsion.flight_data["disa"][FID]
+    altp = propulsion.flight_data["altp"][FID]
+    mach = propulsion.flight_data["mach"][FID]
+    nei = propulsion.flight_data["nei"][FID]
 
     throttle = 1.
 
     (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
-    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCL,throttle,nei)
+    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,FID,throttle,nei)
 
-    propulsion.mcl_thrust_ref = Fn/engine.n_engine
-
-    (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
-
-    propulsion.mcr_thrust_ref = Fn/engine.n_engine
+    propulsion.fid_thrust_ref = Fn/engine.n_engine
 
     return
 

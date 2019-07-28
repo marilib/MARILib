@@ -12,11 +12,6 @@ class Ef1PowerElectricChain(object):
     Electric chain data
     """
     INFO = {\
-    "mto":{"unit":"uc", "om":1.e0, "txt":"Take off shaft power of optional rear engine"},
-    "mcn":{"unit":"uc", "om":1.e0, "txt":"Maxi continuous shaft power of optional rear engine"},
-    "mcl":{"unit":"uc", "om":1.e0, "txt":"Max climb shaft power of optional rear engine"},
-    "mcr":{"unit":"uc", "om":1.e0, "txt":"Max cruise shaft power of optional rear engine"},
-    "fid":{"unit":"uc", "om":1.e0, "txt":"Flight idle shaft power of optional rear engine"},
     "max_power":{"unit":"kW", "om":1.e4, "txt":"Maximum shaft power of optional rear engine"},
     "max_power_rating":{"unit":"int", "om":1.e0, "txt":"Rating of maximum shaft power of optional rear engine"},
     "overall_efficiency":{"unit":"no_dim", "om":1.e0, "txt":"Overall power efficiency of the electric chain"},
@@ -27,12 +22,7 @@ class Ef1PowerElectricChain(object):
     "mass":{"unit":"kg", "om":1.e2, "txt":"Mass of the electric chain (generator, rectifier, wires, cooling)"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the electric chain"}
     }
-    def __init__(self, mto = None,
-                       mcn = None,
-                       mcl = None,
-                       mcr = None,
-                       fid = None,
-                       max_power = None,
+    def __init__(self, max_power = None,
                        max_power_rating = None,
                        overall_efficiency = None,
                        generator_pw_density = None,
@@ -41,11 +31,6 @@ class Ef1PowerElectricChain(object):
                        cooling_pw_density = None,
                        mass = None,
                        c_g = None):
-        self.mto = mto
-        self.mcn = mcn
-        self.mcl = mcl
-        self.mcr = mcr
-        self.fid = fid
         self.max_power = max_power
         self.max_power_rating = max_power_rating
         self.overall_efficiency = overall_efficiency

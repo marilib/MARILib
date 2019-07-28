@@ -145,11 +145,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.rear_electric_nacelle.motor_pw_density = init.e_motor_pw_density()
     aircraft.rear_electric_nacelle.nacelle_pw_density = init.e_nacelle_pw_density()
 
-    aircraft.pte1_power_elec_chain.mto = init.electric_shaft_power()       # Watts, rear fan shaft power
-    aircraft.pte1_power_elec_chain.mcn = init.electric_shaft_power()       # Watts, rear fan shaft power
-    aircraft.pte1_power_elec_chain.mcl = init.electric_shaft_power()       # Watts, rear fan shaft power
-    aircraft.pte1_power_elec_chain.mcr = init.electric_shaft_power()       # Watts, rear fan shaft power
-    aircraft.pte1_power_elec_chain.fid = init.idle_electric_shaft_power()
+    aircraft.rear_electric_engine.mto_r_shaft_power = init.electric_shaft_power()       # Watts, rear fan shaft power
+    aircraft.rear_electric_engine.mcn_r_shaft_power = init.electric_shaft_power()       # Watts, rear fan shaft power
+    aircraft.rear_electric_engine.mcl_r_shaft_power = init.electric_shaft_power()       # Watts, rear fan shaft power
+    aircraft.rear_electric_engine.mcr_r_shaft_power = init.electric_shaft_power()       # Watts, rear fan shaft power
+    aircraft.rear_electric_engine.fid_r_shaft_power = init.idle_electric_shaft_power()
 
     aircraft.pte1_power_elec_chain.overall_efficiency = init.e_chain_efficiency()
     aircraft.pte1_power_elec_chain.generator_pw_density = init.generator_power_density()
@@ -181,11 +181,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
                                                          aircraft.fuselage.width,
                                                          aircraft.electrofan_nacelle.width)
 
-    aircraft.ef1_power_elec_chain.mto = 0.       # Watts, rear fan shaft power
-    aircraft.ef1_power_elec_chain.mcn = 0.       # Watts, rear fan shaft power
-    aircraft.ef1_power_elec_chain.mcl = 0.       # Watts, rear fan shaft power
-    aircraft.ef1_power_elec_chain.mcr = 0.       # Watts, rear fan shaft power
-    aircraft.ef1_power_elec_chain.fid = 0.
+    aircraft.electrofan_engine.mto_e_shaft_power = init.electric_shaft_power()       # Watts, fan shaft power
+    aircraft.electrofan_engine.mcn_e_shaft_power = init.electric_shaft_power()       # Watts, fan shaft power
+    aircraft.electrofan_engine.mcl_e_shaft_power = init.electric_shaft_power()       # Watts, fan shaft power
+    aircraft.electrofan_engine.mcr_e_shaft_power = init.electric_shaft_power()       # Watts, fan shaft power
+    aircraft.electrofan_engine.fid_e_shaft_power = init.idle_electric_shaft_power()
 
     aircraft.ef1_power_elec_chain.overall_efficiency = init.e_chain_efficiency()
     aircraft.ef1_power_elec_chain.generator_pw_density = init.generator_power_density()

@@ -15,6 +15,78 @@ from marilib.earth import environment as earth
 
 
 #===========================================================================================================
+def efan_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width):
+    """
+    Electrofan nacelle design
+    """
+
+    gam = earth.heat_ratio()
+    r = earth.gaz_constant()
+    Cp = earth.heat_constant(gam,r)
+
+    Vsnd = earth.sound_speed(Tamb)
+    Vair = Vsnd*Mach
+
+    # Electrical nacelle geometry : e-nacelle diameter is size by cruise conditions
+    #-----------------------------------------------------------------------------------------------------------
+
+    deltaV = 2.*Vair*(this_nacelle.efficiency_fan/this_nacelle.efficiency_prop - 1.)      # speed variation produced by the fan
+
+    PwInput = this_nacelle.efficiency_fan*shaft_power     # kinetic energy produced by the fan
+
+    Vinlet = Vair
+    Vjet = Vinlet + deltaV
+
+    q1 = 2.*PwInput / (Vjet**2 - Vinlet**2)
+
+    MachInlet = Mach     # The inlet is in free stream
+
+    Ptot = earth.total_pressure(Pamb,MachInlet)        # Stagnation pressure at inlet position
+
+    Ttot = earth.total_temperature(Tamb,MachInlet)     # Stagnation temperature at inlet position
+
+    MachFan = 0.5       # required Mach number at fan position
+
+    CQoA1 = corrected_air_flow(Ptot,Ttot,MachFan)        # Corrected air flow per area at fan position
+
+    eFanArea = q1/CQoA1     # Fan area around the hub
+
+    fan_width = numpy.sqrt(hub_width**2 + 4*eFanArea/numpy.pi)        # Fan diameter
+
+    TtotJet = Ttot + shaft_power/(q1*Cp)        # Stagnation pressure increases due to introduced work
+
+    Tstat = TtotJet - 0.5*Vjet**2/Cp        # static temperature
+
+    VsndJet = numpy.sqrt(gam*r*Tstat) # Sound velocity at nozzle exhaust
+
+    MachJet = Vjet/VsndJet # Mach number at nozzle output
+
+    PtotJet = earth.total_pressure(Pamb,MachJet)       # total pressure at nozzle exhaust (P = Pamb)
+
+    CQoA2 = corrected_air_flow(PtotJet,TtotJet,MachJet)     # Corrected air flow per area at nozzle output
+
+    nozzle_area = q1/CQoA2        # Fan area around the hub
+
+    nozzle_width = numpy.sqrt(4*nozzle_area/numpy.pi)       # Nozzle diameter
+
+    this_nacelle.hub_width = hub_width
+
+    this_nacelle.fan_width = fan_width
+
+    this_nacelle.nozzle_width = nozzle_width
+
+    this_nacelle.nozzle_area = nozzle_area
+
+    this_nacelle.width = 1.20*fan_width      # Surrounding structure
+
+    this_nacelle.length = 1.50*this_nacelle.width
+
+    this_nacelle.net_wetted_area = numpy.pi*this_nacelle.width*this_nacelle.length        # Nacelle wetted area
+
+    return
+
+
+#===========================================================================================================
 def resize_boundary_layer(body_width,hub_width):
     """
     Compute the relation between d0 and d1

@@ -134,7 +134,7 @@
         sfc_cruise_ref = +
         sec_cruise_ref = +
         bli_effect = +
-        bli_e_thrust_factor = +
+        bli_r_thrust_factor = +
         bli_thrust_factor = +
         rating_code = +
         mto_thrust_ref = +

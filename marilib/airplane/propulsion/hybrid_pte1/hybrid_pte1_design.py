@@ -32,22 +32,19 @@ def eval_pte1_engine_design(aircraft):
     """
 
     design_driver = aircraft.design_driver
-    fuselage = aircraft.fuselage
 
     propulsion = aircraft.propulsion
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
 
-    battery = aircraft.pte1_battery
     power_elec = aircraft.pte1_power_elec_chain
     r_engine = aircraft.rear_electric_engine
-    r_nacelle = aircraft.rear_electric_nacelle
 
     low_speed = aircraft.low_speed
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
-    # Propulsion architecture design, definition of e-fan power in each fligh t phase
+    # Propulsion architecture design, definition reference conditions for engine performances
     #-----------------------------------------------------------------------------------------------------------
 
     # Initialisation
@@ -56,88 +53,45 @@ def eval_pte1_engine_design(aircraft):
     rca = design_driver.ref_cruise_altp
     roa = low_speed.req_oei_altp
 
-    #                      MTO   MCN    MCL  MCR  FIR
-    fd_disa = {"MTO":5.  , "MCN":0.   , "MCL":0. , "MCR":0. , "FID":0. }
+    #                      MTO   MCN    MCL  MCR  FID
+    fd_disa = {"MTO":15. , "MCN":0.   , "MCL":0. , "MCR":0. , "FID":0. }
     fd_altp = {"MTO":0.  , "MCN":roa  , "MCL":toc, "MCR":rca, "FID":rca}
     fd_mach = {"MTO":0.25, "MCN":crm/2, "MCL":crm, "MCR":crm, "FID":crm}
     fd_nei  = {"MTO":0.  , "MCN":1.   , "MCL":0. , "MCR":0. , "FID":0. }
 
-    r_engine.flight_data = {"disa":fd_disa, "altp":fd_altp, "mach":fd_mach, "nei":fd_nei}
+    propulsion.flight_data = {"disa":fd_disa, "altp":fd_altp, "mach":fd_mach, "nei":fd_nei}
 
-    e_fan_power = {"MTO":power_elec.mto,
-                   "MCN":power_elec.mcn,
-                   "MCL":power_elec.mcl,
-                   "MCR":power_elec.mcr,
-                   "FID":power_elec.fid}
-
-    # Battery power feed is used in temporary phases only (take off and climb)
-    power_factor = battery.power_feed * r_nacelle.controller_efficiency * r_nacelle.motor_efficiency
-    battery_power_feed = {"MTO":power_factor,
-                          "MCN":0.,
-                          "MCL":power_factor,
-                          "MCR":0.,
-                          "FID":0.}
-
-    e_power_ratio = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
-    e_shaft_power = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
-
-    throttle = 1.
-
-    for rating in propulsion.rating_code:
-        (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(fd_altp[rating],fd_disa[rating])
-        (fn,sfc,data) = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[rating],rating,throttle,fd_nei[rating])
-        (fn_core,fn_fan0,fn0,shaft_power0) = data
-
-        if e_fan_power[rating]>1:       # required eFan shaft power is given, turbofan shaft power ratio is deduced
-
-            # Fraction of the turbofan shaft power dedicated to electric generation
-            e_power_ratio[rating] =  ( (e_fan_power[rating] - battery_power_feed[rating] \
-                                        )/ power_elec.overall_efficiency \
-                                      )/((shaft_power0)*(engine.n_engine-fd_nei[rating]))
-
-            # e-fan shaft power
-            e_shaft_power[rating] = e_fan_power[rating]
-
-        else:       # required turbofan shaft power ration is given, absolute shaft power is deduced
-
-            # Shaft power dedicated to electric generator
-            shaft_power2 = e_power_ratio[rating]*shaft_power0*(engine.n_engine-fd_nei[rating])
-
-            # Fraction of the shaft power dedicated to the electric generation
-            e_power_ratio[rating] = e_fan_power[rating]
-
-            e_shaft_power[rating] =   shaft_power2*power_elec.overall_efficiency \
-                                    + battery_power_feed[rating]
-
-    # Storing results
-    r_engine.n_engine = 1   # Only one electric fan at rear end of the fuselage
-
-    power_elec.mto_e_power_ratio = e_power_ratio[MTO]
-    power_elec.mcn_e_power_ratio = e_power_ratio[MCN]
-    power_elec.mcl_e_power_ratio = e_power_ratio[MCL]
-    power_elec.mcr_e_power_ratio = e_power_ratio[MCR]
-    power_elec.fid_e_power_ratio = e_power_ratio[FID]
-
-    r_engine.mto_e_shaft_power = e_shaft_power[MTO]
-    r_engine.mcn_e_shaft_power = e_shaft_power[MCN]
-    r_engine.mcl_e_shaft_power = e_shaft_power[MCL]
-    r_engine.mcr_e_shaft_power = e_shaft_power[MCR]
-    r_engine.fid_e_shaft_power = e_shaft_power[FID]
-
-    # Engine performance update
+    # Thrust factor at take off due to power offtake
     #-----------------------------------------------------------------------------------------------------------
     (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(fd_altp[MTO],fd_disa[MTO])
-    (fn,sfc,data) = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[MTO],MTO,throttle,fd_nei[MTO])
+    throttle = 1.
+    nei = 0.
+
+    fn,sfc0,data = turbofan_thrust(aircraft,Pamb,Tamb,fd_mach[MTO],MTO,throttle,nei)
     (fn_core,fn_fan0,fn0,shaft_power0) = data
 
-    shaft_power1 = (1.-e_power_ratio[MTO])*shaft_power0     # Shaft power dedicated to the fan at take off
-
     Vsnd = earth.sound_speed(Tamb)
+
     Vair = Vsnd*fd_mach[MTO]
+
+    power_offtake = throttle * r_engine.mto_r_shaft_power/(engine.n_engine-nei) / power_elec.overall_efficiency
+
+    shaft_power1 = shaft_power0 - power_offtake     # Shaft power dedicated to the fan
 
     fn_fan1 = nacelle.efficiency_prop*shaft_power1/Vair     # Effective fan thrust
 
     engine.kfn_off_take = (fn_core + fn_fan1)/fn0       # Thrust reduction due to power off take for the e-fan
+
+    # Max rear fan shaft power
+    #-----------------------------------------------------------------------------------------------------------
+    r_shaft_power = numpy.array([r_engine.mto_r_shaft_power,
+                                 r_engine.mcn_r_shaft_power,
+                                 r_engine.mcl_r_shaft_power,
+                                 r_engine.mcr_r_shaft_power,
+                                 r_engine.fid_r_shaft_power])
+
+    power_elec.max_power = max(r_shaft_power)
+    power_elec.max_power_rating = numpy.argmax(r_shaft_power)
 
     return
 
@@ -239,7 +193,7 @@ def eval_pte1_nacelle_design(aircraft):
 
     (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(Altp,dISA)
 
-    shaft_power = r_engine.mcr_e_shaft_power
+    shaft_power = r_engine.mcr_r_shaft_power
     hub_width = 0.5     # Diameter of the e fan hub
 
     body_length = fuselage.length
@@ -251,38 +205,48 @@ def eval_pte1_nacelle_design(aircraft):
     r_nacelle.y_axe = 0.
     r_nacelle.z_axe = 0.91*fuselage.height - 0.55*fuselage.height
 
-    # Engine performance update
+    # Rear fan max thrust on each rating
     #-----------------------------------------------------------------------------------------------------------
-    fd = r_engine.flight_data
+    r_fan_thrust = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
 
-    e_fan_thrust = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
+    r_shaft_power = {"MTO":r_engine.mto_r_shaft_power,
+                     "MCN":r_engine.mcn_r_shaft_power,
+                     "MCL":r_engine.mcl_r_shaft_power,
+                     "MCR":r_engine.mcr_r_shaft_power,
+                     "FID":r_engine.fid_r_shaft_power}
 
     for rating in propulsion.rating_code:
 
-        altp = fd.get("altp")[rating]
-        disa = fd.get("disa")[rating]
-        mach = fd.get("mach")[rating]
-        nei = fd.get("nei")[rating]
+        altp = propulsion.flight_data["altp"][rating]
+        disa = propulsion.flight_data["disa"][rating]
+        mach = propulsion.flight_data["mach"][rating]
 
-        throttle = 1.
+        (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
 
-        (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(altp,disa)
-        (fn,sfc,sec,data) = pte1_thrust(aircraft,Pamb,Tamb,mach,rating,throttle,nei)
-        (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0) = data
+        if (r_shaft_power[rating] > 0.):
 
-        e_fan_thrust[rating] = fn_fan2
+            if (propulsion.bli_effect>0):
+                (fn_fan2,q1,dVbli) = jet.fan_thrust_with_bli(r_nacelle,pamb,tamb,mach,r_shaft_power[rating])
+            else:
+                (fn_fan2,q0) = jet.fan_thrust(r_nacelle,pamb,tamb,mach,r_shaft_power[rating])
 
-    r_engine.mto_e_fan_thrust = e_fan_thrust[MTO]
-    r_engine.mcn_e_fan_thrust = e_fan_thrust[MCN]
-    r_engine.mcl_e_fan_thrust = e_fan_thrust[MCL]
-    r_engine.mcr_e_fan_thrust = e_fan_thrust[MCR]
-    r_engine.fid_e_fan_thrust = e_fan_thrust[FID]
+        else:
+
+            fn_fan2 = 0.
+
+        r_fan_thrust[rating] = fn_fan2
+
+    r_engine.mto_r_fan_thrust = r_fan_thrust[MTO]
+    r_engine.mcn_r_fan_thrust = r_fan_thrust[MCN]
+    r_engine.mcl_r_fan_thrust = r_fan_thrust[MCL]
+    r_engine.mcr_r_fan_thrust = r_fan_thrust[MCR]
+    r_engine.fid_r_fan_thrust = r_fan_thrust[FID]
 
     (eFanFnBli,q1,dVbli) = jet.fan_thrust_with_bli(r_nacelle,Pamb,Tamb,Mach,shaft_power)
 
     (eFanFn,q0) = jet.fan_thrust(r_nacelle,Pamb,Tamb,Mach,shaft_power)
 
-    propulsion.bli_e_thrust_factor = eFanFnBli / eFanFn     # Thrust increase due to BLI at iso shaft power for the e-fan
+    propulsion.bli_r_thrust_factor = eFanFnBli / eFanFn     # Thrust increase due to BLI at iso shaft power for the e-fan
 
     propulsion.bli_thrust_factor = 1.     # Thrust increase due to BLI at iso shaft power for the turbofans (provision)
 
@@ -307,13 +271,7 @@ def eval_pte1_nacelle_mass(aircraft):
 
     # Propulsion system mass is sized according max power
     # -----------------------------------------------------------------------
-    e_shaft_power = numpy.array([r_engine.mto_e_shaft_power,
-                                 r_engine.mcn_e_shaft_power,
-                                 r_engine.mcl_e_shaft_power,
-                                 r_engine.mcr_e_shaft_power,
-                                 r_engine.fid_e_shaft_power])
-
-    shaftPowerMax = max(e_shaft_power)
+    shaftPowerMax = power_elec.max_power
 
     turboFanMass0 = 1250. + 0.021*engine.reference_thrust # Statistical regression
 

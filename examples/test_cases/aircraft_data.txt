@@ -1,5 +1,5 @@
 # MARILib configuration file
-# Created on 25-07-2019 18:53:52
+# Created on 28-07-2019 17:43:36
 [Aircraft]
     name = my_test_airplane
     [[design_driver]]
@@ -12,78 +12,78 @@
         altp_tofl = 0.0000 ft
         kvs1g_tofl = 1.1300 no_dim
         req_tofl = 1500.0 m
-        eff_tofl = 1371.3 m
+        eff_tofl = 1360.2 m
         eff_kvs1g = 1.1300 no_dim
-        seg2_path = 0.07416 no_dim
+        seg2_path = 0.07502 no_dim
         limitation = 1.000 int
-        perfo_constraint_1 = 0.08582 m
+        perfo_constraint_1 = 0.09320 m
         disa_app_speed = 0.0000 degK
         altp_app_speed = 0.0000 ft
         kvs1g_app_speed = 1.2300 no_dim
         req_app_speed = 135.00 kt
-        eff_app_speed = 135.00 kt
-        perfo_constraint_2 = 0.00001784 m
+        eff_app_speed = 134.73 kt
+        perfo_constraint_2 = 0.001992 m
         disa_oei = 15.000 degK
         req_oei_altp = 11000 ft
         req_oei_path = 1.1000 %
-        eff_oei_path = 3.9050 %
+        eff_oei_path = 3.9757 %
         oei_best_speed = None kt
-        perfo_constraint_3 = 255.00 %
+        perfo_constraint_3 = 261.43 %
     [[high_speed]]
         disa_climb = 15.000 degK
         req_vz_climb = 300.00 ft/min
-        eff_vz_climb = 2852.7 ft/min
-        perfo_constraint_1 = 2552.7 ft/min
+        eff_vz_climb = 2877.9 ft/min
+        perfo_constraint_1 = 2577.9 ft/min
         req_vz_cruise = 0.0000 ft/min
-        eff_vz_cruise = 2852.7 ft/min
-        perfo_constraint_2 = 2852.7 ft/min
+        eff_vz_cruise = 2877.9 ft/min
+        perfo_constraint_2 = 2877.9 ft/min
         req_toc_altp = 25000 ft
         cas1_ttc = 190.00 kt
         cas2_ttc = 240.00 kt
         req_ttc = 25.000 min
-        eff_ttc = 9.0089 min
-        perfo_constraint_3 = 0.01066 min
+        eff_ttc = 8.9371 min
+        perfo_constraint_3 = 0.01071 min
         cruise_sfc = None kg/daN/h
         cruise_lod = None no_dim
     [[max_payload_mission]]
-        range = 82.247 NM
+        range = 82.122 NM
         payload = 2280.0 kg
-        tow = 24451 kg
+        tow = 24355 kg
         total_fuel = None kg
         block_fuel = None kg
-        block_time = 0.6294 h
-        block_enrg = 1.3519 MWh
-        total_enrg = 4.3761 MWh
-        battery_mass = 8752.1 kg
+        block_time = 0.6289 h
+        block_enrg = 1.3446 MWh
+        total_enrg = 4.3440 MWh
+        battery_mass = 8688.0 kg
     [[nominal_mission]]
         range = 100.00 NM
         payload = 1900.0 kg
-        tow = 24451 kg
+        tow = 24355 kg
         total_fuel = None kg
         block_fuel = None kg
-        block_time = 0.6937 h
-        block_enrg = 1.5328 MWh
-        total_enrg = 4.5661 MWh
-        battery_mass = 9132.1 kg
+        block_time = 0.6936 h
+        block_enrg = 1.5255 MWh
+        total_enrg = 4.5340 MWh
+        battery_mass = 9068.0 kg
     [[max_fuel_mission]]
-        range = 188.76 NM
+        range = 189.39 NM
         payload = 0.0000 kg
-        tow = 24451 kg
+        tow = 24355 kg
         total_fuel = None kg
-        block_fuel = 8775313229 kg
-        block_time = 1.0151 h
+        block_fuel = 8749120491 kg
+        block_time = 1.0173 h
         block_enrg = None MWh
-        total_enrg = 5.5161 MWh
-        battery_mass = 11032 kg
+        total_enrg = 5.4840 MWh
+        battery_mass = 10968 kg
     [[zero_payload_mission]]
-        range = 188.76 NM
-        tow = 24451 kg
+        range = 189.39 NM
+        tow = 24355 kg
         total_fuel = None kg
         block_fuel = None kg
-        block_time = 1.0151 h
-        block_enrg = 1.3519 MWh
-        total_enrg = 5.5161 MWh
-        battery_mass = 11032 kg
+        block_time = 1.0173 h
+        block_enrg = 1.3446 MWh
+        total_enrg = 5.4840 MWh
+        battery_mass = 10968 kg
     [[cost_mission]]
         disa = 0.0000 degK
         range = 100.00 NM
@@ -91,15 +91,15 @@
         tow = None kg
         total_fuel = 0.0000 kg
         block_fuel = 0.0000 kg
-        block_time = 0.6937 h
-        block_enrg = 1.5328 MWh
-        total_enrg = 4.5661 MWh
-        battery_mass = 9132.1 kg
+        block_time = 0.6936 h
+        block_enrg = 1.5255 MWh
+        total_enrg = 4.5340 MWh
+        battery_mass = 9068.0 kg
         block_CO2 = 0.0000 kg
     [[economics]]
-        gear_price = 0.6880 M$
+        gear_price = 0.6853 M$
         engine_price = 4.5024 M$
-        airplane_price = 37.226 M$
+        airplane_price = 37.169 M$
         battery_price = 0.0000 k$
         battery_mass_price = 20.000 $/kg
         fuel_price = 2.0000 $/gal
@@ -109,22 +109,22 @@
         period = 0.0000004753 year
         interest_rate = 4.0000 %
         utilisation = 1600.0 int
-        cockpit_crew_cost = 592.39 $/trip
-        cabin_crew_cost = 83.241 $/trip
+        cockpit_crew_cost = 592.41 $/trip
+        cabin_crew_cost = 83.234 $/trip
         fuel_cost = 0.0000 $/trip
         elec_cost = 0.0000 $/trip
-        landing_fees = 211.75 $/trip
-        navigation_fees = 39.860 $/trip
+        landing_fees = 210.91 $/trip
+        navigation_fees = 39.782 $/trip
         catering_cost = 58.330 $/trip
         pax_handling_cost = 38.000 $/trip
         ramp_handling_cost = 165.30 $/trip
         standard_operating_cost = None $/trip
-        cash_operating_cost = 1844.5 $/trip
-        total_investment = 38415522 $/trip
-        interest = 372.81 $/trip
-        insurance = 81.433 $/trip
-        depreciation = 1584.6 $/trip
-        direct_operating_cost = 3883.4 $/trip
+        cash_operating_cost = 1843.5 $/trip
+        total_investment = 38357224 $/trip
+        interest = 372.24 $/trip
+        insurance = 81.306 $/trip
+        depreciation = 1582.2 $/trip
+        direct_operating_cost = 3879.3 $/trip
     [[environmental_impact]]
         rgf = 40.885 m2
         CO2_metric = 0.0000 kg/km/m0.48
@@ -139,8 +139,8 @@
         nitric_acid_index = 0.0002000 g/kg
         soot_index = 2500000000000 int
     [[aerodynamics]]
-        cruise_lod_max = 16.176 no_dim
-        cz_cruise_lod_max = 0.7216 no_dim
+        cruise_lod_max = 16.226 no_dim
+        cz_cruise_lod_max = 0.7199 no_dim
         hld_conf_clean = 0.0000 no_dim
         cz_max_clean = 1.4500 no_dim
         hld_conf_to = 0.3000 no_dim
@@ -155,44 +155,45 @@
         sfc_cruise_ref = 0.0000 kg/daN/h
         sec_cruise_ref = 7077.9 kW/daN/h
         bli_effect = 1.000 int
-        bli_e_thrust_factor = None no_dim
+        bli_r_thrust_factor = None no_dim
         bli_thrust_factor = None no_dim
         rating_code = "(MTO, MCN, MCL, MCR, FID) int"
+        flight_data = "{disa: {MTO: 15.000, MCN: 0.0000, MCL: 0.0000, MCR: 0.0000, FID: 0.0000}, altp: {MTO: 0.0000, MCN: 3352.8, MCL: 7620.0, MCR: 7620.0, FID: 7620.0}, mach: {MTO: 0.2500, MCN: 0.2500, MCL: 0.5000, MCR: 0.5000, FID: 0.5000}, nei: {MTO: 0.0000, MCN: 1.000, MCL: 0.0000, MCR: 0.0000, FID: 0.0000}} dict"
         mto_thrust_ref = 3437.6 daN
-        mcn_thrust_ref = 2752.6 daN
+        mcn_thrust_ref = 2816.2 daN
         mcl_thrust_ref = 1803.4 daN
         mcr_thrust_ref = 1803.4 daN
         fid_thrust_ref = 128.72 daN
         mass = 1799.8 kg
-        c_g = 25.694 m
+        c_g = 25.749 m
     [[weights]]
-        mwe = 13067 kg
-        owe = 13419 kg
-        mzfw = 24451 kg
+        mwe = 13035 kg
+        owe = 13387 kg
+        mzfw = 24355 kg
         mass_constraint_1 = 0.0000 kg
-        mlw = 24451 kg
+        mlw = 24355 kg
         mass_constraint_2 = 0.0000 kg
-        mtow = 24451 kg
-        mass_constraint_3 = 0.000000000003638 kg
-        mfw = 11032 kg
+        mtow = 24355 kg
+        mass_constraint_3 = 0.0000 kg
+        mfw = 10968 kg
         battery = 0.0000 kg
     [[center_of_gravity]]
         cg_range_optimization = 0.0000 int
-        mwe = 14.538 m
-        owe = 14.472 m
+        mwe = 14.560 m
+        owe = 14.493 m
         battery = 11.435 m
-        max_fwd_mass = 27093 kg
-        max_fwd_req_cg = 12.789 m
-        max_fwd_trim_cg = 10.516 m
-        cg_constraint_1 = -2.2734 m
-        max_bwd_mass = 25810 kg
-        max_bwd_req_cg = 13.296 m
-        max_bwd_stab_cg = 12.212 m
-        cg_constraint_2 = 1.0841 m
-        max_bwd_oei_mass = 20545 kg
-        max_bwd_oei_req_cg = 13.296 m
-        max_bwd_oei_cg = 9.1804 m
-        cg_constraint_3 = 4.1158 m
+        max_fwd_mass = 27061 kg
+        max_fwd_req_cg = 12.797 m
+        max_fwd_trim_cg = 10.519 m
+        cg_constraint_1 = -2.2788 m
+        max_bwd_mass = 25777 kg
+        max_bwd_req_cg = 13.306 m
+        max_bwd_stab_cg = 12.220 m
+        cg_constraint_2 = 1.0860 m
+        max_bwd_oei_mass = 20471 kg
+        max_bwd_oei_req_cg = 13.306 m
+        max_bwd_oei_cg = 9.0481 m
+        cg_constraint_3 = 4.2575 m
     [[cabin]]
         n_pax_ref = 19.000 int
         n_aisle = 1.000 int
@@ -240,7 +241,7 @@
         span = 22.516 m
         mac = 2.7821 m
         net_wetted_area = 92.381 m2
-        mass = 3882.3 kg
+        mass = 3881.0 kg
         c_g = 11.543 m
         x_root = 10.226 m
         y_root = 1.5600 m
@@ -257,7 +258,7 @@
         x_mac = 10.438 m
         y_mac = 4.5452 m
     [[landing_gears]]
-        mass = 955.60 kg
+        mass = 951.75 kg
         c_g = 12.769 m
     [[horizontal_tail]]
         attachment = 2.0000 int
@@ -267,43 +268,43 @@
         t_o_c = 0.1000 no_dim
         dihedral = 5.0000 deg
         volume = 0.9400 no_dim
-        lever_arm = 10.295 m
-        area = 14.309 m2
-        span = 8.4585 m
-        mac = 1.8224 m
-        net_wetted_area = 28.762 m2
-        mass = 314.81 kg
-        c_g = 21.338 m
-        x_axe = 20.647 m
-        z_axe = 6.1185 m
-        c_axe = 2.5062 m
-        x_tip = 21.424 m
-        y_tip = 4.2293 m
-        z_tip = 6.4885 m
-        c_tip = 0.8772 m
-        x_mac = 20.973 m
-        y_mac = 1.7752 m
+        lever_arm = 10.849 m
+        area = 13.579 m2
+        span = 8.2399 m
+        mac = 1.7753 m
+        net_wetted_area = 27.294 m2
+        mass = 298.74 kg
+        c_g = 21.894 m
+        x_axe = 21.221 m
+        z_axe = 6.0595 m
+        c_axe = 2.4414 m
+        x_tip = 21.978 m
+        y_tip = 4.1199 m
+        z_tip = 6.4199 m
+        c_tip = 0.8545 m
+        x_mac = 21.539 m
+        y_mac = 1.7294 m
     [[vertical_tail]]
-        sweep = 10.000 deg
+        sweep = 15.000 deg
         taper_ratio = 0.4000 no_dim
         aspect_ratio = 1.7000 no_dim
         t_o_c = 0.1000 no_dim
         dihedral = None deg
         volume = 0.4000 m2/kN
-        lever_arm = 9.8731 m
-        area = 4.9675 m2
-        height = 2.9060 m2
-        mac = 1.8141 m
-        net_wetted_area = 9.9848 m2
-        mass = 139.09 kg
-        c_g = 20.916 m
-        x_root = 20.177 m
+        lever_arm = 10.287 m
+        area = 4.7678 m2
+        height = 2.8470 m2
+        mac = 1.7772 m
+        net_wetted_area = 9.5833 m2
+        mass = 133.50 kg
+        c_g = 21.332 m
+        x_root = 20.496 m
         z_root = 3.2125 m
-        c_root = 2.4420 m
-        x_tip = 21.056 m
-        z_tip = 6.1185 m
-        c_tip = 0.9768 m
-        x_mac = 20.553 m
+        c_root = 2.3924 m
+        x_tip = 21.617 m
+        z_tip = 6.0595 m
+        c_tip = 0.9570 m
+        x_mac = 20.976 m
     [[tanks]]
         cantilever_volume = 3.8552 m3
         central_volume = 4.3951 m3
@@ -318,8 +319,8 @@
         fuel_max_bwd_mass = 10795 kg
         fuel_max_bwd_cg = 11.572 m
     [[systems]]
-        mass = 1766.2 kg
-        c_g = 14.393 m
+        mass = 1760.6 kg
+        c_g = 14.447 m
     [[turbofan_pylon]]
         mass = None kg
         c_g = None m
@@ -377,30 +378,20 @@
         c_g = None m
     [[rear_electric_engine]]
         n_engine = None int
-        mto_e_shaft_power = None kW
+        mto_e_shaft_power = 1000.0 kW
         mto_e_fan_thrust = None daN
-        mcn_e_shaft_power = None kW
+        mcn_e_shaft_power = 1000.0 kW
         mcn_e_fan_thrust = None daN
-        mcl_e_shaft_power = None kW
+        mcl_e_shaft_power = 1000.0 kW
         mcl_e_fan_thrust = None daN
-        mcr_e_shaft_power = None kW
+        mcr_e_shaft_power = 1000.0 kW
         mcr_e_fan_thrust = None daN
-        fid_e_shaft_power = None kW
+        fid_e_shaft_power = 10.000 kW
         fid_e_fan_thrust = None daN
         flight_data = None dict
     [[pte1_power_elec_chain]]
-        mto = 1000000 uc
-        mcn = 1000000 uc
-        mcl = 1000000 uc
-        mcr = 1000000 uc
-        fid = 10000 uc
         max_power = None kW
         max_power_rating = None int
-        mto_e_power_ratio = None no_dim
-        mcn_e_power_ratio = None no_dim
-        mcl_e_power_ratio = None no_dim
-        mcr_e_power_ratio = None no_dim
-        fid_e_power_ratio = None no_dim
         overall_efficiency = 0.9000 no_dim
         generator_pw_density = 10.000 kW/kg
         rectifier_pw_density = 20.000 kW/kg
@@ -419,12 +410,12 @@
         c_g = None m
     [[electrofan_pylon]]
         mass = 310.00 kg
-        c_g = 21.236 m
+        c_g = 21.555 m
     [[electrofan_nacelle]]
         attachment = 2.0000 int
         width = 2.8252 m
         length = 4.2377 m
-        x_ext = 18.058 m
+        x_ext = 18.377 m
         y_ext = 3.2551 m
         z_ext = 1.6063 m
         x_int = None m
@@ -463,11 +454,6 @@
         fid_e_fan_thrust = None daN
         flight_data = None dict
     [[ef1_power_elec_chain]]
-        mto = 0.0000 uc
-        mcn = 0.0000 uc
-        mcl = 0.0000 uc
-        mcr = 0.0000 uc
-        fid = 0.0000 uc
         max_power = 4256.6 kW
         max_power_rating = 0.0000 int
         overall_efficiency = 0.9000 no_dim
@@ -476,7 +462,7 @@
         wiring_pw_density = 20.000 kW/kg
         cooling_pw_density = 15.000 kW/kg
         mass = 1135.1 kg
-        c_g = 22.068 m
+        c_g = 22.291 m
     [[ef1_battery]]
         energy_density = 0.5000 kWh/kg
         power_density = 1.000 kW/kg
