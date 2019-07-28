@@ -96,7 +96,8 @@ class Aircraft(object):
 
     def import_from_file(self, filename="Aircraft.ini"):
 
-        in_parser = ConfigObj(filename, indent_type="    ")
+        in_parser = ConfigObj(filename, indent_type="    ",
+                              default_encoding='utf8')
         class_name = self.__class__.__name__
         data_dict = in_parser[class_name]
         set_ac_data(data_dict, self)
@@ -115,7 +116,7 @@ class Aircraft(object):
             :param write_detail: Boolean to write the varaible's description as a inline comment - default value False
         """
 
-        out_parser = ConfigObj(indent_type="    ")
+        out_parser = ConfigObj(indent_type="    ", default_encoding='utf8')
         out_parser.filename = filename
 
         # check python version

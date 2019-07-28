@@ -50,6 +50,7 @@ def eval_ef1_engine_design(aircraft):
 
     power_elec = aircraft.ef1_power_elec_chain
     engine = aircraft.electrofan_engine
+    r_engine = aircraft.rear_electric_engine
     nacelle = aircraft.electrofan_nacelle
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
@@ -98,11 +99,11 @@ def eval_ef1_engine_design(aircraft):
 
     # Max rear fan shaft power, if any
     #-----------------------------------------------------------------------------------------------------------
-    r_shaft_power = numpy.array([engine.mto_r_shaft_power,
-                                 engine.mcn_r_shaft_power,
-                                 engine.mcl_r_shaft_power,
-                                 engine.mcr_r_shaft_power,
-                                 engine.fid_r_shaft_power])
+    r_shaft_power = numpy.array([r_engine.mto_r_shaft_power,
+                                 r_engine.mcn_r_shaft_power,
+                                 r_engine.mcl_r_shaft_power,
+                                 r_engine.mcr_r_shaft_power,
+                                 r_engine.fid_r_shaft_power])
 
     power_elec.max_power = max(r_shaft_power)
     power_elec.max_power_rating = numpy.argmax(r_shaft_power)
