@@ -63,7 +63,9 @@ class ElectrofanNacelle(object):
     Electrofan nacelle data
     """
     INFO = {\
+    "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of electric engine"},
     "attachment":{"unit":"int", "om":1.e0, "txt":"Nacelle attachment (1= under wing, 2= rear fuselage)"},
+    "rear_nacelle":{"unit":"int", "om":1.e0, "txt":"Rear nacelle (0= no, 1= yes)"},
     "width":{"unit":"m", "om":1.e0, "txt":"Maximum width of the nacelles"},
     "length":{"unit":"m", "om":1.e0, "txt":"Length of the fan cowl"},
     "x_ext":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the center of the air inlet of the external nacelle"},
@@ -89,7 +91,9 @@ class ElectrofanNacelle(object):
     "mass":{"unit":"kg", "om":1.e3, "txt":"Equipped mass of the nacelles (including engine mass)"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the nacelles"}
     }
-    def __init__(self, attachment = None,
+    def __init__(self, n_engine = None,
+                       attachment = None,
+                       rear_nacelle = None,
                        width = None,
                        length = None,
                        x_ext = None,
@@ -114,7 +118,9 @@ class ElectrofanNacelle(object):
                        bnd_layer = None,
                        mass = None,
                        c_g = None):
+        self.n_engine = n_engine
         self.attachment = attachment
+        self.rear_nacelle = rear_nacelle
         self.width = width
         self.length = length
         self.x_ext = x_ext
@@ -149,7 +155,6 @@ class ElectrofanEngine(object):
     Electric motor rating power in given conditions
     """
     INFO = {\
-    "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of electric engine"},
     "reference_thrust":{"unit":"daN", "om":1.e4, "txt":"Design Reference Thrust of main engines"},
     "reference_power":{"unit":"kW", "om":1.e3, "txt":"Design Reference Shaft Power of main engines"},
     "rating_factor":{"unit":"int", "om":1.e0, "txt":"Array of rating factors versus reference thrust"},
@@ -165,8 +170,7 @@ class ElectrofanEngine(object):
     "fid_e_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
     "flight_data":{"unit":"dict", "txt":"Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}"}
     }
-    def __init__(self, n_engine = None,
-                       reference_thrust = None,
+    def __init__(self, reference_thrust = None,
                        reference_power = None,
                        rating_factor = None,
                        mto_e_shaft_power = None,
@@ -180,7 +184,6 @@ class ElectrofanEngine(object):
                        fid_e_shaft_power = None,
                        fid_e_fan_thrust = None,
                        flight_data = None):
-        self.n_engine = n_engine
         self.reference_thrust = reference_thrust
         self.reference_power = reference_power
         self.rating_factor = rating_factor

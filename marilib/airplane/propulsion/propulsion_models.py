@@ -83,15 +83,21 @@ def nacelle_drag(aircraft,Re,Mach):
     elif (propulsion.architecture=="PTE1"):
         nacelle = aircraft.turbofan_nacelle
         t_nacelle_cxf,t_nacelle_nwa = turbofan_nacelle_drag(aircraft,nacelle,Re,Mach)
-
         nacelle = aircraft.rear_electric_nacelle
         e_nacelle_cxf,e_nacelle_nwa = rear_electric_nacelle_drag(aircraft,nacelle,Re,Mach)
-
-        nacelle_cxf = t_nacelle_cxf + e_nacelle_cxf
         nacelle_nwa = t_nacelle_nwa + e_nacelle_nwa
+        nacelle_cxf = (t_nacelle_cxf*t_nacelle_nwa + e_nacelle_cxf*e_nacelle_nwa)/nacelle_nwa
     elif (propulsion.architecture=="EF1"):
         nacelle = aircraft.electrofan_nacelle
-        nacelle_cxf,nacelle_nwa = electrofan_nacelle_drag(aircraft,nacelle,Re,Mach)
+        e_nacelle_cxf,e_nacelle_nwa = electrofan_nacelle_drag(aircraft,nacelle,Re,Mach)
+        if (nacelle.rear_engine==1):
+            r_nacelle = aircraft.rear_electric_nacelle
+            r_nacelle_cxf,r_nacelle_nwa = electrofan_nacelle_drag(aircraft,r_nacelle,Re,Mach)
+        else:
+            r_nacelle_cxf = 0.
+            r_nacelle_nwa = 0.
+        nacelle_nwa = e_nacelle_nwa + r_nacelle_nwa
+        nacelle_cxf = (e_nacelle_cxf*e_nacelle_nwa + r_nacelle_cxf*r_nacelle_nwa)/nacelle_nwa
     else:
         raise Exception("propulsion.architecture index is out of range")
 

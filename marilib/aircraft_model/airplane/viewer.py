@@ -93,7 +93,7 @@ def draw_3d_view(aircraft,window_title,plot_title):
         nac_x_ext = aircraft.turbofan_nacelle.x_ext
         nac_y_ext = aircraft.turbofan_nacelle.y_ext
         nac_z_ext = aircraft.turbofan_nacelle.z_ext
-        if (aircraft.turbofan_engine.n_engine==4):
+        if (aircraft.propulsion.n_engine==4):
             nac_x_int = aircraft.turbofan_nacelle.x_int
             nac_y_int = aircraft.turbofan_nacelle.y_int
             nac_z_int = aircraft.turbofan_nacelle.z_int
@@ -104,7 +104,7 @@ def draw_3d_view(aircraft,window_title,plot_title):
         nac_x_ext = aircraft.electrofan_nacelle.x_ext
         nac_y_ext = aircraft.electrofan_nacelle.y_ext
         nac_z_ext = aircraft.electrofan_nacelle.z_ext
-        if (aircraft.electrofan_engine.n_engine==4):
+        if (aircraft.propulsion.n_engine==4):
             nac_x_int = aircraft.electrofan_nacelle.x_int
             nac_y_int = aircraft.electrofan_nacelle.y_int
             nac_z_int = aircraft.electrofan_nacelle.z_int
@@ -260,7 +260,7 @@ def draw_3d_view(aircraft,window_title,plot_title):
                            nac_x_ext,nac_y_ext,nac_z_ext,nac_width,nac_height,nac_length,cyl)
 
     if (aircraft.propulsion.architecture=="TF"):
-        if (aircraft.turbofan_engine.n_engine==4):
+        if (aircraft.propulsion.n_engine==4):
             nac_xz_int,nac_xy_int,nac_yz_int,fan_yz_int = nacelle_shape(0.5*fus_height, \
                            nac_x_int,nac_y_int,nac_z_int,nac_width,nac_height,nac_length,cyl)
 
@@ -319,7 +319,7 @@ def draw_3d_view(aircraft,window_title,plot_title):
     if (aircraft.propulsion.architecture!="TP"):
         plt.plot(xTopView+nac_xy_ext[0:,0], yTopView+nac_xy_ext[0:,1], color="grey", zorder=3)        # Left nacelle top view
         plt.plot(xTopView+nac_xy_ext[0:,0], yTopView-nac_xy_ext[0:,1], color="grey", zorder=3)        # Right nacelle top view
-        if (aircraft.turbofan_engine.n_engine==4):
+        if (aircraft.propulsion.n_engine==4):
             plt.plot(xTopView+nac_xy_int[0:,0], yTopView+nac_xy_int[0:,1], color="grey", zorder=3)        # Left nacelle top view
             plt.plot(xTopView+nac_xy_int[0:,0], yTopView-nac_xy_int[0:,1], color="grey", zorder=3)        # Right nacelle top view
         plt.fill(xTopView+wing_xy[0:,0], yTopView+wing_xy[0:,1], color="white", zorder=4)     # wing_ top view
@@ -364,7 +364,7 @@ def draw_3d_view(aircraft,window_title,plot_title):
     if (aircraft.propulsion.architecture!="TP"):
         plt.fill(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="white", zorder=4)   # wing_ side view
         plt.plot(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="grey", zorder=5)    # wing_ side view
-        if (aircraft.turbofan_engine.n_engine==4):
+        if (aircraft.propulsion.n_engine==4):
             plt.fill(xSideView+nac_xz_int[0:,0], ySideView+nac_xz_int[0:,1], color="white", zorder=6)     # nacelle side view
             plt.plot(xSideView+nac_xz_int[0:,0], ySideView+nac_xz_int[0:,1], color="grey", zorder=6)      # nacelle side view
         plt.fill(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="white", zorder=7)     # nacelle side view

@@ -74,7 +74,7 @@ def eval_pte1_engine_design(aircraft):
 
     Vair = Vsnd*fd_mach[MTO]
 
-    power_offtake = throttle * r_engine.mto_r_shaft_power/(engine.n_engine-nei) / power_elec.overall_efficiency
+    power_offtake = throttle * r_engine.mto_r_shaft_power/(nacelle.n_engine-nei) / power_elec.overall_efficiency
 
     shaft_power1 = shaft_power0 - power_offtake     # Shaft power dedicated to the fan
 
@@ -130,13 +130,13 @@ def eval_pte1_nacelle_design(aircraft):
 
     knac = numpy.pi*nacelle.width*nacelle.length
 
-    nacelle.net_wetted_area = knac*(1.48 - 0.0076*knac)*engine.n_engine
+    nacelle.net_wetted_area = knac*(1.48 - 0.0076*knac)*nacelle.n_engine
 
     tan_phi0 = 0.25*(wing.c_kink-wing.c_tip)/(wing.y_tip-wing.y_kink) + numpy.tan(wing.sweep)
 
     if (nacelle.attachment == 1):
 
-        if (engine.n_engine==2):
+        if (nacelle.n_engine==2):
 
             nacelle.y_ext = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
@@ -146,7 +146,7 @@ def eval_pte1_nacelle_design(aircraft):
                             + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
                             - 0.5*nacelle.width
 
-        elif (engine.n_engine==4):
+        elif (nacelle.n_engine==4):
 
             nacelle.y_int = 0.8 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
@@ -164,11 +164,11 @@ def eval_pte1_nacelle_design(aircraft):
                             + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
                             - 0.5*nacelle.width
         else:
-            raise Exception("engine.n_engine, number of engine not supported")
+            raise Exception("nacelle.n_engine, number of engine not supported")
 
     elif (nacelle.attachment == 2):
 
-        if (engine.n_engine==2):
+        if (nacelle.n_engine==2):
 
             nacelle.y_ext = 0.5 * fuselage.width + 0.6 * nacelle.width      # statistical regression
 
@@ -177,7 +177,7 @@ def eval_pte1_nacelle_design(aircraft):
             nacelle.z_ext = 0.5 * fuselage.height
 
         else:
-            raise Exception("engine.n_engine, number of engine not supported")
+            raise Exception("nacelle.n_engine, number of engine not supported")
 
     else:
         raise Exception("nacelle.attachment, index is out of range")
@@ -281,7 +281,7 @@ def eval_pte1_nacelle_mass(aircraft):
 
     kMass = kTurboFanMass + engine.core_weight_ratio*(1-kTurboFanMass)     # Assuming core mass remains unchanged
 
-    nacelle.mass = engine.n_engine * turboFanMass0 * kMass     # Total engine mass
+    nacelle.mass = nacelle.n_engine * turboFanMass0 * kMass     # Total engine mass
 
     power_elec.mass = (  1./power_elec.generator_pw_density + 1./power_elec.rectifier_pw_density \
                        + 1./power_elec.wiring_pw_density + 1./power_elec.cooling_pw_density \

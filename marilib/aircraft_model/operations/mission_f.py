@@ -56,11 +56,11 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
-    fuel_taxi_out = (34. + 2.3e-4*engine.reference_thrust)*engine.n_engine
+    fuel_taxi_out = (34. + 2.3e-4*engine.reference_thrust)*propulsion.n_engine
     time_taxi_out = 540.
 
     fuel_take_off = 1e-4*(2.8+2.3/engine.bpr)*tow
-    time_take_off = 220.*tow/(engine.reference_thrust*engine.n_engine)
+    time_take_off = 220.*tow/(engine.reference_thrust*propulsion.n_engine)
 
     # Mission leg
     #-----------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     fuel_landing = 1e-4*(0.5+2.3/engine.bpr)*l_w
     time_landing = 180.
 
-    fuel_taxi_in = (26. + 1.8e-4*engine.reference_thrust)*engine.n_engine
+    fuel_taxi_in = (26. + 1.8e-4*engine.reference_thrust)*propulsion.n_engine
     time_taxi_in = 420.
 
     # Block fuel and time

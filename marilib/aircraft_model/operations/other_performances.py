@@ -245,7 +245,7 @@ def take_off_field_length(aircraft,altp,disa,mass,hld_conf):
 
     [seg2_path,tofl] = take_off(aircraft,kvs1g,altp,disa,mass,hld_conf)
 
-    n_engine = aircraft.turbofan_engine.n_engine
+    n_engine = aircraft.propulsion.n_engine
 
     seg2_min_path = regul.seg2_min_path(n_engine)
 

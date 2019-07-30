@@ -199,6 +199,11 @@ def nacelle_body_hub_width():
     return nacelle_body_hub_width_i
 
 #===========================================================================================================
+def ef1_rear_nacelle():
+    efi_rear_nacelle_i = 0
+    return efi_rear_nacelle_i
+
+#===========================================================================================================
 def nacelle_attachment(n_pax_ref):
     if (80<n_pax_ref):
         nacelle_attachment_i = 1     # 1: underwing

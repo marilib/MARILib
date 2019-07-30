@@ -115,13 +115,13 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     Vair = Vsnd*Mach
 
-    power_offtake = throttle * rear_shaft_power[rating]/(engine.n_engine-nei) / power_elec.overall_efficiency
+    power_offtake = throttle * rear_shaft_power[rating]/(nacelle.n_engine-nei) / power_elec.overall_efficiency
 
     shaft_power1 = shaft_power0 - power_offtake     # Shaft power dedicated to the fan
 
     fn_fan1 = nacelle.efficiency_prop*shaft_power1/Vair     # Effective fan thrust
 
-    shaft_power2 = power_offtake * (engine.n_engine - nei)     # Shaft power dedicated to electric generator
+    shaft_power2 = power_offtake * (nacelle.n_engine - nei)     # Shaft power dedicated to electric generator
 
     # Effective eFan shaft power
     pw_shaft2 =   shaft_power2 * power_elec.overall_efficiency \
@@ -144,9 +144,9 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
         fn_fan2 = 0.
         sec = 0.
 
-    sfc = sfc0 * (fn0*(engine.n_engine - nei)) / ((fn_core + fn_fan1)*(engine.n_engine - nei) + fn_fan2)
+    sfc = sfc0 * (fn0*(nacelle.n_engine - nei)) / ((fn_core + fn_fan1)*(nacelle.n_engine - nei) + fn_fan2)
 
-    fn = (fn_core + fn_fan1)*(engine.n_engine - nei) + fn_fan2
+    fn = (fn_core + fn_fan1)*(nacelle.n_engine - nei) + fn_fan2
 
     data = (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0,sfc0)
 

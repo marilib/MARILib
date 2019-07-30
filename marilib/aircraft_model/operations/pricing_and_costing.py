@@ -60,7 +60,6 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     cabin = aircraft.cabin
     propulsion = aircraft.propulsion
-    engine = aircraft.turbofan_engine
     weights = aircraft.weights
     cost_mission = aircraft.cost_mission
 
@@ -89,8 +88,8 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     t_h = 0.05*(propulsion.reference_thrust_effective/4.4482198)*1e-4
 
-    labor_engine = engine.n_engine*(0.645*t_t+t_h*(0.566*t_t+0.434))*labor_cost
-    matrl_engine = engine.n_engine*(25.*t_t+t_h*(0.62*t_t+0.38))
+    labor_engine = propulsion.n_engine*(0.645*t_t+t_h*(0.566*t_t+0.434))*labor_cost
+    matrl_engine = propulsion.n_engine*(25.*t_t+t_h*(0.62*t_t+0.38))
     engine_cost = labor_engine + matrl_engine
 
     w_g = weights.mtow*1e-3
@@ -123,9 +122,9 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     battery_price = eco.battery_mass_price*weights.battery
 
-    aircraft_price = frame_price + engine_price * engine.n_engine + gear_price + battery_price
+    aircraft_price = frame_price + engine_price * propulsion.n_engine + gear_price + battery_price
 
-    eco.total_investment = frame_price * 1.06 + engine.n_engine * engine_price * 1.025
+    eco.total_investment = frame_price * 1.06 + propulsion.n_engine * engine_price * 1.025
 
     eco.interest = (eco.total_investment/(utilisation*period)) * (irp * 0.04 * (((1. + interest_rate)**irp)/((1. + interest_rate)**irp - 1.)) - 1.)
 

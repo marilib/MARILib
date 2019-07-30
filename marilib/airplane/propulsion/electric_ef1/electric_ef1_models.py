@@ -7,6 +7,7 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 import numpy
+from scipy.optimize import fsolve
 
 from marilib.earth import environment as earth
 
@@ -57,11 +58,37 @@ def ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei):
 
     pw_elec = pw_shaft / (nacelle.motor_efficiency*nacelle.controller_efficiency)
 
-    sec = pw_elec / fn_fan
+    if (nacelle.rear_engine==1):
 
-    fn = fn_fan*(engine.n_engine - nei)
+        r_engine = aircraft.rear_electric_engine
+        r_nacelle = aircraft.rear_electric_nacelle
 
-    data = (fn_fan,pw_elec,pw_shaft,q0)
+        r_shaft_power = {"MTO":r_engine.mto_r_shaft_power,
+                         "MCN":r_engine.mcn_r_shaft_power,
+                         "MCL":r_engine.mcl_r_shaft_power,
+                         "MCR":r_engine.mcr_r_shaft_power,
+                         "FID":r_engine.fid_r_shaft_power}
+
+        r_pw_shaft = throttle*r_shaft_power[rating]
+
+        (r_fn_fan,r_q0) = jet.fan_thrust(r_nacelle,pamb,tamb,mach,r_pw_shaft)
+
+        r_pw_elec = r_pw_shaft / (r_nacelle.motor_efficiency*r_nacelle.controller_efficiency)
+
+    else:
+
+        r_pw_shaft = 0.
+        r_pw_elec = 0.
+        r_fn_fan = 0.
+        r_q0 = 0.
+
+    pw = pw_elec*(nacelle.n_engine - nei) + r_pw_elec
+
+    fn = fn_fan*(nacelle.n_engine - nei) + r_fn_fan
+
+    sec = pw / fn
+
+    data = (fn_fan,pw_elec,pw_shaft,q0,r_fn_fan,r_pw_elec,r_pw_shaft,r_q0)
 
     return fn,sec,data
 

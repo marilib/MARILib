@@ -68,7 +68,7 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     shaft_power0 = fn_fan0*Vair/nacelle.efficiency_prop   # Available total shaft power for one engine
 
-    fn = fn0*(engine.n_engine - nei)        # All turbofan thrust
+    fn = fn0*(nacelle.n_engine - nei)        # All turbofan thrust
 
     data = (fn_core,fn_fan0,fn0,shaft_power0)   # Data for ONE turbofan engine
 

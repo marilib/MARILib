@@ -45,8 +45,9 @@ class Propulsion(object):
     Propulsion data
     """
     INFO = {\
-    "architecture":{"unit":"int", "om":1.e0, "txt":"Propulsion architecture, 1:turbofan, 2:partial turbo electric n°1"},
-    "fuel_type":{"unit":"int", "om":1.e0, "txt":"Type of fuel, Kerosene, Hydrogene, Methane, Battery"},
+    "architecture":{"unit":"string", "om":1.e0, "txt":"Propulsion architecture, TF:turbofan, PTE1:partial turbo electric n°1, EF1, electric with batteries"},
+    "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of main engines"},
+    "fuel_type":{"unit":"string", "om":1.e0, "txt":"Type of fuel, Kerosene, Hydrogene, Methane, Battery"},
     "battery_energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
     "reference_thrust_effective":{"unit":"daN", "om":1.e5, "txt":"Effective reference_thrust computed as max thrust(Mach = 0.25, ISA+15, Sea Level) / 0.8"},
     "sfc_cruise_ref":{"unit":"kg/daN/h", "om":1.e0, "txt":"Specific Fuel Consumption in cruise condition, isa, ref_cruise_altp, cruise_mach"},
@@ -65,6 +66,7 @@ class Propulsion(object):
     "c_g":{"unit":"m", "om":1.e1, "txt":"Global CG position for the whole propulsion system (pylons, nacelles, engines, ...)"}
     }
     def __init__(self, architecture = None,
+                       n_engine = None,
                        fuel_type = None,
                        battery_energy_density = None,
                        reference_thrust_effective = None,
@@ -83,6 +85,7 @@ class Propulsion(object):
                        mass = None,
                        c_g = None):
         self.architecture = architecture
+        self.n_engine = n_engine
         self.fuel_type = fuel_type
         self.battery_energy_density = battery_energy_density
         self.reference_thrust_effective = reference_thrust_effective

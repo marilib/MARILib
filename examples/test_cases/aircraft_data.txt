@@ -1,5 +1,5 @@
 # MARILib configuration file
-# Created on 28-07-2019 18:57:14
+# Created on 28-07-2019 19:17:44
 [Aircraft]
     name = my_test_airplane
     [[design_driver]]
@@ -148,8 +148,8 @@
         hld_conf_ld = 1.000 no_dim     #  High lift device setting in landing configuration (nominal value is 1)
         cz_max_ld = 2.6000 no_dim     #  Maximum lift coefficient in landing configuration
     [[propulsion]]
-        architecture = EF1 int     #  Propulsion architecture, 1:turbofan, 2:partial turbo electric n°1
-        fuel_type = Battery int     #  Type of fuel, Kerosene, Hydrogene, Methane, Battery
+        architecture = EF1 string     #  Propulsion architecture, TF:turbofan, PTE1:partial turbo electric n°1, EF1, electric with batteries
+        fuel_type = Battery string     #  Type of fuel, Kerosene, Hydrogene, Methane, Battery
         battery_energy_density = 0.5000 kWh/kg     #  Battery energy density
         reference_thrust_effective = 4297.0 daN     #  Effective reference_thrust computed as max thrust(Mach = 0.25, ISA+15, Sea Level) / 0.8
         sfc_cruise_ref = 0.0000 kg/daN/h     #  Specific Fuel Consumption in cruise condition, isa, ref_cruise_altp, cruise_mach

@@ -61,11 +61,11 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
-    enrg_taxi_out = e_factor*(34. + 2.3e-4*engine.reference_thrust)*engine.n_engine
+    enrg_taxi_out = e_factor*(34. + 2.3e-4*engine.reference_thrust)*propulsion.n_engine
     time_taxi_out = 540.
 
     enrg_take_off = e_factor*1e-4*(2.8+2.3/engine.bpr)*tow
-    time_take_off = 220.*tow/(engine.reference_thrust*engine.n_engine)
+    time_take_off = 220.*tow/(engine.reference_thrust*propulsion.n_engine)
 
     # Mission leg
     #-----------------------------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
     enrg_landing = e_factor*1e-4*(0.5+2.3/engine.bpr)*l_w
     time_landing = 180.
 
-    enrg_taxi_in = e_factor*(26. + 1.8e-4*engine.reference_thrust)*engine.n_engine
+    enrg_taxi_in = e_factor*(26. + 1.8e-4*engine.reference_thrust)*propulsion.n_engine
     time_taxi_in = 420.
 
     # Block fuel and time

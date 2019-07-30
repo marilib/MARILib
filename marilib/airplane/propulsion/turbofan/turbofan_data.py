@@ -27,6 +27,7 @@ class TurbofanNacelle(object):
     Turbofan nacelle data
     """
     INFO = {\
+    "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of turbofan"},
     "attachment":{"unit":"int", "om":1.e0, "txt":"Nacelle attachment (1= under wing, 2= rear fuselage)"},
     "width":{"unit":"m", "om":1.e0, "txt":"Maximum width of the nacelles"},
     "length":{"unit":"m", "om":1.e0, "txt":"Length of the fan cowl"},
@@ -48,7 +49,8 @@ class TurbofanNacelle(object):
     "mass":{"unit":"kg", "om":1.e3, "txt":"Equipped mass of the nacelles (including engine mass)"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the nacelles"}
     }
-    def __init__(self, attachment = None,
+    def __init__(self, n_engine = None,
+                       attachment = None,
                        width = None,
                        length = None,
                        x_ext = None,
@@ -68,6 +70,7 @@ class TurbofanNacelle(object):
                        bnd_layer = None,
                        mass = None,
                        c_g = None):
+        self.n_engine = n_engine
         self.attachment = attachment
         self.width = width
         self.length = length
@@ -95,7 +98,6 @@ class TurbofanEngine(object):
     Turbofan engine data
     """
     INFO = {\
-    "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of turbofan"},
     "bpr":{"unit":"no_dim", "om":1.e0, "txt":"By Pass Ratio of the turbofan"},
     "reference_thrust":{"unit":"daN", "om":1.e4, "txt":"Design Reference Thrust of the engines"},
     "rating_factor":{"unit":"int", "om":1.e0, "txt":"Array of rating factors versus reference thrust"},
@@ -104,15 +106,13 @@ class TurbofanEngine(object):
     "core_weight_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total nacelle mass which is taken by the core"},
     "kfn_off_take":{"unit":"no_dim", "om":1.e0, "txt":"reference_thrust factor due to power off take (if any)"}
     }
-    def __init__(self, n_engine = None,
-                       bpr = None,
+    def __init__(self, bpr = None,
                        reference_thrust = None,
                        rating_factor = None,
                        core_thrust_ratio = None,
                        core_width_ratio = None,
                        core_weight_ratio = None,
                        kfn_off_take = None):
-        self.n_engine = n_engine
         self.bpr = bpr
         self.reference_thrust = reference_thrust
         self.rating_factor = rating_factor

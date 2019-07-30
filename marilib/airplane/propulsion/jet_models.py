@@ -81,7 +81,8 @@ def efan_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width):
 
     this_nacelle.length = 1.50*this_nacelle.width
 
-    this_nacelle.net_wetted_area = numpy.pi*this_nacelle.width*this_nacelle.length        # Nacelle wetted area
+    # Total wetted area of main nacelles
+    this_nacelle.net_wetted_area = numpy.pi*this_nacelle.width*this_nacelle.length*this_nacelle.n_engine
 
     return
 

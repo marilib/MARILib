@@ -34,6 +34,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     """
 
     aircraft.propulsion.architecture = propu_config
+    aircraft.propulsion.n_engine = n_engine
 
     aircraft.propulsion.fuel_type = init.fuel_type(propu_config)
 
@@ -169,6 +170,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.electrofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
 
     aircraft.electrofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
+    aircraft.electrofan_nacelle.rear_nacelle = init.ef1_rear_nacelle()
     aircraft.electrofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.electrofan_nacelle.efficiency_prop = init.efficiency_prop()
     aircraft.electrofan_nacelle.motor_efficiency = init.e_motor_efficiency()

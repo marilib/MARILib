@@ -120,7 +120,6 @@ class RearElectricEngine(object):
     Electric motor rating power in given conditions
     """
     INFO = {\
-    "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of electric engine"},
     "mto_r_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in take off rating (one engine), Sea Level, ISA+15, Mach 0,25"},
     "mto_r_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25"},
     "mcn_r_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in maxi continuous rating (one engine), required ceiling altitude, ISA, cruise Mach"},
@@ -133,8 +132,7 @@ class RearElectricEngine(object):
     "fid_r_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
     "flight_data":{"unit":"dict", "txt":"Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}"}
     }
-    def __init__(self, n_engine = None,
-                       mto_r_shaft_power = None,
+    def __init__(self, mto_r_shaft_power = None,
                        mto_r_fan_thrust = None,
                        mcn_r_shaft_power = None,
                        mcn_r_fan_thrust = None,
@@ -145,7 +143,6 @@ class RearElectricEngine(object):
                        fid_r_shaft_power = None,
                        fid_r_fan_thrust = None,
                        flight_data = None):
-        self.n_engine = n_engine
         self.mto_r_shaft_power = mto_r_shaft_power
         self.mto_r_fan_thrust = mto_r_fan_thrust
         self.mcn_r_shaft_power = mcn_r_shaft_power

@@ -37,22 +37,16 @@ def eval_propulsion_design(aircraft):
 
     if (propulsion.architecture=="TF"):
 
-        engine = aircraft.turbofan_engine
-
         eval_turbofan_engine_design(aircraft)
         eval_turbofan_nacelle_design(aircraft)
 
     elif (propulsion.architecture=="PTE1"):
-
-        engine = aircraft.turbofan_engine
 
         eval_turbofan_engine_design(aircraft)
         eval_pte1_engine_design(aircraft)
         eval_pte1_nacelle_design(aircraft)
 
     elif (propulsion.architecture=="EF1"):
-
-        engine = aircraft.electrofan_engine
 
         eval_ef1_engine_design(aircraft)
         eval_ef1_nacelle_design(aircraft)
@@ -75,8 +69,8 @@ def eval_propulsion_design(aircraft):
 
     Fn,SFC,SEC,Data = propu.thrust(aircraft,pamb,tamb,mach,MTO,throttle,nei)
 
-    propulsion.reference_thrust_effective = (Fn/engine.n_engine)/0.80
-    propulsion.mto_thrust_ref = Fn/engine.n_engine
+    propulsion.reference_thrust_effective = (Fn/propulsion.n_engine)/0.80
+    propulsion.mto_thrust_ref = Fn/propulsion.n_engine
 
     #-----------------------------------------------------------------------------------------------------------
     disa = propulsion.flight_data["disa"][MCN]
@@ -90,7 +84,7 @@ def eval_propulsion_design(aircraft):
 
     (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCN,throttle,nei)
 
-    propulsion.mcn_thrust_ref = Fn/(engine.n_engine-nei)
+    propulsion.mcn_thrust_ref = Fn/(propulsion.n_engine-nei)
 
     #-----------------------------------------------------------------------------------------------------------
     disa = propulsion.flight_data["disa"][MCL]
@@ -104,7 +98,7 @@ def eval_propulsion_design(aircraft):
 
     (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCL,throttle,nei)
 
-    propulsion.mcl_thrust_ref = Fn/engine.n_engine
+    propulsion.mcl_thrust_ref = Fn/propulsion.n_engine
 
     #-----------------------------------------------------------------------------------------------------------
     disa = propulsion.flight_data["disa"][MCR]
@@ -134,7 +128,7 @@ def eval_propulsion_design(aircraft):
 
     (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
 
-    propulsion.mcr_thrust_ref = Fn/engine.n_engine
+    propulsion.mcr_thrust_ref = Fn/propulsion.n_engine
 
     #-----------------------------------------------------------------------------------------------------------
     disa = propulsion.flight_data["disa"][FID]
@@ -148,7 +142,7 @@ def eval_propulsion_design(aircraft):
 
     (Fn,SFC,SEC,Data) = propu.thrust(aircraft,pamb,tamb,mach,FID,throttle,nei)
 
-    propulsion.fid_thrust_ref = Fn/engine.n_engine
+    propulsion.fid_thrust_ref = Fn/propulsion.n_engine
 
     return
 
