@@ -97,13 +97,13 @@ def eval_ef1_engine_design(aircraft):
     engine.mcr_e_shaft_power = ref_shaft_power * engine.rating_factor[MCR]
     engine.fid_e_shaft_power = ref_shaft_power * engine.rating_factor[FID]
 
-    # Max main fan shaft power, if any
+    # Max main fan shaft power
     #-----------------------------------------------------------------------------------------------------------
-    shaft_power = numpy.array([engine.mto_r_shaft_power,
-                               engine.mcn_r_shaft_power,
-                               engine.mcl_r_shaft_power,
-                               engine.mcr_r_shaft_power,
-                               engine.fid_r_shaft_power])
+    shaft_power = numpy.array([engine.mto_e_shaft_power,
+                               engine.mcn_e_shaft_power,
+                               engine.mcl_e_shaft_power,
+                               engine.mcr_e_shaft_power,
+                               engine.fid_e_shaft_power])
 
     power_elec.max_power = max(shaft_power)
     power_elec.max_power_rating = numpy.argmax(shaft_power)
@@ -302,29 +302,27 @@ def eval_ef1_nacelle_mass(aircraft):
                           + 1./r_nacelle.nacelle_pw_density \
                           ) * r_shaft_power_max
 
+        r_nacelle.c_g = fuselage.length + 0.5*nacelle.length
+
     else:
 
         r_shaft_power_max = 0.
         r_nacelle.mass = 0.
+        r_nacelle.c_g = 0.
 
     shaft_power_max = power_elec.max_power
-
-    power_elec.mass = (  1./power_elec.generator_pw_density + 1./power_elec.rectifier_pw_density \
-                       + 1./power_elec.wiring_pw_density + 1./power_elec.cooling_pw_density \
-                      ) * (shaft_power_max * nacelle.n_engine + r_shaft_power_max)
 
     nacelle.mass = (  1./nacelle.controller_pw_density + 1./nacelle.motor_pw_density \
                     + 1./nacelle.nacelle_pw_density \
                    ) * shaft_power_max * nacelle.n_engine
 
-
-    # Propulsion system CG
-    # ------------------------------------------------------------------------
     nacelle.c_g = nacelle.x_ext + 0.70*nacelle.length
 
-    power_elec.c_g = 0.70*nacelle.c_g + 0.30*fuselage.length
+    power_elec.mass = (  1./power_elec.generator_pw_density + 1./power_elec.rectifier_pw_density \
+                       + 1./power_elec.wiring_pw_density + 1./power_elec.cooling_pw_density \
+                      ) * (shaft_power_max * nacelle.n_engine + r_shaft_power_max)
 
-    nacelle.c_g = fuselage.length + 0.5*nacelle.length
+    power_elec.c_g = 0.70*nacelle.c_g + 0.30*fuselage.length
 
     return
 

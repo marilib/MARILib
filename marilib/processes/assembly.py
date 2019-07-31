@@ -120,7 +120,6 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.vertical_tail.area = init.vtp_area(aircraft.wing.area)
 
     #-----------------------------------------------------------------------------------------------------------
-    aircraft.turbofan_engine.n_engine = n_engine
     aircraft.turbofan_engine.bpr = init.bpr(n_pax_ref)
     aircraft.turbofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
 
@@ -129,6 +128,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.turbofan_engine.core_weight_ratio = init.core_weight_ratio()
 
     aircraft.turbofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
+    aircraft.turbofan_nacelle.n_engine = n_engine
     aircraft.turbofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.turbofan_nacelle.efficiency_prop = init.efficiency_prop()
     aircraft.turbofan_nacelle.width = init.nacelle_width(aircraft.turbofan_engine.bpr,
@@ -166,11 +166,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.pte1_battery.power_density = init.battery_power_density()
 
     #-----------------------------------------------------------------------------------------------------------
-    aircraft.electrofan_engine.n_engine = n_engine
     aircraft.electrofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
 
     aircraft.electrofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
-    aircraft.electrofan_nacelle.rear_nacelle = init.ef1_rear_nacelle()
+    aircraft.electrofan_nacelle.n_engine = n_engine
+    aircraft.electrofan_nacelle.rear_engine = init.ef1_rear_nacelle()
     aircraft.electrofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.electrofan_nacelle.efficiency_prop = init.efficiency_prop()
     aircraft.electrofan_nacelle.motor_efficiency = init.e_motor_efficiency()

@@ -98,23 +98,23 @@ class TurbofanEngine(object):
     Turbofan engine data
     """
     INFO = {\
-    "bpr":{"unit":"no_dim", "om":1.e0, "txt":"By Pass Ratio of the turbofan"},
     "reference_thrust":{"unit":"daN", "om":1.e4, "txt":"Design Reference Thrust of the engines"},
+    "bpr":{"unit":"no_dim", "om":1.e0, "txt":"By Pass Ratio of the turbofan"},
     "rating_factor":{"unit":"int", "om":1.e0, "txt":"Array of rating factors versus reference thrust"},
     "core_thrust_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total thrust of a turbofan which is due to the core (typically between 10% & 16% for BPR>5)"},
     "core_width_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total nacelle diameter which is taken by the core"},
     "core_weight_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total nacelle mass which is taken by the core"},
     "kfn_off_take":{"unit":"no_dim", "om":1.e0, "txt":"reference_thrust factor due to power off take (if any)"}
     }
-    def __init__(self, bpr = None,
-                       reference_thrust = None,
+    def __init__(self, reference_thrust = None,
+                       bpr = None,
                        rating_factor = None,
                        core_thrust_ratio = None,
                        core_width_ratio = None,
                        core_weight_ratio = None,
                        kfn_off_take = None):
-        self.bpr = bpr
         self.reference_thrust = reference_thrust
+        self.bpr = bpr
         self.rating_factor = rating_factor
         self.core_thrust_ratio = core_thrust_ratio
         self.core_width_ratio = core_width_ratio

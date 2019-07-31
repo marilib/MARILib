@@ -10,11 +10,8 @@ Created on Thu Jan 24 23:22:21 2019
 
 from marilib.tools import units as unit
 
-from marilib.processes import component as sub_proc
-
-from marilib.aircraft_model.operations import flight_mechanics as flight
-
-from marilib.processes import component as perfo
+from marilib.aircraft_model.operations import mission, \
+                                              flight_mechanics as flight
 
 
 #===========================================================================================================
@@ -39,35 +36,35 @@ def fuel_efficiency_metric(aircraft):
 
     # WARNING : Maximum SAR altitude or speed may be lowered by propulsion ceilings
     #-----------------------------------------------------------------------------------------------------------
-    (sar_max_hw,altp_sar_max_hw) = sub_proc.sar_max(aircraft,high_weight,mach,disa)
+    (sar_max_hw,altp_sar_max_hw) = mission.sar_max(aircraft,high_weight,mach,disa)
     (altp_sar_max_hw,hw_ceiling) = check_ceiling(aircraft,high_weight,altp_sar_max_hw,mach,disa)
     if(hw_ceiling<0.):
         lower_mach = mach - 0.03
-        (sar_max_hw,altp_sar_max_hw) = sub_proc.sar_max(aircraft,high_weight,lower_mach,disa)
+        (sar_max_hw,altp_sar_max_hw) = mission.sar_max(aircraft,high_weight,lower_mach,disa)
         (altp_sar_max_hw,hw_ceiling) = check_ceiling(aircraft,high_weight,altp_sar_max_hw,lower_mach,disa)
-        sar_max_hw = perfo.specific_air_range(aircraft,altp_sar_max_hw,high_weight,lower_mach,disa)
+        sar_max_hw = mission.specific_air_range(aircraft,altp_sar_max_hw,high_weight,lower_mach,disa)
     else:
-        sar_max_hw = perfo.specific_air_range(aircraft,altp_sar_max_hw,high_weight,mach,disa)
+        sar_max_hw = mission.specific_air_range(aircraft,altp_sar_max_hw,high_weight,mach,disa)
 
-    (sar_max_mw,altp_sar_max_mw) = sub_proc.sar_max(aircraft,medium_weight,mach,disa)
+    (sar_max_mw,altp_sar_max_mw) = mission.sar_max(aircraft,medium_weight,mach,disa)
     (altp_sar_max_mw,mw_ceiling) = check_ceiling(aircraft,medium_weight,altp_sar_max_mw,mach,disa)
     if(mw_ceiling<0.):
         lower_mach = mach - 0.03
-        (sar_max_mw,altp_sar_max_mw) = sub_proc.sar_max(aircraft,medium_weight,lower_mach,disa)
+        (sar_max_mw,altp_sar_max_mw) = mission.sar_max(aircraft,medium_weight,lower_mach,disa)
         (altp_sar_max_mw,mw_ceiling) = check_ceiling(aircraft,medium_weight,altp_sar_max_mw,lower_mach,disa)
-        sar_max_mw = perfo.specific_air_range(aircraft,altp_sar_max_mw,medium_weight,lower_mach,disa)
+        sar_max_mw = mission.specific_air_range(aircraft,altp_sar_max_mw,medium_weight,lower_mach,disa)
     else:
-        sar_max_mw = perfo.specific_air_range(aircraft,altp_sar_max_mw,medium_weight,mach,disa)
+        sar_max_mw = mission.specific_air_range(aircraft,altp_sar_max_mw,medium_weight,mach,disa)
 
-    (sar_max_lw,altp_sar_max_lw) = sub_proc.sar_max(aircraft,low_weight,mach,disa)
+    (sar_max_lw,altp_sar_max_lw) = mission.sar_max(aircraft,low_weight,mach,disa)
     (altp_sar_max_lw,lw_ceiling) = check_ceiling(aircraft,low_weight,altp_sar_max_lw,mach,disa)
     if(lw_ceiling<0.):
         lower_mach = mach - 0.03
-        (sar_max_lw,altp_sar_max_lw) = sub_proc.sar_max(aircraft,low_weight,lower_mach,disa)
+        (sar_max_lw,altp_sar_max_lw) = mission.sar_max(aircraft,low_weight,lower_mach,disa)
         (altp_sar_max_lw,lw_ceiling) = check_ceiling(aircraft,low_weight,altp_sar_max_lw,lower_mach,disa)
-        sar_max_lw = perfo.specific_air_range(aircraft,altp_sar_max_lw,low_weight,lower_mach,disa)
+        sar_max_lw = mission.specific_air_range(aircraft,altp_sar_max_lw,low_weight,lower_mach,disa)
     else:
-        sar_max_lw = perfo.specific_air_range(aircraft,altp_sar_max_lw,low_weight,mach,disa)
+        sar_max_lw = mission.specific_air_range(aircraft,altp_sar_max_lw,low_weight,mach,disa)
 
     CO2_metric = (1/rgf**0.24)*(1/sar_max_hw + 1/sar_max_mw + 1/sar_max_lw)/3        # kg/m/m2
 

@@ -14,54 +14,9 @@ from scipy.optimize import fsolve
 
 from marilib.tools.math import maximize_1d, trinome, vander3
 
-from marilib.aircraft_model.operations import mission_b, mission_f, \
-                                              other_performances as perfo, \
+from marilib.aircraft_model.operations import other_performances as perfo, \
                                               environmental_impact as environ, \
                                               pricing_and_costing as costing
-
-
-#===========================================================================================================
-def mission_tow(aircraft,payload,range,altp,mach,disa):
-    """
-    Mission simulation (take off weight is output)
-    """
-
-    if (aircraft.propulsion.fuel_type=="Battery"):
-        tow,block_enrg,block_time,total_enrg = mission_b.b_mission_tow(aircraft,payload,range,altp,mach,disa)
-        return tow,block_enrg,block_time,total_enrg
-    else:
-        tow,block_fuel,block_time,total_fuel = mission_f.f_mission_tow(aircraft,payload,range,altp,mach,disa)
-        return tow,block_fuel,block_time,total_fuel
-
-
-#===========================================================================================================
-def specific_air_range(aircraft,altp,mass,mach,disa):
-
-    if (aircraft.propulsion.fuel_type=="Battery"):
-        sar = mission_b.b_specific_air_range(aircraft,altp,mass,mach,disa)
-    else:
-        sar = mission_f.f_specific_air_range(aircraft,altp,mass,mach,disa)
-    return sar
-
-
-#===========================================================================================================
-def sar_max(aircraft,mass,mach,disa):
-
-    def fct_sar_max(altp,mass,mach,disa,aircraft):
-    #=======================================================================================
-        sar = specific_air_range(aircraft,altp,mass,mach,disa)
-        return sar
-    #---------------------------------------------------------------------------------------
-
-    altp_ini = aircraft.design_driver.ref_cruise_altp
-
-    d_altp = 250.
-
-    fct = [fct_sar_max, mass,mach,disa,aircraft]
-
-    (altp_sar_max,sar_max,rc) = maximize_1d(altp_ini,d_altp,fct)
-
-    return sar_max,altp_sar_max
 
 
 #===========================================================================================================

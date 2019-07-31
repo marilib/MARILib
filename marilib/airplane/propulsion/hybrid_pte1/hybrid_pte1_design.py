@@ -273,31 +273,29 @@ def eval_pte1_nacelle_mass(aircraft):
     # -----------------------------------------------------------------------
     shaftPowerMax = power_elec.max_power
 
-    turboFanMass0 = 1250. + 0.021*engine.reference_thrust # Statistical regression
+    turbo_fan_mass0 = 1250. + 0.021*engine.reference_thrust # Statistical regression
 
-    turboFanMass1 = 1250. + 0.021*engine.reference_thrust*engine.kfn_off_take
+    turbo_fan_mass1 = 1250. + 0.021*engine.reference_thrust*engine.kfn_off_take
 
-    kTurboFanMass = turboFanMass1 / turboFanMass0
+    k_turbo_fan_mass = turbo_fan_mass1 / turbo_fan_mass0
 
-    kMass = kTurboFanMass + engine.core_weight_ratio*(1-kTurboFanMass)     # Assuming core mass remains unchanged
+    k_mass = k_turbo_fan_mass + engine.core_weight_ratio*(1-k_turbo_fan_mass)     # Assuming core mass remains unchanged
 
-    nacelle.mass = nacelle.n_engine * turboFanMass0 * kMass     # Total engine mass
+    nacelle.mass = nacelle.n_engine * turbo_fan_mass0 * k_mass     # Total engine mass
 
-    power_elec.mass = (  1./power_elec.generator_pw_density + 1./power_elec.rectifier_pw_density \
-                       + 1./power_elec.wiring_pw_density + 1./power_elec.cooling_pw_density \
-                       ) * shaftPowerMax
+    nacelle.c_g = nacelle.x_ext + 0.70*nacelle.length
 
     r_nacelle.mass = (  1./r_nacelle.controller_pw_density + 1./r_nacelle.motor_pw_density \
                       + 1./r_nacelle.nacelle_pw_density \
                       ) * shaftPowerMax
 
-    # Propulsion system CG
-    # ------------------------------------------------------------------------
-    nacelle.c_g = nacelle.x_ext + 0.70*nacelle.length
+    r_nacelle.c_g = fuselage.length + 0.5*r_nacelle.length
+
+    power_elec.mass = (  1./power_elec.generator_pw_density + 1./power_elec.rectifier_pw_density \
+                       + 1./power_elec.wiring_pw_density + 1./power_elec.cooling_pw_density \
+                       ) * shaftPowerMax
 
     power_elec.c_g = 0.70*nacelle.c_g + 0.30*fuselage.length
-
-    r_nacelle.c_g = fuselage.length + 0.5*r_nacelle.length
 
     return
 

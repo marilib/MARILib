@@ -39,6 +39,8 @@ run.aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propulsi
 # Modify initial values here
 #======================================================================================================
 
+aircraft.electrofan_nacelle.rear_engine = 1
+
 aircraft.electrofan_engine.reference_thrust = 50000.
 aircraft.wing.area = 56.33
 
@@ -68,7 +70,7 @@ run.eval_performance_analysis(aircraft)
 run.eval_handling_quality_analysis(aircraft)
 
 #------------------------------------------------------------------------------------------------------
-aircraft.export_to_file(filename = "aircraft_data.txt", write_detail=True)
+# aircraft.export_to_file(filename = "aircraft_data.txt", write_detail=True)
 
 #------------------------------------------------------------------------------------------------------
 print("-------------------------------------------")

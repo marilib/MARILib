@@ -69,8 +69,9 @@ def eval_propulsion_design(aircraft):
 
     Fn,SFC,SEC,Data = propu.thrust(aircraft,pamb,tamb,mach,MTO,throttle,nei)
 
-    propulsion.reference_thrust_effective = (Fn/propulsion.n_engine)/0.80
     propulsion.mto_thrust_ref = Fn/propulsion.n_engine
+
+    propulsion.reference_thrust_effective = (Fn/propulsion.n_engine)/0.80
 
     #-----------------------------------------------------------------------------------------------------------
     disa = propulsion.flight_data["disa"][MCN]
@@ -161,6 +162,7 @@ def eval_propulsion_mass(aircraft):
         nacelle = aircraft.turbofan_nacelle
 
         eval_turbofan_pylon_mass(aircraft)
+
         eval_turbofan_nacelle_mass(aircraft)
 
         propulsion.mass = pylon.mass + nacelle.mass
@@ -172,6 +174,7 @@ def eval_propulsion_mass(aircraft):
         nacelle = aircraft.turbofan_nacelle
 
         r_nacelle = aircraft.rear_electric_nacelle
+
         power_elec = aircraft.pte1_power_elec_chain
 
         eval_turbofan_pylon_mass(aircraft)
@@ -187,11 +190,17 @@ def eval_propulsion_mass(aircraft):
         pylon = aircraft.electrofan_pylon
         nacelle = aircraft.electrofan_nacelle
 
+        r_nacelle = aircraft.rear_electric_nacelle
+
+        power_elec = aircraft.ef1_power_elec_chain
+
         eval_ef1_pylon_mass(aircraft)
         eval_ef1_nacelle_mass(aircraft)
 
-        propulsion.mass = pylon.mass + nacelle.mass
-        propulsion.c_g = (pylon.c_g*pylon.mass + nacelle.c_g*nacelle.mass)/propulsion.mass
+        propulsion.mass = pylon.mass + nacelle.mass + r_nacelle.mass + power_elec.mass
+        propulsion.c_g = (  pylon.c_g*pylon.mass + nacelle.c_g*nacelle.mass \
+                          + r_nacelle.c_g*r_nacelle.mass + power_elec.c_g*power_elec.mass \
+                          )/propulsion.mass
 
     else:
         raise Exception("propulsion.architecture index is out of range")
