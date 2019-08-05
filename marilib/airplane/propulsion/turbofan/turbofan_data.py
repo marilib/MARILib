@@ -29,6 +29,7 @@ class TurbofanNacelle(object):
     INFO = {\
     "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of turbofan"},
     "attachment":{"unit":"int", "om":1.e0, "txt":"Nacelle attachment (1= under wing, 2= rear fuselage)"},
+    "rear_nacelle":{"unit":"int", "om":1.e0, "txt":"Rear nacelle (0= no, 1= yes)"},
     "width":{"unit":"m", "om":1.e0, "txt":"Maximum width of the nacelles"},
     "length":{"unit":"m", "om":1.e0, "txt":"Length of the fan cowl"},
     "x_ext":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the center of the air inlet of the external nacelle"},
@@ -51,6 +52,7 @@ class TurbofanNacelle(object):
     }
     def __init__(self, n_engine = None,
                        attachment = None,
+                       rear_nacelle = None,
                        width = None,
                        length = None,
                        x_ext = None,
@@ -72,6 +74,7 @@ class TurbofanNacelle(object):
                        c_g = None):
         self.n_engine = n_engine
         self.attachment = attachment
+        self.rear_nacelle = rear_nacelle
         self.width = width
         self.length = length
         self.x_ext = x_ext

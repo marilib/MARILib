@@ -182,6 +182,8 @@ def eval_pte1_nacelle_design(aircraft):
     else:
         raise Exception("nacelle.attachment, index is out of range")
 
+    nacelle.rear_nacelle = 1    # There is a rear nacelle in this architecture
+
     # Electric nacelle is design by cruise conditions
     #-----------------------------------------------------------------------------------------------------------
     r_engine = aircraft.rear_electric_engine

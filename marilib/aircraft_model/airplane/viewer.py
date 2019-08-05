@@ -79,51 +79,32 @@ def draw_3d_view(aircraft,window_title,plot_title):
     wing_c_tip = aircraft.wing.c_tip
     wing_toc_t = aircraft.wing.t_o_c_t
 
-    if (aircraft.propulsion.architecture=="TP"):
-        nac_length = aircraft.turbofan_nacelle.length
-        nac_height = aircraft.turbofan_nacelle.width
-        nac_width = aircraft.turbofan_nacelle.width
-        nac_x_ext = aircraft.turbofan_nacelle.x_ext
-        nac_y_ext = aircraft.turbofan_nacelle.y_ext
-        nac_z_ext = aircraft.turbofan_nacelle.z_ext
-    elif (aircraft.propulsion.architecture=="TF"):
-        nac_length = aircraft.turbofan_nacelle.length
-        nac_height = aircraft.turbofan_nacelle.width
-        nac_width = aircraft.turbofan_nacelle.width
-        nac_x_ext = aircraft.turbofan_nacelle.x_ext
-        nac_y_ext = aircraft.turbofan_nacelle.y_ext
-        nac_z_ext = aircraft.turbofan_nacelle.z_ext
-        if (aircraft.propulsion.n_engine==4):
-            nac_x_int = aircraft.turbofan_nacelle.x_int
-            nac_y_int = aircraft.turbofan_nacelle.y_int
-            nac_z_int = aircraft.turbofan_nacelle.z_int
-    elif (aircraft.propulsion.architecture=="EF1"):
-        nac_length = aircraft.electrofan_nacelle.length
-        nac_height = aircraft.electrofan_nacelle.width
-        nac_width = aircraft.electrofan_nacelle.width
-        nac_x_ext = aircraft.electrofan_nacelle.x_ext
-        nac_y_ext = aircraft.electrofan_nacelle.y_ext
-        nac_z_ext = aircraft.electrofan_nacelle.z_ext
-        if (aircraft.propulsion.n_engine==4):
-            nac_x_int = aircraft.electrofan_nacelle.x_int
-            nac_y_int = aircraft.electrofan_nacelle.y_int
-            nac_z_int = aircraft.electrofan_nacelle.z_int
+
+    if (aircraft.propulsion.architecture=="TF"):
+        nacelle = aircraft.turbofan_nacelle
     elif (aircraft.propulsion.architecture=="PTE1"):
-        nac_length = aircraft.turbofan_nacelle.length
-        nac_height = aircraft.turbofan_nacelle.width
-        nac_width = aircraft.turbofan_nacelle.width
-        nac_x_ext = aircraft.turbofan_nacelle.x_ext
-        nac_y_ext = aircraft.turbofan_nacelle.y_ext
-        nac_z_ext = aircraft.turbofan_nacelle.z_ext
+        nacelle = aircraft.turbofan_nacelle
+    elif (aircraft.propulsion.architecture=="EF1"):
+        nacelle = aircraft.electrofan_nacelle
     else:
         raise Exception("propulsion.architecture index is out of range")
 
-    e_nac_length = aircraft.rear_electric_nacelle.length
-    e_nac_height = aircraft.rear_electric_nacelle.width
-    e_nac_width = aircraft.rear_electric_nacelle.width
-    e_nac_x_axe = aircraft.rear_electric_nacelle.x_axe
-    e_nac_y_axe = aircraft.rear_electric_nacelle.y_axe
-    e_nac_z_axe = aircraft.rear_electric_nacelle.z_axe
+    nac_length = nacelle.length
+    nac_height = nacelle.width
+    nac_width = nacelle.width
+    nac_x_ext = nacelle.x_ext
+    nac_y_ext = nacelle.y_ext
+    nac_z_ext = nacelle.z_ext
+    if (aircraft.propulsion.n_engine==4):
+        nac_x_int = nacelle.x_int
+        nac_y_int = nacelle.y_int
+        nac_z_int = nacelle.z_int
+
+    r_nac_length = aircraft.rear_electric_nacelle.length
+    r_nac_width = aircraft.rear_electric_nacelle.width
+    r_nac_x_axe = aircraft.rear_electric_nacelle.x_axe
+    r_nac_y_axe = aircraft.rear_electric_nacelle.y_axe
+    r_nac_z_axe = aircraft.rear_electric_nacelle.z_axe
 
     r_nose = 0.15       # Fuselage length ratio of nose evolutive part
     r_cone = 0.35       # Fuselage length ratio of tail cone evolutive part
@@ -264,38 +245,38 @@ def draw_3d_view(aircraft,window_title,plot_title):
             nac_xz_int,nac_xy_int,nac_yz_int,fan_yz_int = nacelle_shape(0.5*fus_height, \
                            nac_x_int,nac_y_int,nac_z_int,nac_width,nac_height,nac_length,cyl)
 
-    # e-Pods
+    # Rear nacelle
     #-----------------------------------------------------------------------------------------------------------
-    if (aircraft.propulsion.architecture=="PTE1"):
-        e_nac_xz = np.array([[e_nac_x_axe                 , e_nac_z_axe+0.5*fus_height+0.4*e_nac_width ] ,
-                            [e_nac_x_axe+0.1*e_nac_length , e_nac_z_axe+0.5*fus_height+0.5*e_nac_width ] ,
-                            [e_nac_x_axe+0.7*e_nac_length , e_nac_z_axe+0.5*fus_height+0.5*e_nac_width ] ,
-                            [e_nac_x_axe+e_nac_length     , e_nac_z_axe+0.5*fus_height+0.4*e_nac_width ] ,
-                            [e_nac_x_axe+e_nac_length     , e_nac_z_axe+0.5*fus_height-0.4*e_nac_width ] ,
-                            [e_nac_x_axe+0.7*e_nac_length , e_nac_z_axe+0.5*fus_height-0.5*e_nac_width ] ,
-                            [e_nac_x_axe+0.1*e_nac_length , e_nac_z_axe+0.5*fus_height-0.5*e_nac_width ] ,
-                            [e_nac_x_axe                 , e_nac_z_axe+0.5*fus_height-0.4*e_nac_width ] ,
-                            [e_nac_x_axe                 , e_nac_z_axe+0.5*fus_height+0.4*e_nac_width ]])
+    if (nacelle.rear_nacelle==1):
+        r_nac_xz = np.array([[r_nac_x_axe                 , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ] ,
+                            [r_nac_x_axe+0.1*r_nac_length , r_nac_z_axe+0.5*fus_height+0.5*r_nac_width ] ,
+                            [r_nac_x_axe+0.7*r_nac_length , r_nac_z_axe+0.5*fus_height+0.5*r_nac_width ] ,
+                            [r_nac_x_axe+r_nac_length     , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ] ,
+                            [r_nac_x_axe+r_nac_length     , r_nac_z_axe+0.5*fus_height-0.4*r_nac_width ] ,
+                            [r_nac_x_axe+0.7*r_nac_length , r_nac_z_axe+0.5*fus_height-0.5*r_nac_width ] ,
+                            [r_nac_x_axe+0.1*r_nac_length , r_nac_z_axe+0.5*fus_height-0.5*r_nac_width ] ,
+                            [r_nac_x_axe                 , r_nac_z_axe+0.5*fus_height-0.4*r_nac_width ] ,
+                            [r_nac_x_axe                 , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ]])
 
-        e_nac_xy = np.array([[e_nac_x_axe                 ,  0.4*e_nac_width ] ,
-                            [e_nac_x_axe+0.1*e_nac_length ,  0.5*e_nac_width ] ,
-                            [e_nac_x_axe+0.7*e_nac_length ,  0.5*e_nac_width ] ,
-                            [e_nac_x_axe+e_nac_length     ,  0.4*e_nac_width ] ,
-                            [e_nac_x_axe+e_nac_length     , -0.4*e_nac_width ] ,
-                            [e_nac_x_axe+0.7*e_nac_length , -0.5*e_nac_width ] ,
-                            [e_nac_x_axe+0.1*e_nac_length , -0.5*e_nac_width ] ,
-                            [e_nac_x_axe                 , -0.4*e_nac_width ] ,
-                            [e_nac_x_axe                 ,  0.4*e_nac_width ]])
+        r_nac_xy = np.array([[r_nac_x_axe                 ,  0.4*r_nac_width ] ,
+                            [r_nac_x_axe+0.1*r_nac_length ,  0.5*r_nac_width ] ,
+                            [r_nac_x_axe+0.7*r_nac_length ,  0.5*r_nac_width ] ,
+                            [r_nac_x_axe+r_nac_length     ,  0.4*r_nac_width ] ,
+                            [r_nac_x_axe+r_nac_length     , -0.4*r_nac_width ] ,
+                            [r_nac_x_axe+0.7*r_nac_length , -0.5*r_nac_width ] ,
+                            [r_nac_x_axe+0.1*r_nac_length , -0.5*r_nac_width ] ,
+                            [r_nac_x_axe                 , -0.4*r_nac_width ] ,
+                            [r_nac_x_axe                 ,  0.4*r_nac_width ]])
 
-        e_d_nac_yz = np.stack([cyl[0:,0]*e_nac_width , cyl[0:,1]*e_nac_width , cyl[0:,2]*e_nac_width], axis=1)
+        r_d_nac_yz = np.stack([cyl[0:,0]*r_nac_width , cyl[0:,1]*r_nac_width , cyl[0:,2]*r_nac_width], axis=1)
 
-        e_d_fan_yz = np.stack([cyl[0:,0]*0.80*e_nac_width , cyl[0:,1]*0.80*e_nac_width , cyl[0:,2]*0.80*e_nac_width], axis=1)
+        r_d_fan_yz = np.stack([cyl[0:,0]*0.80*r_nac_width , cyl[0:,1]*0.80*r_nac_width , cyl[0:,2]*0.80*r_nac_width], axis=1)
 
-        e_nac_yz = np.vstack([np.stack([e_nac_y_axe+e_d_nac_yz[0:,0] , e_nac_z_axe+e_d_nac_yz[0:,1]],axis=1) ,
-                                 np.stack([e_nac_y_axe+e_d_nac_yz[::-1,0] , e_nac_z_axe+e_d_nac_yz[::-1,2]],axis=1)])
+        r_nac_yz = np.vstack([np.stack([r_nac_y_axe+r_d_nac_yz[0:,0] , r_nac_z_axe+r_d_nac_yz[0:,1]],axis=1) ,
+                                 np.stack([r_nac_y_axe+r_d_nac_yz[::-1,0] , r_nac_z_axe+r_d_nac_yz[::-1,2]],axis=1)])
 
-        e_fan_yz = np.vstack([np.stack([e_nac_y_axe+e_d_fan_yz[0:,0] , e_nac_z_axe+e_d_fan_yz[0:,1]],axis=1) ,
-                                 np.stack([e_nac_y_axe+e_d_fan_yz[::-1,0] , e_nac_z_axe+e_d_fan_yz[::-1,2]],axis=1)])
+        r_fan_yz = np.vstack([np.stack([r_nac_y_axe+r_d_fan_yz[0:,0] , r_nac_z_axe+r_d_fan_yz[0:,1]],axis=1) ,
+                                 np.stack([r_nac_y_axe+r_d_fan_yz[::-1,0] , r_nac_z_axe+r_d_fan_yz[::-1,2]],axis=1)])
 
     # Drawing_ box
     #-----------------------------------------------------------------------------------------------------------
@@ -347,8 +328,8 @@ def draw_3d_view(aircraft,window_title,plot_title):
     if (aircraft.horizontal_tail.attachment==2):
         plt.plot(xTopView+htp_xy[0:,0], yTopView+htp_xy[0:,1], "grey", zorder=9)      # htp_ top view (T-tail)
 
-    if (aircraft.propulsion.architecture=="PTE1"):
-        plt.plot(xTopView+e_nac_xy[0:,0], yTopView+e_nac_xy[0:,1], color="grey", zorder=7)        # r_nacelle top view
+    if (nacelle.rear_nacelle==1):
+        plt.plot(xTopView+r_nac_xy[0:,0], yTopView+r_nac_xy[0:,1], color="grey", zorder=7)        # rear nacelle top view
 
     # Draw side view
     #-----------------------------------------------------------------------------------------------------------
@@ -357,9 +338,9 @@ def draw_3d_view(aircraft,window_title,plot_title):
     plt.fill(xSideView+fus_side[0:,0], ySideView+fus_side[0:,1], color="white", zorder=2) # fuselage side view
     plt.plot(xSideView+fus_side[0:,0], ySideView+fus_side[0:,1], color="grey", zorder=3)  # fuselage side view
 
-    if (aircraft.propulsion.architecture=="PTE1"):
-        plt.fill(xSideView+e_nac_xz[0:,0], ySideView+e_nac_xz[0:,1], color="white", zorder=4)   # r_nacelle side view
-        plt.plot(xSideView+e_nac_xz[0:,0], ySideView+e_nac_xz[0:,1], color="grey", zorder=5)    # r_nacelle side view
+    if (nacelle.rear_nacelle==1):
+        plt.fill(xSideView+r_nac_xz[0:,0], ySideView+r_nac_xz[0:,1], color="white", zorder=4)   # rear nacelle side view
+        plt.plot(xSideView+r_nac_xz[0:,0], ySideView+r_nac_xz[0:,1], color="grey", zorder=5)    # rear nacelle side view
 
     if (aircraft.propulsion.architecture!="TP"):
         plt.fill(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="white", zorder=4)   # wing_ side view
@@ -385,9 +366,9 @@ def draw_3d_view(aircraft,window_title,plot_title):
 
     plt.plot(xFrontView+wing_yz[0:,0], yFrontView+wing_yz[0:,1], color="grey", zorder=2)   # wing_ front view
 
-    if (aircraft.propulsion.architecture=="PTE1"):
-        plt.plot(xFrontView+e_nac_yz[0:,0], yFrontView+e_nac_yz[0:,1], color="grey", zorder=3)    # r_nacelle front view
-        plt.plot(xFrontView+e_fan_yz[0:,0], yFrontView+e_fan_yz[0:,1], color="grey", zorder=3)    # e inlet front view
+    if (nacelle.rear_nacelle==1):
+        plt.plot(xFrontView+r_nac_yz[0:,0], yFrontView+r_nac_yz[0:,1], color="grey", zorder=3)    # rear nacelle front view
+        plt.plot(xFrontView+r_fan_yz[0:,0], yFrontView+r_fan_yz[0:,1], color="grey", zorder=3)    # rear inlet front view
 
     plt.fill(xFrontView+fus_front[0:,0], yFrontView+fus_front[0:,1], color="white", zorder=4)   # fuselage front view
     plt.plot(xFrontView+fus_front[0:,0], yFrontView+fus_front[0:,1], color="grey", zorder=5)    # fuselage front view

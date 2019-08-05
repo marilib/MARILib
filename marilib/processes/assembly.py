@@ -170,7 +170,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.electrofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
     aircraft.electrofan_nacelle.n_engine = n_engine
-    aircraft.electrofan_nacelle.rear_engine = init.ef1_rear_nacelle()
+    aircraft.electrofan_nacelle.rear_nacelle = init.ef1_rear_nacelle()
     aircraft.electrofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.electrofan_nacelle.efficiency_prop = init.efficiency_prop()
     aircraft.electrofan_nacelle.motor_efficiency = init.e_motor_efficiency()
@@ -684,7 +684,7 @@ def eval_handling_quality_analysis(aircraft):
 
     c_g.max_fwd_trim_cg = cg_max_fwd_stall         # Forward cg limit
 
-    c_g.cg_constraint_1 = c_g.max_fwd_trim_cg - c_g.max_fwd_req_cg
+    c_g.cg_constraint_1 = c_g.max_fwd_req_cg - c_g.max_fwd_trim_cg
 
     # Backward limit : static stability
     #------------------------------------------------------------------------------------------------------
@@ -694,14 +694,14 @@ def eval_handling_quality_analysis(aircraft):
 
     c_g.max_bwd_stab_cg = cg_max_bwd_stab          # Backward cg limit
 
-    c_g.cg_constraint_2 = c_g.max_bwd_req_cg - c_g.max_bwd_stab_cg
+    c_g.cg_constraint_2 = c_g.max_bwd_stab_cg - c_g.max_bwd_req_cg
 
     # Vertical tail sizing
     #------------------------------------------------------------------------------------------------------
 
     h_q.vertical_tail_sizing(aircraft)
 
-    c_g.cg_constraint_3 = c_g.max_bwd_oei_req_cg - c_g.max_bwd_oei_cg
+    c_g.cg_constraint_3 = c_g.max_bwd_oei_cg - c_g.max_bwd_oei_req_cg
 
     return
 

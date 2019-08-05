@@ -437,9 +437,7 @@ def disa_tofl():
 
 #===========================================================================================================
 def req_tofl(design_range):
-    if(design_range <= unit.m_NM(1500.)):
-        req_tofl_i = 1500.
-    elif(design_range <= unit.m_NM(3500.)):
+    if(design_range <= unit.m_NM(3500.)):
         req_tofl_i = 2000.
     elif(design_range <= unit.m_NM(5500.)):
         req_tofl_i = 2500.

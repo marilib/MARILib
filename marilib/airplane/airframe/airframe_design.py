@@ -36,7 +36,7 @@ def eval_cabin_design(aircraft):
                    + 0.005*(cabin.n_pax_ref/cabin.n_pax_front)**2.25 \
                    - cabin.fwd_limit
 
-    # Factor 0.95 accounts for tappered parts
+    # Factor 0.95 accounts for tapered parts
     cabin.projected_area = 0.95*cabin.length*cabin.width
 
     return

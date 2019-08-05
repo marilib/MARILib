@@ -90,7 +90,7 @@ def nacelle_drag(aircraft,Re,Mach):
     elif (propulsion.architecture=="EF1"):
         nacelle = aircraft.electrofan_nacelle
         e_nacelle_cxf,e_nacelle_nwa = electrofan_nacelle_drag(aircraft,nacelle,Re,Mach)
-        if (nacelle.rear_engine==1):
+        if (nacelle.rear_nacelle==1):
             r_nacelle = aircraft.rear_electric_nacelle
             r_nacelle_cxf,r_nacelle_nwa = electrofan_nacelle_drag(aircraft,r_nacelle,Re,Mach)
         else:

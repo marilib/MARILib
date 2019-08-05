@@ -141,6 +141,8 @@ def eval_turbofan_nacelle_design(aircraft):
     else:
         raise Exception("nacelle.attachment, index is out of range")
 
+    nacelle.rear_nacelle = 0    # No rear nacelle in this architecture
+
     return
 
 

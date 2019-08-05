@@ -43,6 +43,7 @@ def ef1_sec(aircraft,pamb,tamb,mach,rating,thrust,nei):
 #===========================================================================================================
 def ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei):
 
+    propulsion = aircraft.propulsion
     engine = aircraft.electrofan_engine
     nacelle = aircraft.electrofan_nacelle
 
@@ -58,7 +59,7 @@ def ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei):
 
     pw_elec = pw_shaft / (nacelle.motor_efficiency*nacelle.controller_efficiency)
 
-    if (nacelle.rear_engine==1):
+    if (nacelle.rear_nacelle==1):
 
         r_engine = aircraft.rear_electric_engine
         r_nacelle = aircraft.rear_electric_nacelle
@@ -71,7 +72,14 @@ def ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei):
 
         r_pw_shaft = throttle*r_shaft_power[rating]
 
-        (r_fn_fan,r_q0) = jet.fan_thrust(r_nacelle,pamb,tamb,mach,r_pw_shaft)
+        if (propulsion.bli_effect>0):
+            vsnd = earth.sound_speed(tamb)
+            vair = vsnd*mach
+            (r_fn_fan,r_q0,dVbli) = jet.fan_thrust_with_bli(r_nacelle,pamb,tamb,mach,r_pw_shaft)
+            dvbli_o_v = dVbli/vair
+        else:
+            (r_fn_fan,r_q0) = jet.fan_thrust(r_nacelle,pamb,tamb,mach,r_pw_shaft)
+            dvbli_o_v = 0.
 
         r_pw_elec = r_pw_shaft / (r_nacelle.motor_efficiency*r_nacelle.controller_efficiency)
 
@@ -81,6 +89,7 @@ def ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei):
         r_pw_elec = 0.
         r_fn_fan = 0.
         r_q0 = 0.
+        dvbli_o_v = 0.
 
     pw = pw_elec*(nacelle.n_engine - nei) + r_pw_elec
 
@@ -88,7 +97,7 @@ def ef1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei):
 
     sec = pw / fn
 
-    data = (fn_fan,pw_elec,pw_shaft,q0,r_fn_fan,r_pw_elec,r_pw_shaft,r_q0)
+    data = (fn_fan,pw_elec,pw_shaft,q0,r_fn_fan,r_pw_elec,r_pw_shaft,r_q0,dvbli_o_v)
 
     return fn,sec,data
 

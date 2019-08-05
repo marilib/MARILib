@@ -197,7 +197,7 @@ def eval_ef1_nacelle_design(aircraft):
 
     # Eventual rear nacelle
     #-----------------------------------------------------------------------------------------------------------
-    if (nacelle.rear_engine==1):
+    if (nacelle.rear_nacelle==1):
 
         # Electric nacelle is design by cruise conditions
         #-----------------------------------------------------------------------------------------------------------
@@ -288,7 +288,7 @@ def eval_ef1_nacelle_mass(aircraft):
 
     # Propulsion system mass is sized according max power
     # -----------------------------------------------------------------------
-    if (nacelle.rear_engine==1):
+    if (nacelle.rear_nacelle==1):
 
         r_shaft_power = numpy.array([r_engine.mto_r_shaft_power,
                                      r_engine.mcn_r_shaft_power,

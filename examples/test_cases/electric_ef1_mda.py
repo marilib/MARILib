@@ -39,10 +39,19 @@ run.aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propulsi
 # Modify initial values here
 #======================================================================================================
 
-aircraft.electrofan_nacelle.rear_engine = 1
-
 aircraft.electrofan_engine.reference_thrust = 50000.
-aircraft.wing.area = 56.33
+aircraft.wing.area = 75.
+
+aircraft.electrofan_nacelle.rear_nacelle = 1
+
+r_power = 0.5e6       # Watts, electric motor power
+
+aircraft.rear_electric_engine.mto_r_shaft_power = r_power
+aircraft.rear_electric_engine.mcn_r_shaft_power = r_power
+aircraft.rear_electric_engine.mcl_r_shaft_power = r_power
+aircraft.rear_electric_engine.mcr_r_shaft_power = r_power
+
+aircraft.propulsion.bli_effect = 1                      # boundary layer ingestion on rear fan
 
 #======================================================================================================
 # Design process
