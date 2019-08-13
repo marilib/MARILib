@@ -30,7 +30,7 @@ aircraft = Aircraft()
 
 n_pax_ref = 19
 design_range = unit.m_NM(100)
-cruise_mach = 0.50
+cruise_mach = 0.65
 
 #------------------------------------------------------------------------------------------------------
 run.aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propulsive_architecture, number_of_engine)
@@ -41,6 +41,10 @@ run.aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propulsi
 
 aircraft.electrofan_engine.reference_thrust = 50000.
 aircraft.wing.area = 75.
+
+
+aircraft.ef1_battery.stacking = "Variable"
+
 
 aircraft.electrofan_nacelle.rear_nacelle = 1
 
@@ -88,6 +92,8 @@ print("Design range = ","%.0f"%unit.NM_m(aircraft.design_driver.design_range)," 
 print("Cruise Mach number = ","%.2f"%aircraft.design_driver.cruise_mach," Mach")
 print("-------------------------------------------")
 print("Reference thrust electrofan = ","%.0f"%aircraft.electrofan_engine.reference_thrust," N")
+print("Diameter electrofan nacelle = ","%.3f"%aircraft.electrofan_nacelle.width," m")
+print("Diameter electrofan = ","%.3f"%aircraft.electrofan_nacelle.fan_width," m")
 print("Reference shaft power electrofan = ","%.1f"%(aircraft.electrofan_engine.reference_power/1000.)," kW")
 print("Reference thrust effective = ","%.0f"%aircraft.propulsion.reference_thrust_effective," N")
 print("Electrofan mass = ","%.0f"%aircraft.electrofan_nacelle.mass," kg")
@@ -104,8 +110,8 @@ print("-------------------------------------------")
 print("MTOW = ","%.2f"%aircraft.weights.mtow," kg")
 print("MLW = ","%.2f"%aircraft.weights.mlw," kg")
 print("Nominal mission total energy = ","%.3f"%unit.MWh_J(aircraft.nominal_mission.total_enrg)," MWh")
-print("Nominal mission battery mass = ","%.3f"%aircraft.nominal_mission.battery_mass," kg")
-print("Battery = ","%.2f"%aircraft.weights.battery," kg")
+print("Nominal mission battery mass = ","%.3f"%aircraft.nominal_mission.req_battery_mass," kg")
+print("Battery = ","%.2f"%aircraft.weights.battery_in_owe," kg")
 print("OWE = ","%.2f"%aircraft.weights.owe," kg")
 print("MWE = ","%.2f"%aircraft.weights.mwe," kg")
 print("-------------------------------------------")
@@ -133,7 +139,7 @@ print("-------------------------------------------")
 print("Evaluation mission range = ","%.1f"%unit.NM_m(aircraft.cost_mission.range)," NM")
 print("Evaluation mission block energy = ","%.3f"%unit.MWh_J(aircraft.cost_mission.block_enrg)," MWh")
 print("Evaluation mission total energy = ","%.3f"%unit.MWh_J(aircraft.cost_mission.total_enrg)," MWh")
-print("Evaluation mission battery mass = ","%.3f"%aircraft.cost_mission.battery_mass," kg")
+print("Evaluation mission battery mass = ","%.3f"%aircraft.cost_mission.req_battery_mass," kg")
 print("Evaluation mission cash op cost = ","%.0f"%aircraft.economics.cash_operating_cost," $")
 print("CO2 metric = ","%.4f"%(aircraft.environmental_impact.CO2_metric*1000)," kg/km/m0.48")
 

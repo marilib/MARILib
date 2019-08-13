@@ -4,6 +4,19 @@
 Created on Thu Jan 24 23:22:21 2019
 
 @author: DRUOT Thierry
+
+The EF1 architecture corresponds to the following features :
+
+- Electrical main fans
+- Eventual rear electrical fan
+- Battery powered
+
+IMPORTANT REMARK :
+Some simplifications has been taken to ease the use of this model
+- Batteries are supposed to be stacked in the wing box in place of liquid fuel
+- For each typical missions (nominal, max payload, max fuel, zero payload, cost) the mass of the battery
+  which is put on board is exactly what is required for the mission, which supposes that the battery
+  stacking system allows this ...
 """
 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -205,17 +218,20 @@ class Ef1Battery(object):
     Battery data
     """
     INFO = {\
+    "stacking":{"unit":"string", "om":1.e0, "txt":"Battery mass strategy, can be Variable, Max or Given"},
     "energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
     "power_density":{"unit":"kW/kg", "om":1.e0, "txt":"Battery power density (capability to release power per mass unit)"},
     "density":{"unit":"kg/m3", "om":1.e3, "txt":"Battery density (mass per volume unit)"},
     "mass_max":{"unit":"kg", "om":1.e3, "txt":"Maximum battery mass"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Global CG of batteries"}
     }
-    def __init__(self, energy_density = None,
+    def __init__(self, stacking = None,
+                       energy_density = None,
                        power_density = None,
                        density = None,
                        mass_max = None,
                        c_g = None):
+        self.stacking = stacking
         self.energy_density = energy_density
         self.power_density = power_density
         self.density = density

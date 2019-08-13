@@ -36,13 +36,19 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     g = earth.gravity()
 
+    # Departure ground phases
+    #-----------------------------------------------------------------------------------------------------------
+    fuel_taxi_out = (34. + 2.3e-4*engine.reference_thrust)*propulsion.n_engine
+    time_taxi_out = 540.
+
+    fuel_take_off = 1e-4*(2.8+2.3/engine.bpr)*tow
+    time_take_off = 220.*tow/(engine.reference_thrust*propulsion.n_engine)
+
+    # Mission leg
+    #-----------------------------------------------------------------------------------------------------------
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
     vsnd = earth.sound_speed(tamb)
     tas = vsnd*mach
-
-    lod_max, cz_lod_max = airplane_aero.lod_max(aircraft, pamb, tamb, mach)
-
-    lod_cruise = 0.95 * lod_max
 
     throttle = 1.
     nei = 0
@@ -54,16 +60,10 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     else:
         raise Exception("mission_f, propulsive architecture not allowed")
 
-    # Departure ground phases
-    #-----------------------------------------------------------------------------------------------------------
-    fuel_taxi_out = (34. + 2.3e-4*engine.reference_thrust)*propulsion.n_engine
-    time_taxi_out = 540.
+    mass = 0.95 * tow
+    c_z = flight.lift_from_speed(aircraft,pamb,mach,mass)
+    c_x,lod_cruise = airplane_aero.drag(aircraft, pamb, tamb, mach, c_z)
 
-    fuel_take_off = 1e-4*(2.8+2.3/engine.bpr)*tow
-    time_take_off = 220.*tow/(engine.reference_thrust*propulsion.n_engine)
-
-    # Mission leg
-    #-----------------------------------------------------------------------------------------------------------
     if (propulsion.architecture=="TF"):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
     elif (propulsion.architecture=="PTE1"):
@@ -74,11 +74,11 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     time_mission = 1.09*(dist_range/tas)
 
-    l_w = tow - fuel_mission
+    mass = tow - (fuel_taxi_out + fuel_take_off + fuel_mission)
 
     # Arrival ground phases
     #-----------------------------------------------------------------------------------------------------------
-    fuel_landing = 1e-4*(0.5+2.3/engine.bpr)*l_w
+    fuel_landing = 1e-4*(0.5+2.3/engine.bpr)*mass
     time_landing = 180.
 
     fuel_taxi_in = (26. + 1.8e-4*engine.reference_thrust)*propulsion.n_engine
@@ -89,11 +89,17 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     block_fuel = fuel_taxi_out + fuel_take_off + fuel_mission + fuel_landing + fuel_taxi_in
     time_block = time_taxi_out + time_take_off + time_mission + time_landing + time_taxi_in
 
-    # Diversion and holding reserve fuel
+    # Diversion fuel
     #-----------------------------------------------------------------------------------------------------------
-    fuel_diversion = l_w*(1.-numpy.exp(-(sfc*g*regul.diversion_range())/(tas*lod_cruise)))
+    fuel_diversion = mass*(1.-numpy.exp(-(sfc*g*regul.diversion_range())/(tas*lod_cruise)))
 
-    fuel_holding = sfc*(l_w*g/lod_max)*regul.holding_time()
+    # Holding fuel
+    #-----------------------------------------------------------------------------------------------------------
+    altp_holding = unit.m_ft(1500.)
+    mach_holding = 0.50 * mach
+    pamb,tamb,tstd,dtodz = earth.atmosphere(altp_holding,disa)
+    lod_max, cz_lod_max = airplane_aero.lod_max(aircraft, pamb, tamb, mach_holding)
+    fuel_holding = sfc*(mass*g/lod_max)*regul.holding_time()
 
     # Total
     #-----------------------------------------------------------------------------------------------------------

@@ -119,7 +119,7 @@ class CharacteristicWeight(object):
     "mtow":{"unit":"kg", "om":1.e4, "txt":"Maximum Take Off Weight"},
     "mass_constraint_3":{"unit":"kg", "om":1.e4, "txt":"Constraint on MTOW, must be kept positive"},
     "mfw":{"unit":"kg", "om":1.e4, "txt":"Maximum Fuel Weight"},
-    "battery":{"unit":"kg", "om":1.e4, "txt":"Battery mass"}
+    "battery_in_owe":{"unit":"kg", "om":1.e4, "txt":"Battery mass in OWE"}
     }
     def __init__(self, mwe = None,
                        owe = None,
@@ -130,7 +130,7 @@ class CharacteristicWeight(object):
                        mtow = None,
                        mass_constraint_3 = None,
                        mfw = None,
-                       battery = None):
+                       battery_in_owe = None):
         self.mwe = mwe
         self.owe = owe
         self.mzfw = mzfw
@@ -140,7 +140,7 @@ class CharacteristicWeight(object):
         self.mtow = mtow
         self.mass_constraint_3 = mass_constraint_3
         self.mfw = mfw
-        self.battery = battery
+        self.battery_in_owe = battery_in_owe
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class CenterOfGravity(object):

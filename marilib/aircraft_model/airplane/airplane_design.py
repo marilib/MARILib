@@ -26,7 +26,13 @@ def eval_payload_mass(aircraft):
 
     payload.m_container_pallet = 4.36*fuselage.width*fuselage.length        # Containers and pallets
 
-    payload.maximum = cabin.n_pax_ref*payload.m_pax_max
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        if (aircraft.ef1_battery.stacking=="Variable"):
+            payload.maximum = cabin.n_pax_ref*payload.m_pax_max
+        else:
+            payload.maximum = cabin.n_pax_ref*payload.m_pax_nominal # Because in this case, MZFW = MTOW
+    else:
+        payload.maximum = cabin.n_pax_ref*payload.m_pax_max
 
     payload.nominal = cabin.n_pax_ref*payload.m_pax_nominal
 
@@ -87,28 +93,24 @@ def eval_aircraft_weights(aircraft):
     weights.mwe =  cabin.m_furnishing + fuselage.mass + wing.mass + htp.mass + vtp.mass \
                  + ldg.mass + systems.mass + propulsion.mass
 
+    weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + weights.battery_in_owe
+
     if (propulsion.fuel_type=="Battery"):
-
-        # For EF1 architecture : battery mass is not accounted into OWE
-        weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet
-
-        weights.mass_constraint_1 = 0.
-        weights.mass_constraint_2 = 0.
-
+        mzfw = weights.mtow
     else:
-
-        weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + weights.battery
-
         mzfw = weights.owe + payload.maximum
 
-        weights.mass_constraint_1 = weights.mzfw - mzfw
+    weights.mass_constraint_1 = weights.mzfw - mzfw
 
+    if (propulsion.fuel_type=="Battery"):
+        mlw = weights.mtow
+    else:
         if (cabin.n_pax_ref>100):
             mlw = min(weights.mtow , (1.07*weights.mzfw))
         else:
             mlw = weights.mtow
 
-        weights.mass_constraint_2 = weights.mlw - mlw
+    weights.mass_constraint_2 = weights.mlw - mlw
 
     # WARNING : for EF1 architecture, MFW corresponds to max battery weight
     weights.mfw = min(tanks.mfw_volume_limited, weights.mtow - weights.owe)
@@ -164,7 +166,7 @@ def eval_aircraft_cg(aircraft):
                + vtp.c_g*vtp.mass + systems.c_g*systems.mass \
                )/weights.mwe
 
-    c_g.owe = (  c_g.mwe*weights.mwe + cabin.cg_op_item*cabin.m_op_item + c_g.battery*weights.battery \
+    c_g.owe = (  c_g.mwe*weights.mwe + cabin.cg_op_item*cabin.m_op_item + c_g.battery*weights.battery_in_owe \
                + payload.cg_container_pallet*payload.m_container_pallet \
                ) / weights.owe
 

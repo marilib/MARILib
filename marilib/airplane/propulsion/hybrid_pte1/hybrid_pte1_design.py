@@ -321,14 +321,14 @@ def eval_pte1_battery_mass(aircraft):
     if (battery.strategy==1):
         battery.mass = (battery.power_feed*battery.time_feed + battery.energy_cruise)/battery.energy_density
         propulsion.battery_energy_density = battery.energy_density
-        weights.battery = battery.mass
+        weights.battery_in_owe = battery.mass
         c_o_g.battery = battery.c_g
 
     elif (battery.strategy==2):
 
         battery.energy_cruise = max(0.,battery.mass*battery.energy_density - battery.power_feed*battery.time_feed)
         propulsion.battery_energy_density = battery.energy_density
-        weights.battery = battery.mass
+        weights.battery_in_owe = battery.mass
         c_o_g.battery = battery.c_g
 
     else:

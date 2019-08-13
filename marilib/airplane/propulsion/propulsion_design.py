@@ -235,7 +235,7 @@ def eval_battery_mass(aircraft):
     if (aircraft.propulsion.architecture=="TF"):
        aircraft.propulsion.battery_energy_density = 0.
        aircraft.center_of_gravity.battery = 0.
-       aircraft.weights.battery = 0.
+       aircraft.weights.battery_in_owe = 0.
     elif (aircraft.propulsion.architecture=="PTE1"):
        eval_pte1_battery_mass(aircraft)
     elif (aircraft.propulsion.architecture=="EF1"):

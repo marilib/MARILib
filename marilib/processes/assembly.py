@@ -73,6 +73,9 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.cost_mission.disa = init.cost_mission_disa()
     aircraft.cost_mission.range = init.cost_mission_range(design_range)
+    aircraft.cost_mission.req_battery_mass = init.battery_mass()
+
+    aircraft.nominal_mission.battery_mass = init.battery_mass()
 
     aircraft.economics.fuel_price = init.fuel_price()
     aircraft.economics.elec_price = init.elec_price()
@@ -97,6 +100,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.weights.mzfw = init.mzfw(n_pax_ref,design_range)
     aircraft.weights.mtow = init.mtow(n_pax_ref,design_range)
     aircraft.weights.mlw = init.mlw(n_pax_ref,aircraft.weights.mtow,aircraft.weights.mzfw)
+    aircraft.weights.battery_in_owe = init.battery_mass()
 
     aircraft.cabin.n_pax_front = init.n_pax_front(n_pax_ref)
     aircraft.cabin.n_aisle = init.n_aisle(aircraft.cabin.n_pax_front)
@@ -195,6 +199,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.ef1_power_elec_chain.wiring_pw_density = init.wiring_pw_density()
     aircraft.ef1_power_elec_chain.cooling_pw_density = init.cooling_pw_density()
 
+    aircraft.ef1_battery.stacking = init.battery_stacking()
     aircraft.ef1_battery.energy_density = init.battery_energy_density()
     aircraft.ef1_battery.power_density = init.battery_power_density()
     aircraft.ef1_battery.density = init.battery_density()
@@ -457,10 +462,6 @@ def eval_mass_breakdown(aircraft):
     For battery powered airplanes, takes only MTOW as input
     """
 
-    if (aircraft.propulsion.fuel_type=="Battery"):
-        aircraft.weights.mzfw = aircraft.weights.mtow
-        aircraft.weights.mlw = aircraft.weights.mtow
-
     airframe.eval_cabin_mass(aircraft)
     airframe.eval_fuselage_mass(aircraft)
     airframe.eval_vtp_mass(aircraft)
@@ -502,17 +503,15 @@ def eval_mass_estimation(aircraft):
         return y_out
     #-----------------------------------------------------------------------------------------------------------
 
-    if (aircraft.propulsion.fuel_type!="Battery"):
+    x_ini = np.array([aircraft.weights.mlw,
+                      aircraft.weights.mzfw])
 
-        x_ini = np.array([aircraft.weights.mlw,
-                          aircraft.weights.mzfw])
+    fct_arg = aircraft
 
-        fct_arg = aircraft
+    output_dict = fsolve(fct_mass, x0=x_ini, args=fct_arg, full_output=True)
 
-        output_dict = fsolve(fct_mass, x0=x_ini, args=fct_arg, full_output=True)
-
-        aircraft.weights.mlw = output_dict[0][0]                          # Coupling variable
-        aircraft.weights.mzfw = output_dict[0][1]                         # Coupling variable
+    aircraft.weights.mlw = output_dict[0][0]                          # Coupling variable
+    aircraft.weights.mzfw = output_dict[0][1]                         # Coupling variable
 
     # Update mass
     #------------------------------------------------------------------------------------------------------
@@ -529,25 +528,7 @@ def eval_mass_mission_adaptation(aircraft):
     """
 
     #===========================================================================================================
-    def fct_b_mass_mission(x_in,aircraft):
-
-        aircraft.weights.mtow = x_in[0]             # Coupling variable
-
-        # Mass
-        #------------------------------------------------------------------------------------------------------
-        eval_mass_breakdown(aircraft)
-
-        # Mission
-        #------------------------------------------------------------------------------------------------------
-        mission_b.eval_nominal_b_mission(aircraft)
-
-        y_out = aircraft.weights.mass_constraint_3
-
-        return y_out
-    #-----------------------------------------------------------------------------------------------------------
-
-    #===========================================================================================================
-    def fct_f_mass_mission(x_in,aircraft):
+    def fct_mass_mission(x_in,aircraft):
 
         aircraft.weights.mtow = x_in[0]             # Coupling variable
         aircraft.weights.mlw = x_in[1]              # Coupling variable
@@ -559,7 +540,10 @@ def eval_mass_mission_adaptation(aircraft):
 
         # Mission
         #------------------------------------------------------------------------------------------------------
-        mission_f.eval_nominal_f_mission(aircraft)
+        if (aircraft.propulsion.fuel_type=="Battery"):
+            mission_b.eval_nominal_b_mission(aircraft)
+        else:
+            mission_f.eval_nominal_f_mission(aircraft)
 
         y_out = np.array([aircraft.weights.mass_constraint_1,
                           aircraft.weights.mass_constraint_2,
@@ -568,29 +552,17 @@ def eval_mass_mission_adaptation(aircraft):
         return y_out
     #-----------------------------------------------------------------------------------------------------------
 
-    if (aircraft.propulsion.fuel_type=="Battery"):
+    x_ini = np.array([aircraft.weights.mtow,
+                      aircraft.weights.mlw,
+                      aircraft.weights.mzfw])
 
-        x_ini = aircraft.weights.mtow
+    fct_arg = aircraft
 
-        fct_arg = aircraft
+    output_dict = fsolve(fct_mass_mission, x0=x_ini, args=fct_arg, full_output=True)
 
-        output_dict = fsolve(fct_b_mass_mission, x0=x_ini, args=fct_arg, full_output=True)
-
-        aircraft.weights.mtow = output_dict[0][0]                         # Coupling variable
-
-    else:
-
-        x_ini = np.array([aircraft.weights.mtow,
-                          aircraft.weights.mlw,
-                          aircraft.weights.mzfw])
-
-        fct_arg = aircraft
-
-        output_dict = fsolve(fct_f_mass_mission, x0=x_ini, args=fct_arg, full_output=True)
-
-        aircraft.weights.mtow = output_dict[0][0]                         # Coupling variable
-        aircraft.weights.mlw = output_dict[0][1]                          # Coupling variable
-        aircraft.weights.mzfw = output_dict[0][2]                         # Coupling variable
+    aircraft.weights.mtow = output_dict[0][0]                         # Coupling variable
+    aircraft.weights.mlw = output_dict[0][1]                          # Coupling variable
+    aircraft.weights.mzfw = output_dict[0][2]                         # Coupling variable
 
     # Update mass data
     #------------------------------------------------------------------------------------------------------

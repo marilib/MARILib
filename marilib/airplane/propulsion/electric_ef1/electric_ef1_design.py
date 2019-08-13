@@ -328,25 +328,6 @@ def eval_ef1_nacelle_mass(aircraft):
 
 
 #===========================================================================================================
-def eval_battery_cg_range(aircraft):
-    """
-    Wing battery predesign using tank data structure
-    """
-
-    tanks = aircraft.tanks
-
-    # Need to take account of any possible battery loading
-    # WARNING : in early design steps, it may occur that the resulting weight of the airplane would be higher than MTOW
-    tanks.fuel_max_fwd_cg = tanks.fuel_central_cg    # Battery max forward CG, central volume is forward only within backward swept wing
-    tanks.fuel_max_fwd_mass = tanks.central_volume*tanks.fuel_density
-
-    tanks.fuel_max_bwd_cg = tanks.fuel_cantilever_cg    # Battery max Backward CG
-    tanks.fuel_max_bwd_mass = tanks.cantilever_volume*tanks.fuel_density
-
-    return
-
-
-#===========================================================================================================
 def eval_ef1_battery_mass(aircraft):
     """
     Nevertheless, for simplicity reason, battery CG is supposed constant
@@ -361,8 +342,60 @@ def eval_ef1_battery_mass(aircraft):
     battery.mass_max = tanks.mfw_volume_limited
     battery.c_g = tanks.fuel_total_cg
 
-    aircraft.weights.battery = 0.
+    if (battery.stacking=="Variable"):
+        aircraft.weights.battery_in_owe = 0.
+    elif (battery.stacking=="Max"):
+        aircraft.weights.battery_in_owe = battery.mass_max
+    elif (battery.stacking=="Given"):
+        pass
+    else:
+        raise Exception("ef1_battery.stacking, index is unknown")
+
     aircraft.center_of_gravity.battery = battery.c_g
+
+    return
+
+
+#===========================================================================================================
+def eval_battery_cg_range(aircraft):
+    """
+    Wing battery predesign using tank data structure
+    """
+
+    weights = aircraft.weights
+    tanks = aircraft.tanks
+    battery = aircraft.ef1_battery
+
+    # Need to take account of any possible battery loading
+    # WARNING : in early design steps, it may occur that the resulting weight of the airplane would be higher than MTOW
+    if (battery.stacking=="Variable"):
+
+        tanks.fuel_max_fwd_cg = tanks.fuel_central_cg    # Battery max forward CG, central volume is forward only within backward swept wing
+        tanks.fuel_max_fwd_mass = tanks.central_volume*tanks.fuel_density
+
+        tanks.fuel_max_bwd_cg = tanks.fuel_cantilever_cg    # Battery max Backward CG
+        tanks.fuel_max_bwd_mass = tanks.cantilever_volume*tanks.fuel_density
+
+    elif (battery.stacking=="Max"):
+
+        tanks.fuel_max_fwd_cg = tanks.fuel_total_cg    # Battery max forward CG, central volume is forward only within backward swept wing
+        tanks.fuel_max_fwd_mass = tanks.mfw_volume_limited*tanks.fuel_density
+
+        tanks.fuel_max_bwd_cg = tanks.fuel_total_cg    # Battery max Backward CG
+        tanks.fuel_max_bwd_mass = tanks.mfw_volume_limited*tanks.fuel_density
+
+    elif (battery.stacking=="Given"):
+
+        tanks.fuel_max_fwd_cg = tanks.fuel_total_cg    # Battery max forward CG, central volume is forward only within backward swept wing
+        tanks.fuel_max_fwd_mass = weights.battery_in_owe
+
+        tanks.fuel_max_bwd_cg = tanks.fuel_total_cg    # Battery max Backward CG
+        tanks.fuel_max_bwd_mass = weights.battery_in_owe
+
+    else:
+        raise Exception("ef1_battery.stacking, index is unknown")
+
+
 
     return
 
