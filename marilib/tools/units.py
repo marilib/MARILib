@@ -55,10 +55,10 @@ def kWh_J(J): return J/3.6e6   # Translate J into kWh
 
 def MWh_J(J): return J/3.6e9   # Translate J into MWh
 
-#=========================================================================================================================================
-def smart_round(X,S):
-	Fac = (10*numpy.ones(S))**numpy.min(4,max(0,4-round(numpy.log10(S))))
-	return round(X*Fac)#Fac
+
+def smart_round(X, S):
+    Fac = (10 * numpy.ones(S))**numpy.min(4, max(0, 4 - round(numpy.log10(S))))
+    return round(X * Fac)  # Fac
 
 
 #=========================================================================
@@ -483,6 +483,8 @@ UNIT["1e-12.K/m2/km/year"] = 1.e-12
 # dim = "DataStructure"
 UNIT["structure"] = 1
 UNIT["dict"] = 1
+UNIT["array"] = 1
+
 
 # Conversion functions
 #-------------------------------------------------------------------------
@@ -493,15 +495,15 @@ def convert_from(ulab, val):
     if isinstance(val, (type(None), str)):
         return val
     if isinstance(val, list):
-        return [convert_to(ulab, v) for v in val]
+        return [convert_from(ulab, v) for v in val]
     if isinstance(val, tuple):
-        return (convert_to(ulab, v) for v in val)
+        return (convert_from(ulab, v) for v in val)
     if isinstance(val, numpy.ndarray):
-        return numpy.array([convert_to(ulab, v) for v in val])
+        return numpy.array([convert_from(ulab, v) for v in val])
     if isinstance(val, dict):
         dic_val = deepcopy(val)
-        for k, v in dic_val.iteritems():
-            dic_val[k] = dic_val.iteritems()
+        for k, v in dic_val.items():
+            dic_val[k] = convert_from(ulab, v)
         return dic_val
     return val * UNIT[ulab]
 

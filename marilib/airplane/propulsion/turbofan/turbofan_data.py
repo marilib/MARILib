@@ -5,6 +5,12 @@ Created on Thu Jan 24 23:22:21 2019
 
 @author: DRUOT Thierry : original Scilab implementation
          PETEILH Nicolas : portage to Python
+
+The TF architecture corresponds to the following features :
+
+- Twin or quad turbofan, in case of twin, possibility to attached engine on rear fuselage
+- Tube & wing architecture with possibility to attach the wing on top of the fuselage
+- Classical tail planes with the possibility to attach horizontal plane on top of the vertical tail
 """
 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +52,7 @@ class TurbofanNacelle(object):
     "nozzle_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the nozzle of the turbofan nacelle"},
     "nozzle_area":{"unit":"m2", "om":1.e0, "txt":"Exhaust nozzle area of the turbofan nacelle"},
     "body_length":{"unit":"m", "om":1.e0, "txt":"Length of the body in front of the turbofan nacelle"},
-    "bnd_layer":{"unit":"structure", "om":1.e0, "txt":"Boundary layer thickness law in front of the e-fan, 2d array"},
+    "bnd_layer":{"unit":"array", "om":1.e0, "txt":"Boundary layer thickness law in front of the e-fan, 2d array"},
     "mass":{"unit":"kg", "om":1.e3, "txt":"Equipped mass of the nacelles (including engine mass)"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the nacelles"}
     }

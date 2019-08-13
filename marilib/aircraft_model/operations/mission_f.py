@@ -10,15 +10,11 @@ Created on Thu Jan 24 23:22:21 2019
 
 import numpy
 from scipy.optimize import fsolve
-from marilib.tools.math import maximize_1d, trinome, vander3
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth
 from marilib.aircraft_model.airplane import aerodynamics as airplane_aero, \
-                                            airplane_design as airplane, \
                                             regulation as regul
-from marilib.airplane.airframe import airframe_design as airframe
-from marilib.airplane.propulsion import propulsion_design as propulsion
 from marilib.airplane.propulsion import propulsion_models as propu
 from marilib.aircraft_model.operations import flight_mechanics as flight
 

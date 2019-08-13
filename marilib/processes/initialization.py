@@ -297,7 +297,7 @@ def idle_electric_shaft_power():
 
 #===========================================================================================================
 def battery_strategy():
-    battery_strategy_i = 1    # Battery sizing strategy, 1: power_feed & energy_cruise driven, 2: battery mass driven
+    battery_strategy_i = 0    # Battery sizing strategy, 0: no battery, 1: power_feed & energy_cruise driven, 2: battery mass driven
     return battery_strategy_i
 
 #===========================================================================================================

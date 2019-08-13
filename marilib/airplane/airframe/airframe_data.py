@@ -317,7 +317,6 @@ class VerticalTail(object):
     "taper_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Taper ratio of the vertical tail"},
     "aspect_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Aspect ratio of the vertical tail"},
     "t_o_c":{"unit":"no_dim", "om":1.e0, "txt":"Thickness to chord ratio of the vertical tail"},
-    "dihedral":{"unit":"deg", "om":1.e0, "txt":"Mean dihedral of the vertical tail"},
     "volume":{"unit":"m2/kN", "om":1.e0, "txt":"Volume coefficient of the  vertical tail"},
     "lever_arm":{"unit":"m", "om":1.e1, "txt":"Lever arm of the vertical tail (from 25% wing MAC to 25% HTTP MAC"},
     "area":{"unit":"m2", "om":1.e2, "txt":"Vertical tail reference area"},
@@ -338,7 +337,6 @@ class VerticalTail(object):
                        taper_ratio = None,
                        aspect_ratio = None,
                        t_o_c = None,
-                       dihedral = None,
                        volume = None,
                        lever_arm = None,
                        area = None,
@@ -358,7 +356,6 @@ class VerticalTail(object):
         self.taper_ratio = taper_ratio
         self.aspect_ratio = aspect_ratio
         self.t_o_c = t_o_c
-        self.dihedral = dihedral
         self.volume = volume
         self.lever_arm = lever_arm
         self.area = area
@@ -383,7 +380,6 @@ class Tanks(object):
     INFO = {\
     "cantilever_volume":{"unit":"m3", "om":1.e1, "txt":"Volume of tanks in the cantilever wing"},
     "central_volume":{"unit":"m3", "om":1.e1, "txt":"Volume of tanks in the central part of the wing (inside the fuselage)"},
-    "pod_volume":{"unit":"m3", "om":1.e1, "txt":"Volume of tanks in the external bodies"},
     "mfw_volume_limited":{"unit":"kg", "om":1.e4, "txt":"Maximum geometrical fuel volume"},
     "fuel_density":{"unit":"kg/m3", "om":1.e2, "txt":"Fuel density"},
     "fuel_cantilever_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of tanks in the cantilever wing"},
@@ -396,7 +392,6 @@ class Tanks(object):
     }
     def __init__(self, cantilever_volume = None,
                        central_volume = None,
-                       pod_volume = None,
                        mfw_volume_limited = None,
                        fuel_density = None,
                        fuel_cantilever_cg = None,
@@ -409,7 +404,6 @@ class Tanks(object):
                  ):
         self.cantilever_volume = cantilever_volume
         self.central_volume = central_volume
-        self.pod_volume = pod_volume
         self.mfw_volume_limited = mfw_volume_limited
         self.fuel_density = fuel_density
         self.fuel_cantilever_cg = fuel_cantilever_cg

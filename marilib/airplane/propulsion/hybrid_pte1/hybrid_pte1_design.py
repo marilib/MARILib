@@ -318,7 +318,12 @@ def eval_pte1_battery_mass(aircraft):
 
     battery.c_g = fuselage.c_g
 
-    if (battery.strategy==1):
+    if (battery.strategy==0):
+        propulsion.battery_energy_density = 0.
+        weights.battery_in_owe = 0.
+        c_o_g.battery = 0.
+
+    elif (battery.strategy==1):
         battery.mass = (battery.power_feed*battery.time_feed + battery.energy_cruise)/battery.energy_density
         propulsion.battery_energy_density = battery.energy_density
         weights.battery_in_owe = battery.mass

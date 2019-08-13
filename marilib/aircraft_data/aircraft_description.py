@@ -6,16 +6,17 @@ Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry, DELMIRO Thales, GALLARD Francois
 
 """
+
+from ast import literal_eval
 from collections import OrderedDict
 from datetime import datetime
 import itertools
 from copy import deepcopy
-
+import re
+import sys
 
 from configobj import ConfigObj
 from numpy import max, ceil, log10, floor, float64, arange, abs, array, ndarray
-
-import sys
 
 from marilib.tools import units as unit
 
@@ -44,6 +45,16 @@ from marilib.airplane.propulsion.electric_ef1.electric_ef1_data \
     import Ef1PowerElectricChain, Ef1Battery, ElectrofanPylon, ElectrofanNacelle, ElectrofanEngine
 
 STANDARD_FORMAT = 4
+
+PATTERN_RE = r'''# Match (mandatory) whitespace between...
+              (?<=\]) # ] and
+              \s+
+              (?= \[) # [, or
+              |
+              (?<=[^\[\]\s])
+              \s+
+              (?= [^\[\]\s]) # two non-bracket non-whitespace characters
+             '''
 
 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -97,6 +108,7 @@ class Aircraft(object):
         self.ef1_power_elec_chain = Ef1PowerElectricChain()
         self.ef1_battery = Ef1Battery()
 
+
     def import_from_file(self, filename="Aircraft.ini"):
 
         in_parser = ConfigObj(filename, indent_type="    ",
@@ -124,11 +136,9 @@ class Aircraft(object):
 
         # check python version
         if (sys.version_info > (3, 0)):  # using Python 3 or above
-            print("******* Using python 3.x *******")
             data_dict = self.get_data_dict()
             new_dict = {}
         else:  # using Python 2
-            print("******* Using python 2.x *******")
             data_dict = self.get_ordered_data_dict()
             new_dict = OrderedDict()
         class_name = self.__class__.__name__
@@ -156,7 +166,7 @@ class Aircraft(object):
 #------------------------------------------------------------------------------
 
 
-def get_proper_value(value, key, declared_unit):
+def get_proper_value(value, declared_unit):
     is_negative = False
     isnumber = False
     if isinstance(value, str):
@@ -174,17 +184,47 @@ def get_proper_value(value, key, declared_unit):
                 value *= -1
             isnumber = True
         elif value == "None":
-            return None
+            return None, isnumber
         else:
-            return value
+            return value, isnumber
     if isnumber:
         if declared_unit is None:
             raise IOError(
                 "Read config file error: numeric variable without unit")
         converted_value = unit.convert_from(declared_unit, value)
-        return converted_value
+        return converted_value, isnumber
     else:
         raise NotImplementedError
+
+#------------------------------------------------------------------------------
+
+
+def convert_if_is_array(data_str, declared_unit):
+    data_str = data_str.replace(", ", ",").replace(": ", ":")
+    fixed_string = re.sub(PATTERN_RE, ',', data_str, flags=re.VERBOSE)
+    if "array" in declared_unit:
+        my_data = literal_eval(fixed_string)
+        my_data = array(my_data)
+    else:
+        fixed_string = fixed_string.replace(",", ", ").replace(":", ": ")
+        my_data = literal_eval(fixed_string)
+    return my_data
+
+
+def get_ac_dataline(data_line, declared_unit):
+    clean_dict_line = data_line.replace("{", "").replace("}", "").\
+        replace("(", "").replace(")", "").replace("[", "").replace("]", "").\
+        replace(",", " ").replace(":", " ").replace("'", "").replace('"', "")
+    s_set = set(clean_dict_line.split())
+    for s in s_set:
+        value, isnumber = get_proper_value(s, declared_unit)
+        if isnumber:
+            s_new = str(value)
+        else:
+            s_new = "'" + value + "'"
+        data_line = data_line.replace(s, s_new)
+    return convert_if_is_array(data_line, declared_unit)
+
 
 #------------------------------------------------------------------------------
 
@@ -196,38 +236,17 @@ def set_ac_data(data_dict, obj):
             set_ac_data(attr_val, sub_attr)
         else:
             data_line = attr_val.rsplit(None, 1)
-            value_sequence = [data_line[0]]
+            value_sequence = data_line[0]
             assigned_unit = data_line[-1]
             if len(data_line) < 2 or assigned_unit[-1] in (']', '}', ')'):
                 assigned_unit = None
-            initial_char = value_sequence[0][0]
-            isnumpyarray = False
+            initial_char = value_sequence[0]
             if initial_char in ('(', '['):
-                if ',' not in value_sequence[0]:
-                    isnumpyarray = True
-                    value_sequence = data_line[0][1:-1].split()
-                else:
-                    value_sequence = data_line[0][1:- 1].replace(",",
-                                                                 "").split()
+                attr_val = get_ac_dataline(value_sequence, assigned_unit)
             elif initial_char == '{':
-                value_sequence = data_line[0][1:- 1].replace(",",
-                                                             "").replace(":",
-                                                                         " ").split()
-                k = value_sequence[0::2]
-                value_sequence = value_sequence[1::2]
-            attr_val = []
-            for v in value_sequence:
-                v = get_proper_value(v, attr_path, assigned_unit)
-                attr_val.append(v)
-            if len(attr_val) is 1:
-                attr_val = attr_val[0]
+                attr_val = get_ac_dataline(value_sequence, assigned_unit)
             else:
-                if isnumpyarray:
-                    attr_val = array(attr_val)
-                elif initial_char == '(':
-                    attr_val = tuple(attr_val)
-                elif initial_char == '{':
-                    attr_val = dict(itertools.izip(k, attr_val))
+                attr_val, _ = get_proper_value(value_sequence, assigned_unit)
             setattr(obj, attr_path, attr_val)
 
 #------------------------------------------------------------------------------
@@ -299,9 +318,7 @@ def convert_to_orig_type(lst, orig_seq):
 #-------------------------------------------------------------------------
 def to_user_format(value, dec_format):
 
-    if isNaN(value):
-        return value
-    elif isinstance(value, (tuple, list, ndarray)):
+    if isinstance(value, (tuple, list, ndarray)):
         lst = list(value)
         for i in arange(len(lst)):
             lst[i] = to_user_format(lst[i], dec_format)
@@ -311,6 +328,8 @@ def to_user_format(value, dec_format):
             value[k] = to_user_format(v, dec_format)
         return str(value).replace("'", "")
     elif isinstance(value, (float, float64)):
+        if isNaN(value):
+            return value
         if value == 0. or value == -0.:
             return format(value, "".join((".", str(dec_format), "f")))
         else:

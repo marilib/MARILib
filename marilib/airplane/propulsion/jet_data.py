@@ -30,7 +30,7 @@ class RearElectricNacelle(object):
     "nozzle_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the nozzle of the electric nacelle"},
     "nozzle_area":{"unit":"m2", "om":1.e0, "txt":"Exhaust nozzle area of the electric nacelle"},
     "body_length":{"unit":"m", "om":1.e0, "txt":"Length of the body behind the electric nacelle"},
-    "bnd_layer":{"unit":"structure", "om":1.e0, "txt":"Boundary layer thickness law in front of the e-fan, 2d array"},
+    "bnd_layer":{"unit":"array", "om":1.e0, "txt":"Boundary layer thickness law in front of the e-fan, 2d array"},
     "mass":{"unit":"kg", "om":1.e2, "txt":"Equipped mass of the nacelle of the electric fan (including the controller, motor and nacelle)"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the electric nacelle"}
     }

@@ -8,15 +8,22 @@ Created on Thu Jan 24 23:22:21 2019
 The EF1 architecture corresponds to the following features :
 
 - Electrical main fans
-- Eventual rear electrical fan
+- Eventual rear electrical fan  (attribute aircraft.ef1_power_elec_chain.rear_nacelle)
 - Battery powered
 
-IMPORTANT REMARK :
-Some simplifications has been taken to ease the use of this model
-- Batteries are supposed to be stacked in the wing box in place of liquid fuel
-- For each typical missions (nominal, max payload, max fuel, zero payload, cost) the mass of the battery
-  which is put on board is exactly what is required for the mission, which supposes that the battery
-  stacking system allows this ...
+IMPORTANT REMARKS :
+Batteries are supposed to be stacked in the wing box in place of liquid fuel, so available volume is computed the same way
+Three modes of battery stacking are possible :
+1- "Variable"
+   For each typical missions (nominal, max payload, max fuel, zero payload, cost) the mass of the battery
+   which is put on board is exactly what is required for the mission, which supposes that the battery
+   stacking system allows this ...
+   In this case, battery mass is not accounted into OWE
+2- "Max"
+   Battery occupies the maximum available volume into the wing box. In this case, battery mass is fixed whatever the mission
+   and is accounted into the OWE
+3- "Fixed"
+   Battery mass is fixed by the user through the attribute aircraft.weights.battery_in_owe
 """
 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -100,7 +107,7 @@ class ElectrofanNacelle(object):
     "nozzle_width":{"unit":"m", "om":1.e0, "txt":"Diameter of the nozzle of the turbofan nacelle"},
     "nozzle_area":{"unit":"m2", "om":1.e0, "txt":"Exhaust nozzle area of the turbofan nacelle"},
     "body_length":{"unit":"m", "om":1.e0, "txt":"Length of the body in front of the turbofan nacelle"},
-    "bnd_layer":{"unit":"structure", "om":1.e0, "txt":"Boundary layer thickness law in front of the e-fan, 2d array"},
+    "bnd_layer":{"unit":"array", "om":1.e0, "txt":"Boundary layer thickness law in front of the e-fan, 2d array"},
     "mass":{"unit":"kg", "om":1.e3, "txt":"Equipped mass of the nacelles (including engine mass)"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the nacelles"}
     }
@@ -181,7 +188,6 @@ class ElectrofanEngine(object):
     "mcr_e_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in max cruise rating (one engine), reference cruise altitude, ISA, cruise Mach"},
     "fid_e_shaft_power":{"unit":"kW", "om":1.e3, "txt":"E-fan shaft power in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
     "fid_e_fan_thrust":{"unit":"daN", "om":1.e3, "txt":"E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach"},
-    "flight_data":{"unit":"dict", "txt":"Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}"}
     }
     def __init__(self, reference_thrust = None,
                        reference_power = None,
@@ -195,8 +201,7 @@ class ElectrofanEngine(object):
                        mcr_e_shaft_power = None,
                        mcr_e_fan_thrust = None,
                        fid_e_shaft_power = None,
-                       fid_e_fan_thrust = None,
-                       flight_data = None):
+                       fid_e_fan_thrust = None):
         self.reference_thrust = reference_thrust
         self.reference_power = reference_power
         self.rating_factor = rating_factor
@@ -210,7 +215,6 @@ class ElectrofanEngine(object):
         self.mcr_e_fan_thrust = mcr_e_fan_thrust
         self.fid_e_shaft_power = fid_e_shaft_power
         self.fid_e_fan_thrust = fid_e_fan_thrust
-        self.flight_data = flight_data
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class Ef1Battery(object):

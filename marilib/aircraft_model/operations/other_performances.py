@@ -53,7 +53,6 @@ def ceilings(aircraft,toc,oei_ceil):
     speed_mode = 2                      # WARNING : iso Mach climb mode
 
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
-    speed = earth.vcas_from_mach(pamb,design_driver.cruise_mach)
 
     mass = 0.95*weights.mtow
 
@@ -61,8 +60,10 @@ def ceilings(aircraft,toc,oei_ceil):
 
     oei_slope,vz,oei_mach,cz = flight.max_path(aircraft,nei,altp,disa,speed_mode,mass,rating)
 
+    oei_speed = earth.vcas_from_mach(pamb,oei_mach)
+
     #-----------------------------------------------------------------------------------------------------------
-    return vz_clb,vz_crz,oei_slope,oei_mach
+    return vz_clb,vz_crz,oei_slope,oei_speed
 
 
 #===========================================================================================================

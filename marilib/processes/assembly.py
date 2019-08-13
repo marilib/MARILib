@@ -75,7 +75,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.cost_mission.range = init.cost_mission_range(design_range)
     aircraft.cost_mission.req_battery_mass = init.battery_mass()
 
-    aircraft.nominal_mission.battery_mass = init.battery_mass()
+    aircraft.nominal_mission.req_battery_mass = init.battery_mass()
 
     aircraft.economics.fuel_price = init.fuel_price()
     aircraft.economics.elec_price = init.elec_price()

@@ -17,12 +17,11 @@ Inportant remark : to keep consistency with fuelled airplanes, battery mass is b
 
 import numpy
 from scipy.optimize import fsolve
-from marilib.tools.math import maximize_1d, trinome, vander3
 from marilib.tools import units as unit
-from marilib.processes import component as sub_proc, initialization as init
 
 from marilib.earth import environment as earth
-from marilib.aircraft_model.airplane import aerodynamics as airplane_aero, regulation as regul
+from marilib.aircraft_model.airplane import aerodynamics as airplane_aero, \
+                                            regulation as regul
 from marilib.airplane.propulsion import propulsion_models as propu
 from marilib.aircraft_model.operations import flight_mechanics as flight
 
@@ -286,6 +285,7 @@ def eval_cost_b_mission(aircraft):
 
     tow,block_enrg,block_time,total_enrg = b_mission_tow(aircraft,payload,range,altp,mach,disa)
 
+    aircraft.cost_mission.tow = tow
     aircraft.cost_mission.total_fuel = 0.
     aircraft.cost_mission.block_fuel = 0.
     aircraft.cost_mission.total_enrg = total_enrg

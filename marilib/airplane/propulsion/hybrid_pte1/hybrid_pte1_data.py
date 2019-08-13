@@ -5,6 +5,18 @@ Created on Thu Jan 24 23:22:21 2019
 
 @author: DRUOT Thierry : original Scilab implementation
          PETEILH Nicolas : portage to Python
+
+The PTE1 architecture corresponds to the following features :
+
+- Thermal main fans with electrical generators
+- Rear electrical fan with use defined power on each rating
+- Eventual additional battery (attribute aircraft.pte1_battery.battery_strategy)
+
+IMPORTANT REMARKS :
+If an additional battery is installed, two modes are available :
+1- Battery mass is driven by the necessary amount of energy to ensure a power boost at take off and climb of "pte1_battery.power_feed" for a cumulated duration of "pte1_battery.time_feed"
+   and(or) an additional energy "pte1_battery.energy_cruise" delivered all along the cruise
+2- battery mass is given by the user (attribute aircraft.pte1_battery.mass)
 """
 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +61,7 @@ class Pte1Battery(object):
     Battery data
     """
     INFO = {\
-    "strategy":{"unit":"int", "om":1.e0, "txt":"Battery sizing strategy, 1: power_feed & energy_cruise driven, 2: battery mass driven"},
+    "strategy":{"unit":"int", "om":1.e0, "txt":"Battery sizing strategy, 0= no battery, 1= power_feed & energy_cruise driven, 2= battery mass driven"},
     "power_feed":{"unit":"kW", "om":1.e4, "txt":"Power delivered to e-fan(s) at take off and(or) climb during a total of time_feed"},
     "time_feed":{"unit":"min", "om":1.e1, "txt":"Maximum duration of the power_feed delivered to e-fan(s)"},
     "energy_cruise":{"unit":"kWh", "om":1.e1, "txt":"Total battery energy dedicated to cruise"},

@@ -118,8 +118,6 @@ class HighSpeed(object):
     "req_ttc":{"unit":"min", "om":1.e1, "txt":"Required maximum Time To Climb"},
     "eff_ttc":{"unit":"min", "om":1.e1, "txt":"Effective Time To Climb"},
     "perfo_constraint_3":{"unit":"min", "om":1.e0, "txt":"Constraint on time to climb, must be kept positive"},
-    "cruise_sfc":{"unit":"kg/daN/h", "om":1.e0, "txt":"Specific fuel consumption for nominal mission cruise"},
-    "cruise_lod":{"unit":"no_dim", "om":1.e1, "txt":"Lift over drag ratio for nominal mission cruise"}
     }
     def __init__(self, disa_climb = None,
                        req_vz_climb = None,
@@ -133,9 +131,7 @@ class HighSpeed(object):
                        cas2_ttc = None,
                        req_ttc = None,
                        eff_ttc = None,
-                       perfo_constraint_3 = None,
-                       cruise_sfc = None,
-                       cruise_lod = None):
+                       perfo_constraint_3 = None):
         self.disa_climb = disa_climb
         self.req_vz_climb = req_vz_climb
         self.eff_vz_climb = eff_vz_climb
@@ -149,8 +145,6 @@ class HighSpeed(object):
         self.req_ttc = req_ttc
         self.eff_ttc = eff_ttc
         self.perfo_constraint_3 = perfo_constraint_3
-        self.cruise_sfc = cruise_sfc
-        self.cruise_lod = cruise_lod
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class MaxPayloadMission(object):

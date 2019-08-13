@@ -30,9 +30,10 @@ def eval_climb_performances(aircraft):
     toc = aircraft.design_driver.top_of_climb_altp
     oei_ceil_req = aircraft.low_speed.req_oei_altp
 
-    vz_clb,vz_crz,oei_path,oei_mach = perfo.ceilings(aircraft,toc,oei_ceil_req)
+    vz_clb,vz_crz,oei_path,oei_speed = perfo.ceilings(aircraft,toc,oei_ceil_req)
 
     aircraft.low_speed.eff_oei_path = oei_path
+    aircraft.low_speed.oei_best_speed = oei_speed
     aircraft.high_speed.eff_vz_climb = vz_clb
     aircraft.high_speed.eff_vz_cruise = vz_crz
 
@@ -70,13 +71,14 @@ def eval_economics(aircraft):
     block_fuel = aircraft.cost_mission.block_fuel
     block_time = aircraft.cost_mission.block_time
 
-    direct_op_cost,cash_op_cost,battery_price,gear_price,engine_price,airplane_price = costing.eval_operating_costs(aircraft,block_fuel,block_time)
+    standard_op_cost,direct_op_cost,cash_op_cost,battery_price,gear_price,engine_price,airplane_price = costing.eval_operating_costs(aircraft,block_fuel,block_time)
 
     aircraft.economics.battery_price = battery_price
     aircraft.economics.gear_price = gear_price
     aircraft.economics.engine_price = engine_price
     aircraft.economics.airplane_price = airplane_price
 
+    aircraft.economics.standard_operating_cost = standard_op_cost
     aircraft.economics.direct_operating_cost = direct_op_cost
     aircraft.economics.cash_operating_cost = cash_op_cost
 

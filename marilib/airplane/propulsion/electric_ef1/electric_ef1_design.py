@@ -50,7 +50,6 @@ def eval_ef1_engine_design(aircraft):
 
     power_elec = aircraft.ef1_power_elec_chain
     engine = aircraft.electrofan_engine
-    r_engine = aircraft.rear_electric_engine
     nacelle = aircraft.electrofan_nacelle
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
@@ -99,14 +98,14 @@ def eval_ef1_engine_design(aircraft):
 
     # Max main fan shaft power
     #-----------------------------------------------------------------------------------------------------------
-    shaft_power = numpy.array([engine.mto_e_shaft_power,
-                               engine.mcn_e_shaft_power,
-                               engine.mcl_e_shaft_power,
-                               engine.mcr_e_shaft_power,
-                               engine.fid_e_shaft_power])
+    shaft_power_array = numpy.array([engine.mto_e_shaft_power,
+                                     engine.mcn_e_shaft_power,
+                                     engine.mcl_e_shaft_power,
+                                     engine.mcr_e_shaft_power,
+                                     engine.fid_e_shaft_power])
 
-    power_elec.max_power = max(shaft_power)
-    power_elec.max_power_rating = numpy.argmax(shaft_power)
+    power_elec.max_power = max(shaft_power_array)
+    power_elec.max_power_rating = numpy.argmax(shaft_power_array)
 
     return
 
@@ -194,6 +193,34 @@ def eval_ef1_nacelle_design(aircraft):
 
     else:
         raise Exception("nacelle.attachment, index is out of range")
+
+    # Main fan max thrust on each rating
+    #-----------------------------------------------------------------------------------------------------------
+    fan_thrust = {"MTO":0., "MCN":0., "MCL":0., "MCR":0., "FID":0.}
+
+    shaft_power = {"MTO":engine.mto_e_shaft_power,
+                   "MCN":engine.mcn_e_shaft_power,
+                   "MCL":engine.mcl_e_shaft_power,
+                   "MCR":engine.mcr_e_shaft_power,
+                   "FID":engine.fid_e_shaft_power}
+
+    for rating in propulsion.rating_code:
+
+        altp = propulsion.flight_data["altp"][rating]
+        disa = propulsion.flight_data["disa"][rating]
+        mach = propulsion.flight_data["mach"][rating]
+
+        (pamb,tamb,tstd,dtodz) = earth.atmosphere(altp,disa)
+
+        (fn_fan2,q0) = jet.fan_thrust(nacelle,pamb,tamb,mach,shaft_power[rating])
+
+        fan_thrust[rating] = fn_fan2
+
+    engine.mto_e_fan_thrust = fan_thrust[MTO]
+    engine.mcn_e_fan_thrust = fan_thrust[MCN]
+    engine.mcl_e_fan_thrust = fan_thrust[MCL]
+    engine.mcr_e_fan_thrust = fan_thrust[MCR]
+    engine.fid_e_fan_thrust = fan_thrust[FID]
 
     # Eventual rear nacelle
     #-----------------------------------------------------------------------------------------------------------

@@ -134,7 +134,7 @@ def eval_operating_costs(aircraft,block_fuel,block_time):
 
     direct_op_cost = cash_op_cost + eco.interest + eco.depreciation + eco.insurance
 
-    return direct_op_cost,cash_op_cost,battery_price,gear_price,engine_price,aircraft_price
+    return std_op_cost,direct_op_cost,cash_op_cost,battery_price,gear_price,engine_price,aircraft_price
 
 
 
