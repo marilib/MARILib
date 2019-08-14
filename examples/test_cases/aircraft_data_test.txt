@@ -252,7 +252,7 @@
         c_kink = 3.5424 m     #  Wing kink chord length
         x_tip = 12.699 m     #  Longitudinal position of 0% of wing tip chord
         y_tip = 12.990 m     #  Span wise position of 0% of the wing tip chord
-        z_tip = 1.0000 m     #  Vertical position of 0% of the wing tip chord
+        z_tip = 1.000 m     #  Vertical position of 0% of the wing tip chord
         c_tip = 1.1832 m     #  Wing tip chord length
         x_mac = 10.332 m     #  Longitudinal position of wing mean aerodynamic chord
         y_mac = 5.2504 m     #  Span wise position of wing mean aerodynamic chord

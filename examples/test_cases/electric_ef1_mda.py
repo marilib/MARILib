@@ -83,7 +83,17 @@ run.eval_performance_analysis(aircraft)
 run.eval_handling_quality_analysis(aircraft)
 
 #------------------------------------------------------------------------------------------------------
-aircraft.export_to_file(filename = "aircraft_data.txt", write_detail=True)
+fname = "aircraft_data.txt"
+
+aircraft.export_to_file(filename=fname, write_detail=True)
+
+test = Aircraft()
+
+test.import_from_file(filename = fname)
+
+ftest = "aircraft_data_test.txt"
+
+test.export_to_file(filename=ftest, write_detail=True)
 
 #------------------------------------------------------------------------------------------------------
 print("-------------------------------------------")

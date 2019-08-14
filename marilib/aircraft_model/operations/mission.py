@@ -15,6 +15,44 @@ from marilib.aircraft_model.operations import mission_b, mission_f
 
 
 #===========================================================================================================
+def eval_payload_range_missions(aircraft):
+    """
+    Compute Payload - Range diagram corner points
+    """
+
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_payload_range_b_missions(aircraft)
+    else:
+        mission_f.eval_payload_range_f_missions(aircraft)
+
+    return
+
+
+#===========================================================================================================
+def eval_nominal_mission(aircraft):
+    """
+    Nominal mission evaluation
+    """
+
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_nominal_b_mission(aircraft)
+    else:
+        mission_f.eval_nominal_f_mission(aircraft)
+
+
+#===========================================================================================================
+def eval_cost_mission(aircraft):
+    """
+    Cost mission evaluation
+    """
+
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_cost_b_mission(aircraft)
+    else:
+        mission_f.eval_cost_f_mission(aircraft)
+
+
+#===========================================================================================================
 def mission_tow(aircraft,payload,range,altp,mach,disa):
     """
     Mission simulation (take off weight is output)

@@ -20,7 +20,7 @@ from marilib.airplane.airframe import airframe_design as airframe
 
 from marilib.airplane.propulsion import propulsion_design as propulsion
 
-from marilib.aircraft_model.operations import mission_b, mission_f, \
+from marilib.aircraft_model.operations import mission, \
                                             handling_qualities as h_q
 
 from marilib.processes import component as sub_proc, \
@@ -540,10 +540,7 @@ def eval_mass_mission_adaptation(aircraft):
 
         # Mission
         #------------------------------------------------------------------------------------------------------
-        if (aircraft.propulsion.fuel_type=="Battery"):
-            mission_b.eval_nominal_b_mission(aircraft)
-        else:
-            mission_f.eval_nominal_f_mission(aircraft)
+        mission.eval_nominal_mission(aircraft)
 
         y_out = np.array([aircraft.weights.mass_constraint_1,
                           aircraft.weights.mass_constraint_2,
@@ -570,10 +567,7 @@ def eval_mass_mission_adaptation(aircraft):
 
     # Update mission data
     #------------------------------------------------------------------------------------------------------
-    if (aircraft.propulsion.fuel_type=="Battery"):
-        mission_b.eval_nominal_b_mission(aircraft)
-    else:
-        mission_f.eval_nominal_f_mission(aircraft)
+    mission.eval_nominal_mission(aircraft)
 
     return
 
@@ -584,10 +578,7 @@ def eval_payload_range_analysis(aircraft):
     Compute Payload - Range diagram corner points
     """
 
-    if (aircraft.propulsion.fuel_type=="Battery"):
-        mission_b.eval_b_payload_range_analysis(aircraft)
-    else:
-        mission_f.eval_f_payload_range_analysis(aircraft)
+    mission.eval_payload_range_missions(aircraft)
 
     return
 
@@ -600,10 +591,7 @@ def eval_performance_analysis(aircraft):
 
     # Nominal mission
     #------------------------------------------------------------------------------------------------------
-    if (aircraft.propulsion.fuel_type=="Battery"):
-        mission_b.eval_nominal_b_mission(aircraft)
-    else:
-        mission_f.eval_nominal_f_mission(aircraft)
+    mission.eval_nominal_mission(aircraft)
 
     # Take off field length
     #------------------------------------------------------------------------------------------------------
@@ -623,10 +611,7 @@ def eval_performance_analysis(aircraft):
 
     # Cost mission
     #-----------------------------------------------------------------------------------------------------------------------------------------------
-    if (aircraft.propulsion.fuel_type=="Battery"):
-        mission_b.eval_cost_b_mission(aircraft)
-    else:
-        mission_f.eval_cost_f_mission(aircraft)
+    mission.eval_cost_mission(aircraft)
 
     # Economics
     #------------------------------------------------------------------------------------------------------

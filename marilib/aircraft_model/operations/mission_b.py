@@ -199,7 +199,7 @@ def eval_b_mission_coupling(aircraft):
 
 
 #===========================================================================================================
-def eval_b_payload_range_analysis(aircraft):
+def eval_payload_range_b_missions(aircraft):
     """
     Compute Payload - Range diagram corner points
     """

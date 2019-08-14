@@ -182,7 +182,7 @@ def eval_f_mission_coupling(aircraft):
 
 
 #===========================================================================================================
-def eval_f_payload_range_analysis(aircraft):
+def eval_payload_range_f_missions(aircraft):
     """
     Compute Payload - Range diagram corner points
     """
