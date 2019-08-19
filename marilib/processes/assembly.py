@@ -8,8 +8,9 @@ Created on Thu Jan 24 23:22:21 2019
 Changed name from "design.py" to "assembly.py" on 21:05:2019
 """
 
-import numpy as np
-from scipy.optimize import fsolve,minimize,SR1, NonlinearConstraint,BFGS
+from marilib import numpy as np
+from marilib import fsolve
+from scipy.optimize import minimize,SR1, NonlinearConstraint
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth
@@ -659,21 +660,6 @@ def eval_handling_quality_analysis(aircraft):
     h_q.vertical_tail_sizing(aircraft)
 
     c_g.cg_constraint_3 = c_g.max_bwd_oei_cg - c_g.max_bwd_oei_req_cg
-
-    return
-
-
-#===========================================================================================================
-def eval_cg_coupling(aircraft):
-    """
-    This function provides coupling relations to perlorm empennage sizing as a constraint satisfaction problem
-    """
-
-    c_g = aircraft.center_of_gravity
-
-    c_g.max_fwd_req_cg = c_g.max_fwd_trim_cg
-    c_g.max_bwd_stab_cg = c_g.max_bwd_req_cg
-    c_g.max_bwd_oei_cg = c_g.max_bwd_oei_req_cg
 
     return
 

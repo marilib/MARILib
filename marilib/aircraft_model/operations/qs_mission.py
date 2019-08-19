@@ -7,9 +7,9 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 
-import numpy
+from marilib import numpy
 import copy
-from scipy.optimize import fsolve,minimize
+from marilib import fsolve
 from marilib.tools.math import maximize_1d, trinome
 from marilib.tools import units as unit
 

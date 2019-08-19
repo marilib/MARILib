@@ -7,10 +7,11 @@ Created on Thu Jan 24 23:22:21 2019
          PETEILH Nicolas : portage to Python
 """
 
-import numpy
+from marilib import numpy
 
 from marilib.tools import units as unit
 
+from marilib.earth import environment as earth
 
 #===========================================================================================================
 def ref_cruise_altp(propulsive_architecture):
@@ -327,7 +328,7 @@ def battery_power_density():
 
 #===========================================================================================================
 def battery_density():
-    battery_density_i = 2800.    # Battery density (kg/m3)
+    battery_density_i = earth.fuel_density("Battery")    # Battery density (kg/m3)
     return battery_density_i
 
 #===========================================================================================================

@@ -15,8 +15,8 @@ Inportant remark : to keep consistency with fuelled airplanes, battery mass is b
 """
 
 
-import numpy
-from scipy.optimize import fsolve
+from marilib import numpy
+from marilib import fsolve
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth

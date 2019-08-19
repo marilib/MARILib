@@ -6,31 +6,50 @@ Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry
 
 ------------------------------------------------------------------------------------------------------------
-This scenario allows to simulate with GEMS a full design process where HQ based empennage sizing is treated
-as constraint satisfaction internally managed by hq0.
-hq0 does not manage the mass constraints which simulate a common practice where overall design and hq
-are solved alternatively in 2 or 3 loops
+This scenario allows to play with GEMS a full design process with Mass - Mission adaptation AND HQ based empennage
+sizing treated as an optimization problem
+
+All processes must be managed at MDO level
 
 Global design parameter n°1 : aircraft.turbofan_engine.reference_thrust, bounds = (50000,150000)
 Global design parameter n°2 : aircraft.wing.area, bounds = (50,200)
 
+Circular dependencies on : aircraft.turbofan_nacelle.width
+                         : aircraft.turbofan_nacelle.y_ext
+                         : aircraft.horizontal_tail.area
+                         : aircraft.vertical_tail.area
+
 Mass design parameter n°1 : aircraft.weights.mtow
 Mass design parameter n°2 : aircraft.weights.mlw
 Mass design parameter n°3 : aircraft.weights.mzfw
-Mass constraint n°1 : aircraft.weights.mass_constraint_1 ==> 0
-Mass constraint n°2 : aircraft.weights.mass_constraint_2 ==> 0
-Mass constraint n°3 : aircraft.weights.mass_constraint_3 ==> 0
+Mass constraint n°1 : aircraft.weights.mass_constraint_1 >= 0
+Mass constraint n°2 : aircraft.weights.mass_constraint_2 >= 0
+Mass constraint n°3 : aircraft.weights.mass_constraint_3 >= 0
 
-HQ constraint n°1 : aircraft.center_of_gravity.cg_constraint_1 ==> 0     |
-HQ constraint n°2 : aircraft.center_of_gravity.cg_constraint_2 ==> 0     | Managed internally by eval_hq0
-HQ constraint n°3 : aircraft.center_of_gravity.cg_constraint_3 ==> 0     |
+Criterion to be used is : aircraft.weights.mtow
 
-Perfo constraint n°1 : aircraft.high_speed.perfo_constraint_1 > 0
-Perfo constraint n°2 : aircraft.high_speed.perfo_constraint_2 > 0
-Perfo constraint n°3 : aircraft.low_speed.perfo_constraint_3 > 0
-Perfo constraint n°4 : aircraft.high_speed.perfo_constraint_3 > 0
-Perfo constraint n°5 : aircraft.low_speed.perfo_constraint_1 > 0
-Perfo constraint n°6 : aircraft.low_speed.perfo_constraint_2 > 0
+
+HQ design parameter n°1 : aircraft.wing.x_root
+HQ design parameter n°2 : aircraft.horizontal_tail.area
+HQ design parameter n°3 : aircraft.vertical_tail.area
+HQ constraint n°1 : aircraft.center_of_gravity.cg_constraint_1 >= 0
+HQ constraint n°2 : aircraft.center_of_gravity.cg_constraint_2 >= 0
+HQ constraint n°3 : aircraft.center_of_gravity.cg_constraint_3 >= 0
+
+Possible criteria : aircraft.horizontal_tail.area & aircraft.vertical_tail.area
+                  : aircraft.cost_mission.mtow
+
+REMARK :
+HQ optimization can be treated as two coupled optimization of HTP area and VTP area (to be minimized)
+                               or one single optimization of the MTOW
+
+
+Perfo constraint n°1 : aircraft.high_speed.perfo_constraint_1 >= 0
+Perfo constraint n°2 : aircraft.high_speed.perfo_constraint_2 >= 0
+Perfo constraint n°3 : aircraft.low_speed.perfo_constraint_3 >= 0
+Perfo constraint n°4 : aircraft.high_speed.perfo_constraint_3 >= 0
+Perfo constraint n°5 : aircraft.low_speed.perfo_constraint_1 >= 0
+Perfo constraint n°6 : aircraft.low_speed.perfo_constraint_2 >= 0
 
 Possible criteria : aircraft.weights.mtow
                   : aircraft.cost_mission.block_fuel
@@ -54,13 +73,16 @@ from marilib.airplane.propulsion.propulsion_design \
 from marilib.aircraft_model.airplane.airplane_design \
     import eval_aerodynamics_design, eval_mass_coupling
 
+from marilib.aircraft_model.operations.mission \
+    import eval_nominal_mission, eval_cost_mission
+
 from marilib.processes.component \
-    import eval_nominal_mission, eval_mission_coupling, eval_take_off_performances, eval_landing_performances, \
-           eval_co2_metric, eval_cost_mission, eval_economics
+    import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
+           eval_co2_metric, eval_economics
 
 from marilib.processes.assembly \
-    import aircraft_initialize, eval_mass_breakdown, eval_climb_performances, \
-           eval_hq0, eval_payload_range_analysis
+    import aircraft_initialize, eval_mass_breakdown, eval_payload_range_analysis, \
+           eval_handling_quality_analysis
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -106,17 +128,13 @@ def mass_coupling(aircraft):
     eval_mass_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
-def handling_quality_adaptation(aircraft):
-    eval_hq0(aircraft)                          # Compute Wing X position, HTP & VTP areas without solving mass constraints
+def handling_quality_analysis(aircraft):
+    eval_handling_quality_analysis(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def nominal_mission(aircraft):
     eval_nominal_mission(aircraft)
     return
-
-#-----------------------------------------------------------------------------------------------------------
-def mission_coupling(aircraft):
-    eval_mission_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def performance_analysis(aircraft):
@@ -143,8 +161,8 @@ n_pax_ref = 150                     # Reference number of passengers
 design_range = unit.m_NM(3000)      # Design range
 cruise_mach = 0.78                  # Nominal cruise mach number
 
-propu_config = 1    # 1: turbofan, 2: partial turbo electric
-n_engine = 2        # Number of engine
+propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
+n_engine = 2           # Number of engine
 
 aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
 
@@ -167,11 +185,9 @@ aircraft_mass(aircraft)
 
 mass_coupling(aircraft)
 
+handling_quality_analysis(aircraft)
+
 nominal_mission(aircraft)
-
-mission_coupling(aircraft)
-
-handling_quality_adaptation(aircraft)
 
 performance_analysis(aircraft)
 

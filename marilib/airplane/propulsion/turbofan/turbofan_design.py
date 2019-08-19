@@ -7,7 +7,7 @@ Created on Thu Jan 24 23:22:21 2019
          ROCHES Pascal : portage to Python
 """
 
-import numpy
+from marilib import numpy
 
 
 #===========================================================================================================

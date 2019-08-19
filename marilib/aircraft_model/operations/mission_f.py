@@ -8,8 +8,8 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 
-import numpy
-from scipy.optimize import fsolve
+from marilib import numpy
+from marilib import fsolve
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth

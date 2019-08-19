@@ -71,13 +71,16 @@ from marilib.airplane.propulsion.propulsion_design \
 from marilib.aircraft_model.airplane.airplane_design \
     import eval_aerodynamics_design, eval_mass_coupling
 
+from marilib.aircraft_model.operations.mission \
+    import eval_nominal_mission, eval_cost_mission
+
 from marilib.processes.component \
-    import eval_nominal_mission, eval_mission_coupling, eval_take_off_performances, eval_landing_performances, \
-           eval_co2_metric, eval_cost_mission, eval_economics
+    import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
+           eval_co2_metric, eval_economics
 
 from marilib.processes.assembly \
-    import aircraft_initialize, eval_mass_breakdown, eval_climb_performances, \
-           eval_handling_quality_analysis, eval_payload_range_analysis
+    import aircraft_initialize, eval_mass_breakdown, eval_payload_range_analysis, \
+           eval_handling_quality_analysis
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -132,10 +135,6 @@ def nominal_mission(aircraft):
     return
 
 #-----------------------------------------------------------------------------------------------------------
-def mission_coupling(aircraft):
-    eval_mission_coupling(aircraft)
-
-#-----------------------------------------------------------------------------------------------------------
 def performance_analysis(aircraft):
     eval_take_off_performances(aircraft)
     eval_climb_performances(aircraft)
@@ -160,8 +159,8 @@ n_pax_ref = 150                     # Reference number of passengers
 design_range = unit.m_NM(3000)      # Design range
 cruise_mach = 0.78                  # Nominal cruise mach number
 
-propu_config = 1    # 1: turbofan, 2: partial turbo electric
-n_engine = 2        # Number of engine
+propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
+n_engine = 2           # Number of engine
 
 aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
 
@@ -187,8 +186,6 @@ mass_coupling(aircraft)
 handling_quality_analysis(aircraft)
 
 nominal_mission(aircraft)
-
-mission_coupling(aircraft)
 
 performance_analysis(aircraft)
 

@@ -7,7 +7,7 @@ Created on Thu Jan 24 23:22:21 2019
          PETEILH Nicolas : portage to Python
 """
 
-import numpy as np
+from marilib import numpy as np
 
 import matplotlib.pyplot as plt
 

@@ -6,7 +6,7 @@ Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry
 """
 
-import numpy
+from marilib import numpy
 from marilib.earth import environment_grad as earth
 
 disa = 15.

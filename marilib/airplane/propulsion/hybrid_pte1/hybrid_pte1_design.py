@@ -7,9 +7,9 @@ Created on Thu Jan 24 23:22:21 2019
          ROCHES Pascal : portage to Python
 """
 
-import numpy
+from marilib import numpy
 
-from scipy.optimize import fsolve
+from marilib import fsolve
 from marilib.tools.math import lin_interp_1d
 
 from marilib.earth import environment as earth

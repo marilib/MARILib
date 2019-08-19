@@ -7,7 +7,7 @@ Created on Thu Jan 24 23:22:21 2019
          PETEILH Nicolas : portage to Python
 """
 
-import numpy
+from marilib import numpy
 
 from marilib.tools import units as unit
 

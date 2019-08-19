@@ -10,7 +10,7 @@ Changed name from "solvers.py" to "component.py" on 21:05:2019
 """
 
 
-from scipy.optimize import fsolve
+from marilib import fsolve
 
 from marilib.tools.math import maximize_1d, trinome, vander3
 

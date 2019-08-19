@@ -8,7 +8,7 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 
-import numpy
+from marilib import numpy
 
 from marilib.earth import environment as earth
 

@@ -7,7 +7,7 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 
-from scipy.optimize import fsolve
+from marilib import fsolve
 
 from marilib.tools.math import maximize_1d
 
