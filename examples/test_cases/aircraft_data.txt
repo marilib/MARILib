@@ -1,5 +1,5 @@
 # MARILib configuration file
-# Created on 19-08-2019 18:04:38
+# Created on 20-08-2019 10:03:00
 [Aircraft]
     name = my_test_airplane
     [[design_driver]]
@@ -12,11 +12,11 @@
         altp_tofl = 0.0000 ft     #  Altitude for take off field length computation
         kvs1g_tofl = 1.1300 no_dim     #  Minimum allowed stall speed margin at take off
         req_tofl = 2000.0 m     #  Maximum take off field length at MTOW and given conditions
-        eff_tofl = 2131.8 m     #  Effective take off field length at MTOW and given condition
+        eff_tofl = 2099.6 m     #  Effective take off field length at MTOW and given condition
         eff_kvs1g = 1.1300 no_dim     #  Effective stall speed margin at take off
-        seg2_path = 0.04233 no_dim     #  Air path at 35 ft at take off
+        seg2_path = 0.04548 no_dim     #  Air path at 35 ft at take off
         limitation = 1.000 int     #  Active limitation, 0: error, 1: field length, 2: min climb path
-        perfo_constraint_1 = -0.06591 m     #  Constraint on Take Off Field Length, must be kept positive
+        perfo_constraint_1 = -0.04978 m     #  Constraint on Take Off Field Length, must be kept positive
         disa_app_speed = 0.0000 degK     #  Temperature shift for approach speed computation
         altp_app_speed = 0.0000 ft     #  Altitude for approach speed computation
         kvs1g_app_speed = 1.2300 no_dim     #  Minimum allowed stall speed margin at landing
@@ -26,30 +26,30 @@
         disa_oei = 15.000 degK     #  Temperature shift for One Engine Inoperative (OEI)
         req_oei_altp = 11000 ft     #  Required One Engine Inoperative (OEI) minimum altitude
         req_oei_path = 1.1000 %     #  Required minimum slope OEI at 95%MTOW, required altitude and MCN rating
-        eff_oei_path = 1.9297 %     #  Effective slope OEI at 95%MTOW, required altitude and MCN rating
-        oei_best_speed = 191.93 kt     #  Calibrated Air Speed (CAS) at which slope is maximum in given conditions
-        perfo_constraint_3 = 75.426 %     #  Constraint on One Engine Inoperative performance, must be kept positive
+        eff_oei_path = 1.8264 %     #  Effective slope OEI at 95%MTOW, required altitude and MCN rating
+        oei_best_speed = 184.83 kt     #  Calibrated Air Speed (CAS) at which slope is maximum in given conditions
+        perfo_constraint_3 = 66.040 %     #  Constraint on One Engine Inoperative performance, must be kept positive
     [[high_speed]]
         disa_climb = 15.000 degK     #  Temperature shift for Maximum climb speed computation
         req_vz_climb = 300.00 ft/min     #  Required minimum climb speed at 97%MTOW, nominal initial cruise altitude and MCL rating
-        eff_vz_climb = 716.93 ft/min     #  Effective climb speed at 97%MTOW, nominal initial cruise altitude and MCL rating
-        perfo_constraint_1 = 416.93 ft/min     #  Constraint on climb performance with MCL rating, must be kept positive
+        eff_vz_climb = 624.86 ft/min     #  Effective climb speed at 97%MTOW, nominal initial cruise altitude and MCL rating
+        perfo_constraint_1 = 324.86 ft/min     #  Constraint on climb performance with MCL rating, must be kept positive
         req_vz_cruise = 0.0000 ft/min     #  Required minimum climb speed at 97%MTOW, nominal initial cruise altitude and MCR rating
-        eff_vz_cruise = 321.42 ft/min     #  Effective climb speed at 97%MTOW, nominal initial cruise altitude and MCR rating
-        perfo_constraint_2 = 321.42 ft/min     #  Constraint on climb performance with MCR rating, must be kept positive
+        eff_vz_cruise = 229.35 ft/min     #  Effective climb speed at 97%MTOW, nominal initial cruise altitude and MCR rating
+        perfo_constraint_2 = 229.35 ft/min     #  Constraint on climb performance with MCR rating, must be kept positive
         req_toc_altp = 31000 ft     #  Targeted Top Of Climb Altitude (TOC) for Time To Climb (TTC) computation
         cas1_ttc = 250.00 kt     #  Calibrated Air Speed (CAS) below 10000ft for TTC computation
         cas2_ttc = 300.00 kt     #  Calibrated Air Speed (CAS) above 10000ft for TTC computation
         req_ttc = 25.000 min     #  Required maximum Time To Climb
-        eff_ttc = 20.397 min     #  Effective Time To Climb
-        perfo_constraint_3 = 0.003069 min     #  Constraint on time to climb, must be kept positive
+        eff_ttc = 21.616 min     #  Effective Time To Climb
+        perfo_constraint_3 = 0.002256 min     #  Constraint on time to climb, must be kept positive
     [[max_payload_mission]]
-        range = 2450.0 NM     #  Range of the max payload mission
+        range = 2461.5 NM     #  Range of the max payload mission
         payload = 18000 kg     #  Payload of the max payload mission
         tow = 76338 kg     #  Take off weight of the max payload mission
-        total_fuel = 14074 kg     #  Total fuel of the max payload mission
-        block_fuel = 11954 kg     #  Block fuel of the max payload mission
-        block_time = 6.2753 h     #  Block time of the max payload mission
+        total_fuel = 14443 kg     #  Total fuel of the max payload mission
+        block_fuel = 12274 kg     #  Block fuel of the max payload mission
+        block_time = 6.3031 h     #  Block time of the max payload mission
         block_enrg = None MWh     #  Block energy of the max payload mission
         total_enrg = None MWh     #  Total energy of the max payload mission
         req_battery_mass = None kg     #  Required battery mass of the max payload mission
@@ -57,28 +57,28 @@
         range = 3000.0 NM     #  Range of the nominal mission
         payload = 15000 kg     #  Payload of the nominal mission
         tow = 76338 kg     #  Take off weight of the nominal mission
-        total_fuel = 16497 kg     #  Total fuel of the nominal mission
-        block_fuel = 14324 kg     #  Block fuel of the nominal mission
+        total_fuel = 16861 kg     #  Total fuel of the nominal mission
+        block_fuel = 14641 kg     #  Block fuel of the nominal mission
         block_time = 7.6085 h     #  Block time of the nominal mission
         block_enrg = None MWh     #  Block energy of the nominal mission
         total_enrg = None MWh     #  Total energy of the nominal mission
         req_battery_mass = 0.0000 kg     #  Required battery mass of the nominal mission
     [[max_fuel_mission]]
-        range = 4591.1 NM     #  Range of the max fuel mission
-        payload = 9055.5 kg     #  Payload of the max fuel mission
+        range = 4469.9 NM     #  Range of the max fuel mission
+        payload = 9424.6 kg     #  Payload of the max fuel mission
         tow = 76338 kg     #  Take off weight of the max fuel mission
         total_fuel = 23019 kg     #  Total fuel of the max fuel mission
-        block_fuel = 20703 kg     #  Block fuel of the max fuel mission
-        block_time = 11.466 h     #  Block time of the max fuel mission
+        block_fuel = 20667 kg     #  Block fuel of the max fuel mission
+        block_time = 11.172 h     #  Block time of the max fuel mission
         block_enrg = None MWh     #  Block energy of the max fuel mission
         total_enrg = None MWh     #  Total energy of the max fuel mission
         req_battery_mass = None kg     #  Required battery mass of the max fuel mission
     [[zero_payload_mission]]
-        range = 5185.5 NM     #  Range of the zero payload mission
-        tow = 67282 kg     #  Take off weight of the zero payload mission
+        range = 5069.0 NM     #  Range of the zero payload mission
+        tow = 66913 kg     #  Take off weight of the zero payload mission
         total_fuel = 23019 kg     #  Total fuel of the zero payload mission
-        block_fuel = 20919 kg     #  Block fuel of the zero payload mission
-        block_time = 12.905 h     #  Block time of the zero payload mission
+        block_fuel = 20897 kg     #  Block fuel of the zero payload mission
+        block_time = 12.622 h     #  Block time of the zero payload mission
         block_enrg = None MWh     #  Block energy of the zero payload mission
         total_enrg = None MWh     #  Total energy of the zero payload mission
         req_battery_mass = None kg     #  Required battery mass of the zero payload mission
@@ -86,18 +86,18 @@
         disa = 0.0000 degK     #  Temperature shift of the cost evaluation mission
         range = 800.00 NM     #  Range of the cost evaluation mission
         payload = 15000 kg     #  Payload of the cost evaluation mission
-        tow = 64802 kg     #  Take off weight of the cost evaluation mission
-        total_fuel = 5538.1 kg     #  Total fuel of the cost evaluation mission
-        block_fuel = 3866.6 kg     #  Block fuel of the cost evaluation mission
+        tow = 64556 kg     #  Take off weight of the cost evaluation mission
+        total_fuel = 5661.5 kg     #  Total fuel of the cost evaluation mission
+        block_fuel = 3951.7 kg     #  Block fuel of the cost evaluation mission
         block_time = 2.2721 h     #  Block time of the cost evaluation mission
         block_enrg = None MWh     #  Block energy of the cost evaluation mission
         total_enrg = None MWh     #  Total energy of the cost evaluation mission
         req_battery_mass = 0.0000 kg     #  Required battery mass of the cost evaluation mission
-        block_CO2 = 12141 kg     #  Mass of carbon dioxide emitted during the mission
+        block_CO2 = 12408 kg     #  Mass of carbon dioxide emitted during the mission
     [[economics]]
         gear_price = 2.0872 M$     #  Price of landing gears
         engine_price = 12.997 M$     #  Price of one engine
-        airplane_price = 91.860 M$     #  Price of the airplane
+        airplane_price = 91.423 M$     #  Price of the airplane
         battery_price = 0.0000 k$     #  Total price of the battery (eventual)
         battery_mass_price = 20.000 $/kg     #  Mass price of battery (eventual)
         fuel_price = 2.0000 $/gal     #  Fuel price
@@ -108,24 +108,24 @@
         interest_rate = 4.0000 %     #  Interest rate
         utilisation = 1600.0 int     #  Number of flights per year
         cockpit_crew_cost = 1814.9 $/trip     #  Cockpit crew cost
-        cabin_crew_cost = 817.97 $/trip     #  Cabin crew cost
-        fuel_cost = 2544.1 $/trip     #  Fuel cost
+        cabin_crew_cost = 817.95 $/trip     #  Cabin crew cost
+        fuel_cost = 2600.1 $/trip     #  Fuel cost
         elec_cost = 0.0000 $/trip     #  Cost of electricity
         landing_fees = 661.09 $/trip     #  Landing fees
         navigation_fees = 563.44 $/trip     #  Navigation fees
         catering_cost = 460.50 $/trip     #  Catering cost
         pax_handling_cost = 300.00 $/trip     #  Pax handling cost
         ramp_handling_cost = 1305.0 $/trip     #  Ramp handling cost
-        standard_operating_cost = 7100.2 $/trip     #  Standard operating cost
-        cash_operating_cost = 9983.7 $/trip     #  Cash operating cost
-        total_investment = 94249421 $/trip     #  Total investment
-        interest = 914.65 $/trip     #  Interest
-        insurance = 200.94 $/trip     #  Insurance
-        depreciation = 3887.8 $/trip     #  Depreciation
-        direct_operating_cost = 14987 $/trip     #  Direct operating cost
+        standard_operating_cost = 7156.7 $/trip     #  Standard operating cost
+        cash_operating_cost = 10040 $/trip     #  Cash operating cost
+        total_investment = 93786427 $/trip     #  Total investment
+        interest = 910.16 $/trip     #  Interest
+        insurance = 199.99 $/trip     #  Insurance
+        depreciation = 3868.7 $/trip     #  Depreciation
+        direct_operating_cost = 15019 $/trip     #  Direct operating cost
     [[environmental_impact]]
         rgf = 90.689 m2     #  Reference Geometric Factor, close to cabin floor pressurized area (but higher)
-        CO2_metric = 0.0004192 kg/km/m0.48     #  Fuel efficiency metric
+        CO2_metric = 0.0004283 kg/km/m0.48     #  Fuel efficiency metric
         CO2_index = 3.1400 g/kg     #  Mass of carbon dioxide emitted per kg of fuel
         H2O_index = 1.2900 g/kg     #  Mass of water emitted per kg of fuel
         SO2_index = 0.0008000 g/kg     #  Mass of sulfur dioxide emitted per kg of fuel
@@ -137,8 +137,8 @@
         nitric_acid_index = 0.0002000 g/kg     #  Mass of nitric acid emitted per kg of fuel
         soot_index = 2500000000000 int     #  Number of soot particle emitted per kg of fuel
     [[aerodynamics]]
-        cruise_lod_max = 17.725 no_dim     #  Maximum lift over drag ratio in cruise condition
-        cz_cruise_lod_max = 0.6718 no_dim     #  Lift coefficient corresponding to maximum lift over drag
+        cruise_lod_max = 17.535 no_dim     #  Maximum lift over drag ratio in cruise condition
+        cz_cruise_lod_max = 0.6779 no_dim     #  Lift coefficient corresponding to maximum lift over drag
         hld_conf_clean = 0.0000 no_dim     #  High lift device setting in clean configuration (0 by definition)
         cz_max_clean = 1.4500 no_dim     #  Maximum lift coefficient in clean wing configuration
         hld_conf_to = 0.3000 no_dim     #  High lift device setting in take off configuration (0 < hld_conf < 0,6)
@@ -146,53 +146,53 @@
         hld_conf_ld = 1.000 no_dim     #  High lift device setting in landing configuration (nominal value is 1)
         cz_max_ld = 3.0000 no_dim     #  Maximum lift coefficient in landing configuration
     [[propulsion]]
-        architecture = PTE1 string     #  Propulsion architecture, TF:turbofan, PTE1:partial turbo electric n°1, EF1, electric with batteries
+        architecture = TF string     #  Propulsion architecture, TF:turbofan, PTE1:partial turbo electric n°1, EF1, electric with batteries
         n_engine = 2.0000 int     #  Number of main engines
         fuel_type = Kerosene string     #  Type of fuel, Kerosene, Hydrogene, Methane, Battery
         battery_energy_density = 0.0000 kWh/kg     #  Battery energy density
-        reference_thrust_effective = 11815 daN     #  Effective reference_thrust computed as max thrust(Mach = 0.25, ISA+15, Sea Level) / 0.8
-        sfc_cruise_ref = 0.5338 kg/daN/h     #  Specific Fuel Consumption in cruise condition, isa, ref_cruise_altp, cruise_mach
-        sec_cruise_ref = 8404.6 kW/daN/h     #  Specific Energy Consumption of the electric chain (if any) in cruise condition, isa, ref_cruise_altp, cruise_mach
+        reference_thrust_effective = 11920 daN     #  Effective reference_thrust computed as max thrust(Mach = 0.25, ISA+15, Sea Level) / 0.8
+        sfc_cruise_ref = 0.5399 kg/daN/h     #  Specific Fuel Consumption in cruise condition, isa, ref_cruise_altp, cruise_mach
+        sec_cruise_ref = 0.0000 kW/daN/h     #  Specific Energy Consumption of the electric chain (if any) in cruise condition, isa, ref_cruise_altp, cruise_mach
         bli_effect = 1.000 int     #  BLI effect switch, 0: without, 1: with
-        bli_r_thrust_factor = 1.2100 no_dim     #  Thrust factor at constant power due to boundary layer ingestion of the e-fan in cruise condition
-        bli_thrust_factor = 1.000 no_dim     #  Thrust factor at constant power due to boundary layer ingestion of other fans in cruise condition
+        bli_r_thrust_factor = None no_dim     #  Thrust factor at constant power due to boundary layer ingestion of the e-fan in cruise condition
+        bli_thrust_factor = None no_dim     #  Thrust factor at constant power due to boundary layer ingestion of other fans in cruise condition
         rating_code = "(MTO, MCN, MCL, MCR, FID) int"     #  Array of rating codes [0:MTO, 1:MCN, 2:MCL, 3:MCR, 4:FID]
         flight_data = "{disa: {MTO: 15.000, MCN: 0.0000, MCL: 0.0000, MCR: 0.0000, FID: 0.0000}, altp: {MTO: 0.0000, MCN: 3352.8, MCL: 9448.8, MCR: 10668, FID: 10668}, mach: {MTO: 0.2500, MCN: 0.3900, MCL: 0.7800, MCR: 0.7800, FID: 0.7800}, nei: {MTO: 0.0000, MCN: 1.000, MCL: 0.0000, MCR: 0.0000, FID: 0.0000}} dict"     #  Dictionary of flying conditions for each rating {'disa':array, 'altp':array, 'mach':array, 'nei':array}
-        mto_thrust_ref = 9451.6 daN     #  Turbofan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25
-        mcn_thrust_ref = 6073.6 daN     #  Turbofan thrust in maxi continuous rating (one engine), Required ceiling altitude, ISA, cruise Mach
-        mcl_thrust_ref = 2867.4 daN     #  Turbofan thrust in max climb rating (one engine), Required Top of Climb altitude, ISA, cruise Mach
-        mcr_thrust_ref = 2298.2 daN     #  Turbofan thrust in max cruise rating (one engine), Reference cruise altitude, ISA, cruise Mach
-        fid_thrust_ref = 406.59 daN     #  Turbofan thrust in flight idle rating (one engine), Reference cruise altitude, ISA, cruise Mach
-        mass = 8834.1 kg     #  Total mass of the propulsion system (pylons, nacelles, engines, ...)
-        c_g = 17.754 m     #  Global CG position for the whole propulsion system (pylons, nacelles, engines, ...)
+        mto_thrust_ref = 9536.2 daN     #  Turbofan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25
+        mcn_thrust_ref = 6086.7 daN     #  Turbofan thrust in maxi continuous rating (one engine), Required ceiling altitude, ISA, cruise Mach
+        mcl_thrust_ref = 2836.3 daN     #  Turbofan thrust in max climb rating (one engine), Required Top of Climb altitude, ISA, cruise Mach
+        mcr_thrust_ref = 2272.2 daN     #  Turbofan thrust in max cruise rating (one engine), Reference cruise altitude, ISA, cruise Mach
+        fid_thrust_ref = 405.74 daN     #  Turbofan thrust in flight idle rating (one engine), Reference cruise altitude, ISA, cruise Mach
+        mass = 8465.0 kg     #  Total mass of the propulsion system (pylons, nacelles, engines, ...)
+        c_g = 16.904 m     #  Global CG position for the whole propulsion system (pylons, nacelles, engines, ...)
     [[weights]]
-        mwe = 39300 kg     #  Manufacturer Weight Empty
-        owe = 44264 kg     #  Operating Weight Empty (= mwe + m_op_item + m_cont_pallet)
+        mwe = 38931 kg     #  Manufacturer Weight Empty
+        owe = 43895 kg     #  Operating Weight Empty (= mwe + m_op_item + m_cont_pallet)
         mzfw = 59169 kg     #  Maximum Zero Fuel Weight (= owe + n_pax_ref.m_pax_max)
-        mass_constraint_1 = -3094.3 kg     #  Constraint on MZFW, must be kept positive
+        mass_constraint_1 = -2725.2 kg     #  Constraint on MZFW, must be kept positive
         mlw = 63311 kg     #  Maximum Landing Weight (close or equal to 1,07mzfw except for small aircraft where mlw = mtow)
         mass_constraint_2 = 0.0000 kg     #  Constraint on MLW, must be kept positive
         mtow = 76338 kg     #  Maximum Take Off Weight
-        mass_constraint_3 = 576.94 kg     #  Constraint on MTOW, must be kept positive
+        mass_constraint_3 = 581.96 kg     #  Constraint on MTOW, must be kept positive
         mfw = 23019 kg     #  Maximum Fuel Weight
         battery_in_owe = 0.0000 kg     #  Battery mass in OWE
     [[center_of_gravity]]
         cg_range_optimization = 0.0000 int     #  Wing position, HTP area and VTP area optimized according to HQ criteria, 0: no, 1:yes
-        mwe = 19.039 m     #  Longitudinal position of MWE CG
-        owe = 19.020 m     #  Longitudinal position of OWE CG
+        mwe = 18.857 m     #  Longitudinal position of MWE CG
+        owe = 18.859 m     #  Longitudinal position of OWE CG
         battery = 0.0000 m     #  Longitudinal position of battery CG
-        max_fwd_mass = 66338 kg     #  Aircraft mass at maximum forward CG
-        max_fwd_req_cg = 17.592 m     #  Required maximum forward aircraft CG
-        max_fwd_trim_cg = 17.534 m     #  Maximum trim-able forward CG
-        cg_constraint_1 = 0.05806 m     #  Forward CG constraint n°1, must be kept positive
-        max_bwd_mass = 68608 kg     #  Aircraft mass at maximum backward payload CG
-        max_bwd_req_cg = 19.611 m     #  Required maximum backward aircraft CG
+        max_fwd_mass = 65969 kg     #  Aircraft mass at maximum forward CG
+        max_fwd_req_cg = 17.476 m     #  Required maximum forward aircraft CG
+        max_fwd_trim_cg = 17.546 m     #  Maximum trim-able forward CG
+        cg_constraint_1 = -0.06995 m     #  Forward CG constraint n°1, must be kept positive
+        max_bwd_mass = 68239 kg     #  Aircraft mass at maximum backward payload CG
+        max_bwd_req_cg = 19.510 m     #  Required maximum backward aircraft CG
         max_bwd_stab_cg = 19.629 m     #  Maximum backward CG
-        cg_constraint_2 = 0.01813 m     #  Backward CG constraint n°1, must be kept positive
-        max_bwd_oei_mass = 54157 kg     #  Aircraft mass for OEI control criterion
-        max_bwd_oei_req_cg = 19.611 m     #  Required backward CG at max_bwd_oei_mass
-        max_bwd_oei_cg = 20.160 m     #  Maximum backward CG according to OEI control
-        cg_constraint_3 = 0.5489 m     #  Backward CG constraint n°2, must be kept positive
+        cg_constraint_2 = 0.1190 m     #  Backward CG constraint n°1, must be kept positive
+        max_bwd_oei_mass = 53844 kg     #  Aircraft mass for OEI control criterion
+        max_bwd_oei_req_cg = 19.510 m     #  Required backward CG at max_bwd_oei_mass
+        max_bwd_oei_cg = 18.528 m     #  Maximum backward CG according to OEI control
+        cg_constraint_3 = -0.9821 m     #  Backward CG constraint n°2, must be kept positive
     [[cabin]]
         n_pax_ref = 150.00 int     #  Reference Number of passengers (often 2 class layout)
         n_aisle = 1.000 int     #  Number of aisle in economic section
@@ -317,23 +317,23 @@
         fuel_max_bwd_cg = 17.984 m     #  Max backward fuel cg
     [[systems]]
         mass = 4391.3 kg     #  Mass of all airplane systems
-        c_g = 19.981 m     #  Longitudinal position of the system CG
+        c_g = 19.896 m     #  Longitudinal position of the system CG
     [[turbofan_pylon]]
         mass = 767.29 kg     #  Equipped mass of the pylons
-        c_g = 16.917 m     #  Longitudinal position of the CG of the pylons
+        c_g = 17.122 m     #  Longitudinal position of the CG of the pylons
     [[turbofan_nacelle]]
         n_engine = 2.0000 int     #  Number of turbofan
         attachment = 1.000 int     #  Nacelle attachment (1= under wing, 2= rear fuselage)
-        rear_nacelle = 1.000 int     #  Rear nacelle (0= no, 1= yes)
-        width = 2.7070 m     #  Maximum width of the nacelles
-        length = 4.5638 m     #  Length of the fan cowl
-        x_ext = 13.494 m     #  Longitudinal position of the center of the air inlet of the external nacelle
-        y_ext = 7.1645 m     #  Span wise position of the center of the air inlet of the external nacelle
-        z_ext = -2.9777 m     #  Vertical position of the center of the air inlet of the external nacelle
+        rear_nacelle = 0.0000 int     #  Rear nacelle (0= no, 1= yes)
+        width = 2.9465 m     #  Maximum width of the nacelles
+        length = 4.7886 m     #  Length of the fan cowl
+        x_ext = 13.530 m     #  Longitudinal position of the center of the air inlet of the external nacelle
+        y_ext = 7.5238 m     #  Span wise position of the center of the air inlet of the external nacelle
+        z_ext = -3.0660 m     #  Vertical position of the center of the air inlet of the external nacelle
         x_int = None m     #  Longitudinal position of the center of the air inlet of the internal nacelle
         y_int = None m     #  Span wise position of the center of the air inlet of the internal nacelle
         z_int = None m     #  Vertical position of the center of the air inlet of the internal nacelle
-        net_wetted_area = 91.987 m2     #  Total net wetted area of the nacelles (fan cowls)
+        net_wetted_area = 101.34 m2     #  Total net wetted area of the nacelles (fan cowls)
         efficiency_fan = 0.9500 no_dim     #  Fan efficiency for turbofan (capability to turn shaft power into kinetic energy)
         efficiency_prop = 0.8200 no_dim     #  Propeller like Fan+Cowl efficiency for turbofan (FanThrust.Vair)/(Shaft power)
         hub_width = None m     #  Diameter of the hub of the turbofan nacelle (for pusher fan only)
@@ -342,8 +342,8 @@
         nozzle_area = None m2     #  Exhaust nozzle area of the turbofan nacelle
         body_length = None m     #  Length of the body in front of the turbofan nacelle
         bnd_layer = None array     #  Boundary layer thickness law in front of the e-fan, 2d array
-        mass = 7450.2 kg     #  Equipped mass of the nacelles (including engine mass)
-        c_g = 16.689 m     #  Longitudinal position of the CG of the nacelles
+        mass = 7697.7 kg     #  Equipped mass of the nacelles (including engine mass)
+        c_g = 16.882 m     #  Longitudinal position of the CG of the nacelles
     [[turbofan_engine]]
         reference_thrust = 12376 daN     #  Design Reference Thrust of the engines
         bpr = 9.0000 no_dim     #  By Pass Ratio of the turbofan
@@ -351,14 +351,14 @@
         core_thrust_ratio = 0.1300 no_dim     #  Fraction of the total thrust of a turbofan which is due to the core (typically between 10% & 16% for BPR>5)
         core_width_ratio = 0.7000 no_dim     #  Fraction of the total nacelle diameter which is taken by the core
         core_weight_ratio = 0.1300 no_dim     #  Fraction of the total nacelle mass which is taken by the core
-        kfn_off_take = 0.9453 no_dim     #  reference_thrust factor due to power off take (if any)
+        kfn_off_take = None no_dim     #  reference_thrust factor due to power off take (if any)
     [[rear_electric_nacelle]]
-        width = 1.4958 m     #  Maximum width of the electric fan cowl
-        length = 2.2437 m     #  Length of the electric fan cowl
-        x_axe = 37.551 m     #  Longitudinal position of the center of the electric nacelle air inlet
-        y_axe = 0.0000 m     #  Span wise position of the center of the electric nacelle air inlet
-        z_axe = 1.4985 m     #  Vertical position of the center of the electric nacelle air inlet
-        net_wetted_area = 10.544 m2     #  Total net wetted area of the electric fan nacelle (fan cowl)
+        width = None m     #  Maximum width of the electric fan cowl
+        length = None m     #  Length of the electric fan cowl
+        x_axe = None m     #  Longitudinal position of the center of the electric nacelle air inlet
+        y_axe = None m     #  Span wise position of the center of the electric nacelle air inlet
+        z_axe = None m     #  Vertical position of the center of the electric nacelle air inlet
+        net_wetted_area = None m2     #  Total net wetted area of the electric fan nacelle (fan cowl)
         efficiency_fan = 0.9500 no_dim     #  Fan efficiency for turbofan (capability to turn shaft power into kinetic energy)
         efficiency_prop = 0.8200 no_dim     #  Propeller like Fan+Cowl efficiency for turbofan (FanThrust.Vair)/(Shaft power)
         motor_efficiency = 0.9800 no_dim     #  Motor efficiency
@@ -366,41 +366,35 @@
         controller_pw_density = 20.000 kW/kg     #  Power density of controller
         motor_pw_density = 10.000 kW/kg     #  Power density of electric motor
         nacelle_pw_density = 5.0000 kW/kg     #  Power density of e-fan nacelle and mountings
-        hub_width = 0.5000 m     #  Diameter of the hub of the electric nacelle
-        fan_width = 1.2465 m     #  Diameter of the fan of the electric nacelle
-        nozzle_width = 0.9083 m     #  Diameter of the nozzle of the electric nacelle
-        nozzle_area = 0.6480 m2     #  Exhaust nozzle area of the electric nacelle
-        body_length = 37.252 m     #  Length of the body behind the electric nacelle
-        bnd_layer = '''[[0.001000 0.007698] [0.06346 0.3591] [0.1259 0.6044]
- [0.1884 0.8063] [0.2508 0.9830] [0.3133 1.1428] [0.3758 1.2904]
- [0.4382 1.4285] [0.5007 1.5592] [0.5631 1.6838] [0.6256 1.8033]
- [0.6880 1.9184] [0.7505 2.0298] [0.8130 2.1380] [0.8754 2.2432]
- [0.9379 2.3459] [1.0003 2.4464] [1.0628 2.5447] [1.1252 2.6413]
- [1.1877 2.7361] [1.2502 2.8294] [1.3126 2.9212] [1.3751 3.0118]
- [1.4375 3.1012] [0.0000 0.0000]] array'''     #  Boundary layer thickness law in front of the e-fan, 2d array
-        mass = 350.00 kg     #  Equipped mass of the nacelle of the electric fan (including the controller, motor and nacelle)
-        c_g = 38.374 m     #  Longitudinal position of the CG of the electric nacelle
+        hub_width = None m     #  Diameter of the hub of the electric nacelle
+        fan_width = None m     #  Diameter of the fan of the electric nacelle
+        nozzle_width = None m     #  Diameter of the nozzle of the electric nacelle
+        nozzle_area = None m2     #  Exhaust nozzle area of the electric nacelle
+        body_length = None m     #  Length of the body behind the electric nacelle
+        bnd_layer = None array     #  Boundary layer thickness law in front of the e-fan, 2d array
+        mass = None kg     #  Equipped mass of the nacelle of the electric fan (including the controller, motor and nacelle)
+        c_g = None m     #  Longitudinal position of the CG of the electric nacelle
     [[rear_electric_engine]]
         mto_r_shaft_power = 1000.0 kW     #  E-fan shaft power in take off rating (one engine), Sea Level, ISA+15, Mach 0,25
-        mto_r_fan_thrust = 874.98 daN     #  E-fan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25
+        mto_r_fan_thrust = None daN     #  E-fan thrust in take off rating (one engine), Sea Level, ISA+15, Mach 0,25
         mcn_r_shaft_power = 1000.0 kW     #  E-fan shaft power in maxi continuous rating (one engine), required ceiling altitude, ISA, cruise Mach
-        mcn_r_fan_thrust = 700.95 daN     #  E-fan thrust in maxi continuous rating (one engine), required ceiling altitude, ISA, cruise Mach
+        mcn_r_fan_thrust = None daN     #  E-fan thrust in maxi continuous rating (one engine), required ceiling altitude, ISA, cruise Mach
         mcl_r_shaft_power = 1000.0 kW     #  E-fan shaft power in max climb rating (one engine), required Top of Climb altitude, ISA, cruise Mach
-        mcl_r_fan_thrust = 449.18 daN     #  E-fan thrust in max climb rating (one engine), required Top of Climb altitude, ISA, cruise Mach
+        mcl_r_fan_thrust = None daN     #  E-fan thrust in max climb rating (one engine), required Top of Climb altitude, ISA, cruise Mach
         mcr_r_shaft_power = 1000.0 kW     #  E-fan shaft power in max cruise rating (one engine), reference cruise altitude, ISA, cruise Mach
-        mcr_r_fan_thrust = 446.00 daN     #  E-fan thrust in max cruise rating (one engine), reference cruise altitude, ISA, cruise Mach
+        mcr_r_fan_thrust = None daN     #  E-fan thrust in max cruise rating (one engine), reference cruise altitude, ISA, cruise Mach
         fid_r_shaft_power = 10.000 kW     #  E-fan shaft power in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach
-        fid_r_fan_thrust = 5.6350 daN     #  E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach
+        fid_r_fan_thrust = None daN     #  E-fan thrust in flight idle rating (one engine), reference cruise altitude, ISA, cruise Mach
     [[pte1_power_elec_chain]]
-        max_power = 1000.0 kW     #  E-fan motor maximum power
-        max_power_rating = 0.0000 int     #  Engine rating of e-fan motor maximum power
+        max_power = None kW     #  E-fan motor maximum power
+        max_power_rating = None int     #  Engine rating of e-fan motor maximum power
         overall_efficiency = 0.9000 no_dim     #  Power efficiency of the electric chain
         generator_pw_density = 10.000 kW/kg     #  Power density of electric generation
         rectifier_pw_density = 20.000 kW/kg     #  Power density of rectifiers
         wiring_pw_density = 20.000 kW/kg     #  Power density of wiring
         cooling_pw_density = 15.000 kW/kg     #  Power density of cooling system
-        mass = 266.67 kg     #  Mass of the electric chain (generator, rectifier, wires, cooling)
-        c_g = 22.858 m     #  Longitudinal position of the CG of the electric chain
+        mass = None kg     #  Mass of the electric chain (generator, rectifier, wires, cooling)
+        c_g = None m     #  Longitudinal position of the CG of the electric chain
     [[pte1_battery]]
         strategy = 0.0000 int     #  Battery sizing strategy, 0= no battery, 1= power_feed & energy_cruise driven, 2= battery mass driven
         power_feed = 0.0000 kW     #  Power delivered to e-fan(s) at take off and(or) climb during a total of time_feed
@@ -409,7 +403,7 @@
         energy_density = 0.5000 kWh/kg     #  Battery energy density
         power_density = 1.000 kW/kg     #  Battery power density (capability to release power per mass unit
         mass = None kg     #  Total battery mass
-        c_g = 18.626 m     #  Global CG of batteries
+        c_g = None m     #  Global CG of batteries
     [[electrofan_pylon]]
         mass = None kg     #  Equipped mass of the pylons
         c_g = None m     #  Longitudinal position of the CG of the pylons

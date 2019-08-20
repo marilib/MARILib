@@ -39,7 +39,7 @@ print("Initialization : done")
 
 # Solve the geometric coupling between airframe and engines
 #------------------------------------------------------------------------------------------------------
-run.eval_aircraft_geom_analysis(aircraft)
+run.eval_geometrical_analysis(aircraft)
 
 # Estimate all mass and CGs with or without Mass-Mission adaptation
 #------------------------------------------------------------------------------------------------------

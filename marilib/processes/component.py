@@ -10,9 +10,7 @@ Changed name from "solvers.py" to "component.py" on 21:05:2019
 """
 
 
-from marilib import fsolve
-
-from marilib.tools.math import maximize_1d, trinome, vander3
+from marilib.tools import units as unit
 
 from marilib.aircraft_model.operations import other_performances as perfo, \
                                               environmental_impact as environ, \
@@ -39,8 +37,8 @@ def eval_climb_performances(aircraft):
 
     aircraft.low_speed.perfo_constraint_3 = (oei_path - aircraft.low_speed.req_oei_path) / aircraft.low_speed.req_oei_path
 
-    aircraft.high_speed.perfo_constraint_1 = vz_clb - aircraft.high_speed.req_vz_climb
-    aircraft.high_speed.perfo_constraint_2 = vz_crz - aircraft.high_speed.req_vz_cruise
+    aircraft.high_speed.perfo_constraint_1 = (vz_clb - aircraft.high_speed.req_vz_climb) / unit.mps_ftpmin(300.)
+    aircraft.high_speed.perfo_constraint_2 = (vz_crz - aircraft.high_speed.req_vz_cruise) / unit.mps_ftpmin(300.)
 
     # Time to climb to requested altitude
     #------------------------------------------------------------------------------------------------------

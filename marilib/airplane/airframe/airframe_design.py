@@ -298,6 +298,23 @@ def eval_vtp_statistical_sizing(aircraft):
 
 
 #===========================================================================================================
+def eval_vtp_constraint(aircraft):
+    """
+    VTP coupling relations
+    This relation is put apart from vtp_design because GEMS does not manage functions that compute their own input
+    """
+    nacelle = aircraft.turbofan_nacelle
+    engine = aircraft.turbofan_engine
+    vtp = aircraft.vertical_tail
+
+    vtp_area = vtp.volume*(1.e-3*engine.reference_thrust*nacelle.y_ext)/vtp.lever_arm
+
+    vtp.vtp_sizing_constraint_1 = (vtp.area - vtp_area) / vtp.area
+
+    return
+
+
+#===========================================================================================================
 def eval_vtp_mass(aircraft):
     """
     VTP mass & CG estimation
@@ -395,6 +412,22 @@ def eval_htp_statistical_sizing(aircraft):
     htp = aircraft.horizontal_tail
 
     htp.area = htp.volume*(wing.area*wing.mac/htp.lever_arm)
+
+    return
+
+
+#===========================================================================================================
+def eval_htp_constraint(aircraft):
+    """
+    HTP coupling relations
+    This relation is put apart from htp_design because GEMS does not manage functions that compute their own input
+    """
+    wing = aircraft.wing
+    htp = aircraft.horizontal_tail
+
+    htp_area = htp.volume*(wing.area*wing.mac/htp.lever_arm)
+
+    htp.htp_sizing_constraint_1 = (htp.area - htp_area) / htp.area
 
     return
 

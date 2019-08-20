@@ -227,7 +227,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
 
 #===========================================================================================================
-def eval_aircraft_geom_analysis(aircraft):
+def eval_geometrical_analysis(aircraft):
     """
     Perform geometrical analysis
     Do not solve any coupling
@@ -275,11 +275,12 @@ def eval_tail_statistical_sizing(aircraft):
         airframe.eval_wing_design(ac)
         airframe.eval_vtp_design(ac)
         airframe.eval_htp_design(ac)
-        airframe.eval_vtp_statistical_sizing(ac)
-        airframe.eval_htp_statistical_sizing(ac)
 
-        y_out = np.array([x_in[0] - ac.horizontal_tail.area,
-                          x_in[1] - ac.vertical_tail.area])
+        airframe.eval_vtp_constraint(ac)
+        airframe.eval_htp_constraint(ac)
+
+        y_out = np.array([ac.horizontal_tail.htp_sizing_constraint_1,
+                          ac.vertical_tail.vtp_sizing_constraint_1])
 
         return y_out
     #-----------------------------------------------------------------------------------------------------------
@@ -376,11 +377,11 @@ def eval_aircraft_statistical_pre_design(aircraft):
 
         eval_aircraft_pre_design(ac)
 
-        airframe.eval_vtp_statistical_sizing(ac)
-        airframe.eval_htp_statistical_sizing(ac)
+        airframe.eval_vtp_constraint(ac)
+        airframe.eval_htp_constraint(ac)
 
-        y_out = np.array([x_in[0] - ac.horizontal_tail.area,
-                          x_in[1] - ac.vertical_tail.area])
+        y_out = np.array([ac.horizontal_tail.htp_sizing_constraint_1,
+                          ac.vertical_tail.vtp_sizing_constraint_1])
 
         return y_out
     #-----------------------------------------------------------------------------------------------------------
@@ -642,7 +643,7 @@ def eval_handling_quality_analysis(aircraft):
 
     c_g.max_fwd_trim_cg = cg_max_fwd_stall         # Forward cg limit
 
-    c_g.cg_constraint_1 = c_g.max_fwd_req_cg - c_g.max_fwd_trim_cg
+    c_g.cg_constraint_1 = (c_g.max_fwd_req_cg - c_g.max_fwd_trim_cg) / c_g.max_fwd_req_cg
 
     # Backward limit : static stability
     #------------------------------------------------------------------------------------------------------
@@ -652,14 +653,14 @@ def eval_handling_quality_analysis(aircraft):
 
     c_g.max_bwd_stab_cg = cg_max_bwd_stab          # Backward cg limit
 
-    c_g.cg_constraint_2 = c_g.max_bwd_stab_cg - c_g.max_bwd_req_cg
+    c_g.cg_constraint_2 = (c_g.max_bwd_stab_cg - c_g.max_bwd_req_cg) / c_g.max_bwd_req_cg
 
     # Vertical tail sizing
     #------------------------------------------------------------------------------------------------------
 
     h_q.vertical_tail_sizing(aircraft)
 
-    c_g.cg_constraint_3 = c_g.max_bwd_oei_cg - c_g.max_bwd_oei_req_cg
+    c_g.cg_constraint_3 = (c_g.max_bwd_oei_cg - c_g.max_bwd_oei_req_cg) / c_g.max_bwd_oei_req_cg
 
     return
 

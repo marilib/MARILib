@@ -113,11 +113,11 @@ class CharacteristicWeight(object):
     "mwe":{"unit":"kg", "om":1.e4, "txt":"Manufacturer Weight Empty"},
     "owe":{"unit":"kg", "om":1.e4, "txt":"Operating Weight Empty (= mwe + m_op_item + m_cont_pallet)"},
     "mzfw":{"unit":"kg", "om":1.e4, "txt":"Maximum Zero Fuel Weight (= owe + n_pax_ref.m_pax_max)"},
-    "mass_constraint_1":{"unit":"kg", "om":1.e4, "txt":"Constraint on MZFW, must be kept positive"},
+    "mass_constraint_1":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on MZFW, must be kept positive"},
     "mlw":{"unit":"kg", "om":1.e4, "txt":"Maximum Landing Weight (close or equal to 1,07mzfw except for small aircraft where mlw = mtow)"},
-    "mass_constraint_2":{"unit":"kg", "om":1.e4, "txt":"Constraint on MLW, must be kept positive"},
+    "mass_constraint_2":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on MLW, must be kept positive"},
     "mtow":{"unit":"kg", "om":1.e4, "txt":"Maximum Take Off Weight"},
-    "mass_constraint_3":{"unit":"kg", "om":1.e4, "txt":"Constraint on MTOW, must be kept positive"},
+    "mass_constraint_3":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on MTOW, must be kept positive"},
     "mfw":{"unit":"kg", "om":1.e4, "txt":"Maximum Fuel Weight"},
     "battery_in_owe":{"unit":"kg", "om":1.e4, "txt":"Battery mass in OWE"}
     }
@@ -155,15 +155,15 @@ class CenterOfGravity(object):
     "max_fwd_mass":{"unit":"kg", "om":1.e4, "txt":"Aircraft mass at maximum forward CG"},
     "max_fwd_req_cg":{"unit":"m", "om":1.e1, "txt":"Required maximum forward aircraft CG"},
     "max_fwd_trim_cg":{"unit":"m", "om":1.e1, "txt":"Maximum trim-able forward CG"},
-    "cg_constraint_1":{"unit":"m", "om":1.e0, "txt":"Forward CG constraint n°1, must be kept positive"},
+    "cg_constraint_1":{"unit":"no_dim", "om":1.e0, "txt":"Forward CG constraint n°1, must be kept positive"},
     "max_bwd_mass":{"unit":"kg", "om":1.e4, "txt":"Aircraft mass at maximum backward payload CG"},
     "max_bwd_req_cg":{"unit":"m", "om":1.e1, "txt":"Required maximum backward aircraft CG"},
     "max_bwd_stab_cg":{"unit":"m", "om":1.e1, "txt":"Maximum backward CG"},
-    "cg_constraint_2":{"unit":"m", "om":1.e0, "txt":"Backward CG constraint n°1, must be kept positive"},
+    "cg_constraint_2":{"unit":"no_dim", "om":1.e0, "txt":"Backward CG constraint n°1, must be kept positive"},
     "max_bwd_oei_mass":{"unit":"kg", "om":1.e4, "txt":"Aircraft mass for OEI control criterion"},
     "max_bwd_oei_req_cg":{"unit":"m", "om":1.e1, "txt":"Required backward CG at max_bwd_oei_mass"},
     "max_bwd_oei_cg":{"unit":"m", "om":1.e1, "txt":"Maximum backward CG according to OEI control"},
-    "cg_constraint_3":{"unit":"m", "om":1.e0, "txt":"Backward CG constraint n°2, must be kept positive"}
+    "cg_constraint_3":{"unit":"no_dim", "om":1.e0, "txt":"Backward CG constraint n°2, must be kept positive"}
     }
     def __init__(self, cg_range_optimization = None,
                        mwe = None,

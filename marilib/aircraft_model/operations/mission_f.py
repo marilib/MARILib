@@ -164,7 +164,7 @@ def eval_nominal_f_mission(aircraft):
 
     mtow = owe + payload + total_fuel
 
-    aircraft.weights.mass_constraint_3 = aircraft.weights.mtow - mtow
+    aircraft.weights.mass_constraint_3 = (aircraft.weights.mtow - mtow) / aircraft.weights.mtow
 
     return
 

@@ -27,7 +27,7 @@ cruise_mach = 0.78
 #------------------------------------------------------------------------------------------------------
 run.aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propulsive_architecture, number_of_engine)
 
-run.eval_aircraft_geom_analysis(aircraft)
+run.eval_geometrical_analysis(aircraft)
 
 run.eval_mass_breakdown(aircraft)
 

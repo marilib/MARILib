@@ -100,7 +100,7 @@ def eval_aircraft_weights(aircraft):
     else:
         mzfw = weights.owe + payload.maximum
 
-    weights.mass_constraint_1 = weights.mzfw - mzfw
+    weights.mass_constraint_1 = (weights.mzfw - mzfw) / weights.mzfw
 
     if (propulsion.fuel_type=="Battery"):
         mlw = weights.mtow
@@ -110,7 +110,7 @@ def eval_aircraft_weights(aircraft):
         else:
             mlw = weights.mtow
 
-    weights.mass_constraint_2 = weights.mlw - mlw
+    weights.mass_constraint_2 = (weights.mlw - mlw) / weights.mlw
 
     # WARNING : for EF1 architecture, MFW corresponds to max battery weight
     weights.mfw = min(tanks.mfw_volume_limited, weights.mtow - weights.owe)

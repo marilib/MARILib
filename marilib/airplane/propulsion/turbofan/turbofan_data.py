@@ -8,7 +8,7 @@ Created on Thu Jan 24 23:22:21 2019
 
 The TF architecture corresponds to the following features :
 
-- Twin or quad turbofan, in case of twin, possibility to attached engine on rear fuselage
+- Twin or quad turbofan. In case of twin, possibility to attached engine on rear fuselage
 - Tube & wing architecture with possibility to attach the wing on top of the fuselage
 - Classical tail planes with the possibility to attach horizontal plane on top of the vertical tail
 """

@@ -13,7 +13,7 @@ Changes from version 1.0.0 are :
 
 5- Name of functions "eval_vtp_coupling" and "eval_htp_coupling" changed resp. to "eval_vtp_statistical_sizing" and "eval_htp_statistical_sizing"
 
-6- Add function "eval_aircraft_geom_analysis" in assembly.py
+6- Add function "eval_geometrical_analysis" in assembly.py
 
 7- Suppress propulsive_architecture as input of Aircraft() (bug)
 
