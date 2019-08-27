@@ -76,25 +76,6 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
 
 #===========================================================================================================
-def turbofan_nacelle_drag(aircraft,nacelle,Re,Mach):
-    """
-    Turbofan nacelle drag
-    WARNING : All nacelle drag returned
-    """
-
-    wing = aircraft.wing
-
-    fac = (1. + 0.126*Mach**2)
-
-    # All nacelle drag
-    nac_nwa = nacelle.net_wetted_area
-
-    nac_cxf =   1.15*((0.455/fac)*(numpy.log(10.)/numpy.log(Re*nacelle.length))**2.58)*nac_nwa/wing.area
-
-    return nac_cxf,nac_nwa
-
-
-#===========================================================================================================
 def turbofan_oei_drag(aircraft,nacelle,pamb,tamb):
     """
     Inoperative engine drag coefficient

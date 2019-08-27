@@ -18,14 +18,14 @@ from marilib.airplane.propulsion.turbofan.turbofan_models import turbofan_thrust
 
 
 #===========================================================================================================
-def pte1_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei):
+def pte2_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei):
     """
-    SFC for PTE1 architecture
+    SFC for PTE2 architecture
     """
 
     #===========================================================================================================
     def fct_sfc(throttle,aircraft,pamb,tamb,mach,rating,thrust,nei):
-        fn,sfc,sec,data = pte1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
+        fn,sfc,sec,data = pte2_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
         return (thrust - fn)
 
     x_ini = 0.8
@@ -36,61 +36,20 @@ def pte1_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei):
 
     throttle = output_dict[0][0]
 
-    fn,sfc,sec,data = pte1_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
+    fn,sfc,sec,data = pte2_thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
     return sfc
 
 
 #===========================================================================================================
-def pte1_sfc_old(aircraft,pamb,tamb,mach,rating,nei):
-    """
-    Bucket SFC for a turbofan
-    """
+def pte2_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     propulsion = aircraft.propulsion
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
 
-    power_elec = aircraft.pte1_power_elec_chain
-    r_engine = aircraft.rear_electric_engine
-    r_nacelle = aircraft.rear_electric_nacelle
-
-    power_ratio = {"MTO":power_elec.mto_e_power_ratio,
-                   "MCN":power_elec.mcn_e_power_ratio,
-                   "MCL":power_elec.mcl_e_power_ratio,
-                   "MCR":power_elec.mcr_e_power_ratio,
-                   "FID":power_elec.fid_e_power_ratio}
-
-    sfc0 = ( 0.4 + 1./engine.bpr**0.895 )/36000.
-
-    if (propulsion.bli_effect>0):
-        kBLIe = propulsion.bli_r_thrust_factor
-    else:
-        kBLIe = 1.
-
-    kC = engine.core_thrust_ratio
-    kW = power_ratio[rating]
-
-    eff_prop = nacelle.efficiency_prop
-    eff_e_prop = r_nacelle.efficiency_prop
-    eff_chain = power_elec.overall_efficiency
-
-    eff_h = kC + (1.-kC)*( kW*kBLIe*(eff_e_prop/eff_prop)*eff_chain + (1.-kW) )
-
-    sfc = sfc0 / eff_h
-
-    return sfc
-
-
-#===========================================================================================================
-def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
-
-    propulsion = aircraft.propulsion
-    engine = aircraft.turbofan_engine
-    nacelle = aircraft.turbofan_nacelle
-
-    battery = aircraft.pte1_battery
-    power_elec = aircraft.pte1_power_elec_chain
+    battery = aircraft.pte2_battery
+    power_elec = aircraft.pte2_power_elec_chain
     r_engine = aircraft.rear_electric_engine
     r_nacelle = aircraft.rear_electric_nacelle
 
@@ -112,44 +71,81 @@ def pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
     (fn_core,fn_fan0,fn0,shaft_power0) = data
 
     Vsnd = earth.sound_speed(Tamb)
-
     Vair = Vsnd*Mach
 
-    power_offtake = throttle * rear_shaft_power[rating]/(nacelle.n_engine-nei) / power_elec.overall_efficiency
+    if (nacelle.rear_nacelle==1):
 
-    shaft_power1 = shaft_power0 - power_offtake     # Shaft power dedicated to the fan
+        power_offtake = throttle * rear_shaft_power[rating]/(nacelle.n_engine-nei) / power_elec.overall_efficiency
 
-    fn_fan1 = nacelle.efficiency_prop*shaft_power1/Vair     # Effective fan thrust
+        # Shaft power of rear fan
+        shaft_power2 = power_offtake * (nacelle.n_engine - nei)     # Shaft power dedicated to electric generator
 
-    shaft_power2 = power_offtake * (nacelle.n_engine - nei)     # Shaft power dedicated to electric generator
-
-    # Effective eFan shaft power
-    pw_shaft2 =   shaft_power2 * power_elec.overall_efficiency \
-                + r_nacelle.motor_efficiency * r_nacelle.controller_efficiency * battery_power_feed[rating]
-
-    if (pw_shaft2 > 0.):
+        # Effective eFan shaft power
+        pw_shaft2 =   shaft_power2 * power_elec.overall_efficiency \
+                    + r_nacelle.motor_efficiency * r_nacelle.controller_efficiency * battery_power_feed[rating]
 
         if (propulsion.bli_effect>0):
             (fn_fan2,q1,dVbli) = jet.fan_thrust_with_bli(r_nacelle,Pamb,Tamb,Mach,pw_shaft2)
-            dVbli_o_V = dVbli/Vair
+            dVbli_o_V2 = dVbli/Vair
         else:
             (fn_fan2,q0) = jet.fan_thrust(r_nacelle,Pamb,Tamb,Mach,pw_shaft2)
-            dVbli_o_V = 0.
+            dVbli_o_V2 = 0.
 
         sec = (pw_shaft2/(r_nacelle.motor_efficiency*r_nacelle.controller_efficiency))/fn_fan2
 
     else:
-
-        dVbli_o_V  = 0.
-        fn_fan2 = 0.
+        power_offtake = 0.
         sec = 0.
+        fn_fan2 = 0.
+        dVbli_o_V2 = 0.
+        shaft_power2 = 0.
+
+    # Shaft power of main fans
+    shaft_power1 = shaft_power0 - power_offtake     # Shaft power dedicated to the fan
+
+    if (propulsion.bli_effect>0):
+        (fn_fan1,q1,dVbli) = jet.fan_thrust_with_bli(nacelle,Pamb,Tamb,Mach,shaft_power1)
+        dVbli_o_V1 = dVbli/Vair
+    else:
+        (fn_fan1,q0) = jet.fan_thrust(nacelle,Pamb,Tamb,Mach,shaft_power1)
+        dVbli_o_V1 = 0.
 
     sfc = sfc0 * (fn0*(nacelle.n_engine - nei)) / ((fn_core + fn_fan1)*(nacelle.n_engine - nei) + fn_fan2)
 
     fn = (fn_core + fn_fan1)*(nacelle.n_engine - nei) + fn_fan2
 
-    data = (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0,sfc0)
+    data = (fn_core,fn_fan1,dVbli_o_V1,shaft_power1,fn_fan2,dVbli_o_V2,shaft_power2,fn0,shaft_power0,sfc0)
 
     return fn,sfc,sec,data
 
+
+#===========================================================================================================
+def blimp_body_drag(aircraft,Re,Mach):
+    """
+    Turbofan nacelle drag
+    """
+
+    wing = aircraft.wing
+    blimp_body = aircraft.pte2_blimp_body
+
+    fac = (1. + 0.126*Mach**2)
+
+    blp_nwa = blimp_body.net_wetted_area
+
+    blp_cxf =   1.05*((0.455/fac)*(numpy.log(10)/numpy.log(Re*blimp_body.length))**2.58)*blp_nwa/wing.area
+
+    return blp_cxf,blp_nwa
+
+
+#===========================================================================================================
+def pte2_oei_drag(aircraft,nacelle,pamb,tamb):
+    """
+    Inoperative engine drag coefficient
+    """
+
+    wing = aircraft.wing
+
+    dCx = 0.01*nacelle.width**2 / wing.area     # Very low because the nacelle is burried into the boundary layer of the blimp
+
+    return dCx
 

@@ -78,8 +78,11 @@ def time_to_climb(aircraft,toc,disa,mass,vcas1,vcas2,mach):
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
     if(vcas1>unit.mps_kt(250.)):
+        print("vcas1 = ",unit.kt_mps(vcas1))
         print("time_to_climb_, vcas1 must be lower than or equal to 250kt")
     if(vcas1>vcas2):
+        print("vcas1 = ",unit.kt_mps(vcas1))
+        print("vcas2 = ",unit.kt_mps(vcas2))
         print("time_to_climb_, vcas1 must be lower than or equal to vcas2")
 
     cross_over_altp = earth.cross_over_altp(vcas2,mach)
@@ -215,7 +218,7 @@ def take_off(aircraft,kvs1g,altp,disa,mass,hld_conf):
 
     cz_to = czmax / kvs1g**2
 
-    mach = flight.speed_from_lift(aircraft,pamb,cz_to,mass)
+    mach = flight.speed_from_lift(aircraft,pamb,tamb,cz_to,mass)
 
     throttle = 1.
 

@@ -189,6 +189,8 @@ class NominalMission(object):
     INFO = {\
     "range":{"unit":"NM", "om":1.e3, "txt":"Range of the nominal mission"},
     "payload":{"unit":"kg", "om":1.e4, "txt":"Payload of the nominal mission"},
+    "nominal_cruise_mach":{"unit":"mach", "om":1.e0, "txt":"Cruise mach of nominal mission"},
+    "nominal_cruise_altp":{"unit":"ft", "om":1.e0, "txt":"Cruise altitude of nominal mission"},
     "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the nominal mission"},
     "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the nominal mission"},
     "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the nominal mission"},
@@ -199,6 +201,8 @@ class NominalMission(object):
     }
     def __init__(self, range = None,
                        payload = None,
+                       nominal_cruise_mach = None,
+                       nominal_cruise_altp = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
@@ -207,7 +211,9 @@ class NominalMission(object):
                        total_enrg = None,
                        req_battery_mass = None):
         self.range = range
-        self.payload = payload 
+        self.payload = payload
+        self.nominal_cruise_mach = nominal_cruise_mach
+        self.nominal_cruise_altp = nominal_cruise_altp
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 

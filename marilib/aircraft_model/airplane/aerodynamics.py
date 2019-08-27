@@ -29,12 +29,12 @@ def high_lift(wing,hld_conf):
     cz_max_ld = {
             0 : 1.45 ,  # Clean
             1 : 2.25 ,  # Flap only, Rotation without slot
-            2 : 2.60 ,  # Flap only, Rotation with slot      (ATR)
+            2 : 2.60 ,  # Flap only, Rotation single slot      (ATR)
             3 : 2.80 ,  # Flap only, Rotation double slot
-            4 : 2.80 ,  # Flap only, Fowler
-            5 : 2.00 ,  # Slap only
-            6 : 2.45 ,  # Slat + Flap rotation double slot
-            7 : 2.60 ,  # Slat + Flap rotation with slot
+            4 : 2.80 ,  # Fowler Flap
+            5 : 2.00 ,  # Slat only
+            6 : 2.45 ,  # Slat + Flap rotation without slot
+            7 : 2.70 ,  # Slat + Flap rotation single slot
             8 : 2.90 ,  # Slat + Flap rotation double slot
             9 : 3.00 ,  # Slat + Fowler                      (A320)
             10 : 3.20,  # Slat + Fowler + Fowler double slot (A321)

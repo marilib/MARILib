@@ -21,7 +21,7 @@ def efan_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width):
     """
 
     gam = earth.heat_ratio()
-    r = earth.gaz_constant()
+    r = earth.gas_constant()
     Cp = earth.heat_constant(gam,r)
 
     Vsnd = earth.sound_speed(Tamb)
@@ -127,7 +127,7 @@ def rear_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width,body_l
     """
 
     gam = earth.heat_ratio()
-    r = earth.gaz_constant()
+    r = earth.gas_constant()
     Cp = earth.heat_constant(gam,r)
 
     (rho,sig) = earth.air_density(Pamb,Tamb)
@@ -233,7 +233,7 @@ def fan_thrust_with_bli(nacelle,Pamb,Tamb,Mach,PwShaft):
     """
 
     gam = earth.heat_ratio()
-    r = earth.gaz_constant()
+    r = earth.gas_constant()
     Cp = earth.heat_constant(gam,r)
 
     #===========================================================================================================
@@ -294,7 +294,7 @@ def fan_thrust(nacelle,Pamb,Tamb,Mach,PwShaft):
     """
 
     gam = earth.heat_ratio()
-    r = earth.gaz_constant()
+    r = earth.gas_constant()
     Cp = earth.heat_constant(gam,r)
 
     #===========================================================================================================
@@ -352,7 +352,7 @@ def corrected_air_flow(Ptot,Ttot,Mach):
     Computes the corrected air flow per square meter
     """
 
-    R = earth.gaz_constant()
+    R = earth.gas_constant()
     gam = earth.heat_ratio()
 
     f_M = Mach*(1. + 0.5*(gam-1)*Mach**2)**(-(gam+1.)/(2.*(gam-1.)))
@@ -436,3 +436,23 @@ def boundary_layer(re,x_length):
     d = (0.385*x_length)/(re*x_length)**(1./5.)
 
     return d
+
+
+#===========================================================================================================
+def nacelle_generic_drag(aircraft,nacelle,Re,Mach):
+    """
+    WARNING : nacelle drag returned corresponds to the number of engine : nacelle.n_engine
+    """
+
+    wing = aircraft.wing
+
+    fac = (1. + 0.126*Mach**2)
+
+    # All nacelle drag
+    nac_nwa = nacelle.net_wetted_area
+
+    nac_cxf =   1.15*((0.455/fac)*(numpy.log(10.)/numpy.log(Re*nacelle.length))**2.58)*nac_nwa/wing.area
+
+    return nac_cxf,nac_nwa
+
+

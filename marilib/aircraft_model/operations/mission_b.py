@@ -67,7 +67,7 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
         raise Exception("mission_b, propulsive architecture not allowed")
 
     mass = 0.95 * tow
-    c_z = flight.lift_from_speed(aircraft,pamb,mach,mass)
+    c_z = flight.lift_from_speed(aircraft,pamb,tamb,mach,mass)
     c_x,lod_cruise = airplane_aero.drag(aircraft, pamb, tamb, mach, c_z)
 
     if (propulsion.architecture=="EF1"):
@@ -125,7 +125,7 @@ def b_specific_air_range(aircraft,altp,mass,mach,disa):
 
     vsnd = earth.sound_speed(tamb)
 
-    Cz = flight.lift_from_speed(aircraft,pamb,mach,mass)
+    Cz = flight.lift_from_speed(aircraft,pamb,tamb,mach,mass)
 
     [Cx,LoD] = airplane_aero.drag(aircraft,pamb,tamb,mach,Cz)
 
@@ -151,8 +151,8 @@ def eval_nominal_b_mission(aircraft):
     """
 
     disa = 0.
-    altp = aircraft.design_driver.ref_cruise_altp
-    mach = aircraft.design_driver.cruise_mach
+    altp = aircraft.nominal_mission.nominal_cruise_altp
+    mach = aircraft.nominal_mission.nominal_cruise_mach
     nei = 0
 
     aircraft.nominal_mission.payload = aircraft.payload.nominal

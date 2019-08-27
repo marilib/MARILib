@@ -26,6 +26,7 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     """
 
     engine = aircraft.turbofan_engine
+    nacelle = aircraft.turbofan_nacelle
     propulsion = aircraft.propulsion
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
@@ -53,11 +54,13 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
         fn,sfc,data = propu.turbofan_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
     elif (propulsion.architecture=="PTE1"):
         fn,sfc,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+    elif (propulsion.architecture=="PTE2"):
+        fn,sfc,sec,data = propu.pte2_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
     else:
         raise Exception("mission_f, propulsive architecture not allowed")
 
     mass = 0.95 * tow
-    c_z = flight.lift_from_speed(aircraft,pamb,mach,mass)
+    c_z = flight.lift_from_speed(aircraft,pamb,tamb,mach,mass)
     c_x,lod_cruise = airplane_aero.drag(aircraft, pamb, tamb, mach, c_z)
 
     if (propulsion.architecture=="TF"):
@@ -65,6 +68,13 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     elif (propulsion.architecture=="PTE1"):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
                         - (sfc/sec)*aircraft.pte1_battery.energy_cruise
+    elif (propulsion.architecture=="PTE2"):
+        if (nacelle.rear_nacelle==1):
+            fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
+                            - (sfc/sec)*aircraft.pte2_battery.energy_cruise
+        else:
+            fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
+
     else:
         raise Exception("propulsion.architecture index is out of range")
 
@@ -120,7 +130,7 @@ def f_specific_air_range(aircraft,altp,mass,mach,disa):
 
     vsnd = earth.sound_speed(tamb)
 
-    Cz = flight.lift_from_speed(aircraft,pamb,mach,mass)
+    Cz = flight.lift_from_speed(aircraft,pamb,tamb,mach,mass)
 
     [Cx,LoD] = airplane_aero.drag(aircraft,pamb,tamb,mach,Cz)
 
@@ -142,8 +152,8 @@ def eval_nominal_f_mission(aircraft):
     """
 
     disa = 0.
-    altp = aircraft.design_driver.ref_cruise_altp
-    mach = aircraft.design_driver.cruise_mach
+    altp = aircraft.nominal_mission.nominal_cruise_altp
+    mach = aircraft.nominal_mission.nominal_cruise_mach
     nei = 0
 
     aircraft.nominal_mission.payload = aircraft.payload.nominal

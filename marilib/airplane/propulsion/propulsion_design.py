@@ -21,6 +21,10 @@ from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_design \
     import eval_pte1_nacelle_design, eval_pte1_engine_design, \
            eval_pte1_nacelle_mass, eval_pte1_battery_mass
 
+from marilib.airplane.propulsion.hybrid_pte2.hybrid_pte2_design \
+    import eval_pte2_nacelle_design, eval_pte2_engine_design, eval_blimp_body_design, \
+           eval_pte2_nacelle_mass, eval_pte2_battery_mass, eval_blimp_body_mass
+
 from marilib.airplane.propulsion.electric_ef1.electric_ef1_design \
     import eval_ef1_nacelle_design, eval_ef1_engine_design, eval_battery_cg_range, \
            eval_ef1_pylon_mass, eval_ef1_nacelle_mass, eval_ef1_battery_mass
@@ -45,6 +49,12 @@ def eval_propulsion_design(aircraft):
         eval_turbofan_engine_design(aircraft)
         eval_pte1_engine_design(aircraft)
         eval_pte1_nacelle_design(aircraft)
+
+    elif (propulsion.architecture=="PTE2"):
+
+        eval_blimp_body_design(aircraft)
+        eval_pte2_engine_design(aircraft)
+        eval_pte2_nacelle_design(aircraft)
 
     elif (propulsion.architecture=="EF1"):
 
@@ -120,6 +130,10 @@ def eval_propulsion_design(aircraft):
         fn,sfc,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
         propulsion.sfc_cruise_ref = sfc
         propulsion.sec_cruise_ref = sec
+    elif (propulsion.architecture=="PTE2"):
+        fn,sfc,sec,data = propu.pte2_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+        propulsion.sfc_cruise_ref = sfc
+        propulsion.sec_cruise_ref = sec
     elif (propulsion.architecture=="EF1"):
         fn,sec,data = propu.ef1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
         propulsion.sfc_cruise_ref = 0.
@@ -162,7 +176,6 @@ def eval_propulsion_mass(aircraft):
         nacelle = aircraft.turbofan_nacelle
 
         eval_turbofan_pylon_mass(aircraft)
-
         eval_turbofan_nacelle_mass(aircraft)
 
         propulsion.mass = pylon.mass + nacelle.mass
@@ -172,9 +185,7 @@ def eval_propulsion_mass(aircraft):
 
         pylon = aircraft.turbofan_pylon
         nacelle = aircraft.turbofan_nacelle
-
         r_nacelle = aircraft.rear_electric_nacelle
-
         power_elec = aircraft.pte1_power_elec_chain
 
         eval_turbofan_pylon_mass(aircraft)
@@ -185,13 +196,27 @@ def eval_propulsion_mass(aircraft):
                           + r_nacelle.c_g*r_nacelle.mass + power_elec.c_g*power_elec.mass \
                           )/propulsion.mass
 
+    elif (propulsion.architecture=="PTE2"):
+
+        nacelle = aircraft.turbofan_nacelle
+        r_nacelle = aircraft.rear_electric_nacelle
+        power_elec = aircraft.pte2_power_elec_chain
+        blimp_body = aircraft.pte2_blimp_body
+
+        eval_blimp_body_mass(aircraft)
+        eval_pte2_nacelle_mass(aircraft)
+
+        # REMARK : Blimp body mass is included into propulsion
+        propulsion.mass = blimp_body.mass + nacelle.mass + r_nacelle.mass + power_elec.mass
+        propulsion.c_g = (  blimp_body.c_g*blimp_body.mass + nacelle.c_g*nacelle.mass \
+                          + r_nacelle.c_g*r_nacelle.mass + power_elec.c_g*power_elec.mass \
+                          )/propulsion.mass
+
     elif (propulsion.architecture=="EF1"):
 
         pylon = aircraft.electrofan_pylon
         nacelle = aircraft.electrofan_nacelle
-
         r_nacelle = aircraft.rear_electric_nacelle
-
         power_elec = aircraft.ef1_power_elec_chain
 
         eval_ef1_pylon_mass(aircraft)
@@ -238,6 +263,8 @@ def eval_battery_mass(aircraft):
        aircraft.weights.battery_in_owe = 0.
     elif (aircraft.propulsion.architecture=="PTE1"):
        eval_pte1_battery_mass(aircraft)
+    elif (aircraft.propulsion.architecture=="PTE2"):
+       eval_pte2_battery_mass(aircraft)
     elif (aircraft.propulsion.architecture=="EF1"):
        eval_ef1_battery_mass(aircraft)
 

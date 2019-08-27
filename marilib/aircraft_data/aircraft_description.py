@@ -38,6 +38,9 @@ from marilib.airplane.propulsion.turbofan.turbofan_data \
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_data \
     import Pte1PowerElectricChain, Pte1Battery
 
+from marilib.airplane.propulsion.hybrid_pte2.hybrid_pte2_data \
+    import Pte2BlimpBody, Pte2PowerElectricChain, Pte2Battery
+
 from marilib.airplane.propulsion.jet_data \
     import RearElectricNacelle, RearElectricEngine
 
@@ -101,6 +104,9 @@ class Aircraft(object):
         self.rear_electric_engine = RearElectricEngine()
         self.pte1_power_elec_chain = Pte1PowerElectricChain()
         self.pte1_battery = Pte1Battery()
+        self.pte2_blimp_body = Pte2BlimpBody()
+        self.pte2_power_elec_chain = Pte2PowerElectricChain()
+        self.pte2_battery = Pte2Battery()
 
         self.electrofan_pylon = ElectrofanPylon()
         self.electrofan_nacelle = ElectrofanNacelle()

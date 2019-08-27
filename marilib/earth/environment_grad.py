@@ -15,9 +15,9 @@ from marilib.earth import environment as earth
 #===========================================================================================================
 def air_density_grad(pamb,pamb_d,tamb,tamb_d):
     """
-    Ideal gaz density
+    Ideal gas density
     """
-    R = earth.gaz_constant()
+    R = earth.gas_constant()
     rho0 = earth.sea_level_density()
     rho = pamb/(R*tamb)
     rho_d = pamb_d/(R*tamb) - tamb_d*pamb/(R*tamb**2)
@@ -29,9 +29,9 @@ def air_density_grad(pamb,pamb_d,tamb,tamb_d):
 #===========================================================================================================
 def sound_speed_grad(tamb,tamb_d):
     """
-    Sound speed for ideal gaz
+    Sound speed for ideal gas
     """
-    R = earth.gaz_constant()
+    R = earth.gas_constant()
     gam = earth.heat_ratio()
     vsnd = numpy.sqrt(gam*R*tamb)
     vsnd_d = 0.5*numpy.sqrt(gam*R/tamb)*tamb_d
@@ -44,7 +44,7 @@ def atmosphere_grad(altp,altp_d,disa,disa_d):
     Pressure from pressure altitude from ground to 50 km
     """
     g = earth.gravity()
-    R = earth.gaz_constant()
+    R = earth.gas_constant()
 
     Z = numpy.array([0., 10999., 19999.,31999., 46999., 49999.])
     Z_d = numpy.array([0., 0., 0.,0., 0., 0.])
@@ -118,7 +118,7 @@ def atmosphere_geo_grad(altg,altg_d,disa,disa_d):
     Pressure from pressure altitude from ground to 50 km
     """
     g = earth.gravity()
-    R = earth.gaz_constant()
+    R = earth.gas_constant()
 
     Zi = numpy.array([0., 10999., 19999.,31999., 46999., 49999.])
     dtodzi = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
@@ -209,7 +209,7 @@ def pressure_altitude_grad(pamb,pamb_d):
     Pressure altitude from ground to 50 km
     """
     g = earth.gravity()
-    R = earth.gaz_constant()
+    R = earth.gas_constant()
 
     Z = numpy.array([0., 10999., 19999.,31999., 46999., 49999.])
     dtodz = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])

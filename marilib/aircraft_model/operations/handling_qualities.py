@@ -42,7 +42,7 @@ def forward_cg_stall(aircraft,altp,disa,nei,hld_conf,speed_mode,mass):
 
     c_z = cz_max_wing - cz_max_htp      # Max forward Cg assumed, HTP has down lift
 
-    mach = flight.speed_from_lift(aircraft,pamb,c_z,mass)
+    mach = flight.speed_from_lift(aircraft,pamb,tamb,c_z,mass)
 
     [cza_wo_htp,xlc_wo_htp,ki_wing] = frame_aero.wing_aero_data(aircraft,mach,hld_conf)
 
@@ -131,7 +131,7 @@ def vertical_tail_sizing(aircraft):
 
     czmax_to = aerodynamics.cz_max_to
 
-    mach_s1g = flight.speed_from_lift(aircraft,pamb,czmax_to,tow)
+    mach_s1g = flight.speed_from_lift(aircraft,pamb,tamb,czmax_to,tow)
 
     mach_35ft = stall_margin*mach_s1g       # V2 speed
   

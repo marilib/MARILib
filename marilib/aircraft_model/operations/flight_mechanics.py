@@ -17,22 +17,34 @@ from marilib.airplane.propulsion import propulsion_models as propu
 
 
 #===========================================================================================================
-def lift_from_speed(aircraft,pamb,mach,mass):
+def lift_from_speed(aircraft,pamb,tamb,mach,mass):
 
     wing = aircraft.wing
     g = earth.gravity()
     gam = earth.heat_ratio()
-    c_z = (2.*mass*g)/(gam*pamb*mach**2*wing.area)
+
+    if (aircraft.propulsion.architecture=="PTE2"):
+        m = mass + aircraft.pte2_blimp_body.buoyancy_force
+    else:
+        m = mass
+
+    c_z = (2.*m*g)/(gam*pamb*mach**2*wing.area)
     return c_z
 
 
 #===========================================================================================================
-def speed_from_lift(aircraft,pamb,cz,mass):
+def speed_from_lift(aircraft,pamb,tamb,cz,mass):
 
     wing = aircraft.wing
     g = earth.gravity()
     gam = earth.heat_ratio()
-    mach = numpy.sqrt((mass*g)/(0.5*gam*pamb*wing.area*cz))
+
+    if (aircraft.propulsion.architecture=="PTE2"):
+        m = mass + aircraft.pte2_blimp_body.buoyancy_force
+    else:
+        m = mass
+
+    mach = numpy.sqrt((m*g)/(0.5*gam*pamb*wing.area*cz))
     return mach
 
 
@@ -79,7 +91,7 @@ def acceleration(aircraft,nei,altp,disa,speed_mode,speed,mass,rating):
 
     fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
-    cz = lift_from_speed(aircraft,pamb,mach,mass)
+    cz = lift_from_speed(aircraft,pamb,tamb,mach,mass)
 
     cx,lod = aero.drag(aircraft,pamb,tamb,mach,cz)
 
@@ -108,7 +120,7 @@ def air_path(aircraft,nei,altp,disa,speed_mode,speed,mass,rating):
 
     fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
 
-    cz = lift_from_speed(aircraft,pamb,mach,mass)
+    cz = lift_from_speed(aircraft,pamb,tamb,mach,mass)
 
     [cx,lod] = aero.drag(aircraft,pamb,tamb,mach,cz)
 
@@ -137,7 +149,7 @@ def max_path(aircraft,nei,altp,disa,speed_mode,mass,rating):
     #=======================================================================================
     def fct_max_path(cz,aircraft,nei,altp,disa,speed_mode,mass,rating,isformax):
         pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
-        mach = speed_from_lift(aircraft,pamb,cz,mass)
+        mach = speed_from_lift(aircraft,pamb,tamb,cz,mass)
         speed = get_speed(pamb,speed_mode,mach)
         [slope,vz] = air_path(aircraft,nei,altp,disa,speed_mode,speed,mass,rating)
         if(isformax==True):

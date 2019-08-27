@@ -19,6 +19,8 @@ def ref_cruise_altp(propulsive_architecture):
         ref_cruise_altp_i = unit.m_ft(35000.)
     elif (propulsive_architecture=="PTE1"):
         ref_cruise_altp_i = unit.m_ft(35000.)
+    elif (propulsive_architecture=="PTE2"):
+        ref_cruise_altp_i = unit.m_ft(10000.)
     elif (propulsive_architecture=="EF1"):
         ref_cruise_altp_i = unit.m_ft(25000.)
     else:
@@ -31,6 +33,8 @@ def top_of_climb_altp(propulsive_architecture):
         top_of_climb_altp_i = unit.m_ft(31000.)
     elif (propulsive_architecture=="PTE1"):
         top_of_climb_altp_i = unit.m_ft(31000.)
+    elif (propulsive_architecture=="PTE2"):
+        top_of_climb_altp_i = unit.m_ft(10000.)
     elif (propulsive_architecture=="EF1"):
         top_of_climb_altp_i = unit.m_ft(25000.)
     else:
@@ -105,7 +109,7 @@ def wing_morphing():
     return wing_morphing_i
 
 #===========================================================================================================
-def hld_type(n_pax_ref):
+def hld_type(propulsive_architecture,n_pax_ref):
     """
     hld_type = 0  : Clean
     hld_type = 1  : Flap only, Rotation without slot
@@ -119,16 +123,34 @@ def hld_type(n_pax_ref):
     hld_type = 9  : Slat + Fowler                      (A320)
     hld_type = 10 : Slat + Slotted Fowler (A321)
     """
-    if (n_pax_ref>100):
-        hld_type_i = 9
+    if (propulsive_architecture=="PTE2"):
+        hld_type_i = 2
     else:
-        hld_type_i = 7
+        if (n_pax_ref>100):
+            hld_type_i = 9
+        else:
+            hld_type_i = 7
     return hld_type_i
 
 #===========================================================================================================
 def wing_area(n_pax_ref,design_range):
     wing_area_i = 60. + 88.*n_pax_ref*design_range*1.e-9
     return wing_area_i
+
+#===========================================================================================================
+def blimp_body_length(wing_span):
+    blimp_body_length_i = wing_span
+    return blimp_body_length_i
+
+#===========================================================================================================
+def blimp_body_width(wing_span):
+    blimp_body_width_i = 0.18*wing_span
+    return blimp_body_width_i
+
+#===========================================================================================================
+def blimp_body_gas():
+    blimp_body_gas_i = "helium"
+    return blimp_body_gas_i
 
 #===========================================================================================================
 def htp_area(wing_area):
@@ -482,16 +504,20 @@ def req_app_speed(n_pax_ref):
 def cas1_ttc(cruise_mach):
     if (cruise_mach>=0.6):
         cas1_ttc_i = unit.mps_kt(250.)
-    else:
+    elif (cruise_mach>=0.4):
         cas1_ttc_i = unit.mps_kt(190.)
+    else:
+        cas1_ttc_i = unit.mps_kt(70.)
     return cas1_ttc_i
 
 #===========================================================================================================
 def cas2_ttc(cruise_mach):
     if (cruise_mach>=0.6):
         cas2_ttc_i = unit.mps_kt(300.)
-    else:
+    elif (cruise_mach>=0.4):
         cas2_ttc_i = unit.mps_kt(240.)
+    else:
+        cas2_ttc_i = unit.mps_kt(80.)
     return cas2_ttc_i
 
 #===========================================================================================================

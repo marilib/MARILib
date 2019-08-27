@@ -6,22 +6,67 @@ Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry : original Scilab implementation
          PETEILH Nicolas : portage to Python
 
-The PTE1 architecture corresponds to the following features :
+The PTE2 architecture corresponds to the following features :
 
-- Tube and wing architecture
-- Twin thermal main fans with electrical generators
+- Tube & wing architecture with blimb body mounted on each wing
+- Thermal main fans with electrical generators
 - Rear electrical fan with use defined power on each rating
-- Eventual additional battery (attribute aircraft.pte1_battery.battery_strategy)
+- Eventual additional battery (attribute aircraft.pte2_battery.battery_strategy)
 
 IMPORTANT REMARKS :
 If an additional battery is installed, two modes are available :
-1- Battery mass is driven by the necessary amount of energy to ensure a power boost at take off and climb of "pte1_battery.power_feed" for a cumulated duration of "pte1_battery.time_feed"
-   and(or) an additional energy "pte1_battery.energy_cruise" delivered all along the cruise
-2- battery mass is given by the user (attribute aircraft.pte1_battery.mass)
+1- Battery mass is driven by the necessary amount of energy to ensure a power boost at take off and climb of "pte2_battery.power_feed" for a cumulated duration of "pte2_battery.time_feed"
+   and(or) an additional energy "pte2_battery.energy_cruise" delivered all along the cruise
+2- battery mass is given by the user (attribute aircraft.pte2_battery.mass)
 """
 
 #--------------------------------------------------------------------------------------------------------------------------------
-class Pte1PowerElectricChain(object):
+class Pte2BlimpBody(object):
+    """
+    Blimp body data
+    """
+    INFO = {\
+    "width":{"unit":"m", "om":1.e0, "txt":"Diameter of the blimp bodies"},
+    "length":{"unit":"m", "om":1.e1, "txt":"Length of the blimp bodies"},
+    "x_axe":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the center of the blimp body nose"},
+    "y_axe":{"unit":"m", "om":1.e1, "txt":"Span wise position of the center of the right blimp body nose"},
+    "z_axe":{"unit":"m", "om":1.e0, "txt":"Vertical position of the center of the blimp body nose"},
+    "net_wetted_area":{"unit":"m2", "om":1.e2, "txt":"Total net wetted area of the blimp bodies"},
+    "usable_volume":{"unit":"m3", "om":1.e3, "txt":"Usable volume for helium into the blimp bodies"},
+    "gas_type":{"unit":"string", "om":0., "txt":"type of buoyancy gas : helium or hydrogen"},
+    "gas_mass":{"unit":"kg", "om":1.e2, "txt":"Mass of gas on board"},
+    "buoyancy_force":{"unit":"daN", "om":1.e4, "txt":"Buoyancy force"},
+    "mass":{"unit":"kg", "om":1.e3, "txt":"Equipped mass of the blimp bodies without engines"},
+    "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the blimp bodies"}
+    }
+    def __init__(self, width = None,
+                       length = None,
+                       x_axe = None,
+                       y_axe = None,
+                       z_axe = None,
+                       net_wetted_area = None,
+                       usable_volume = None,
+                       gas_type = None,
+                       gas_mass = None,
+                       buoyancy_force = None,
+                       mass = None,
+                       c_g = None):
+        self.length = length
+        self.width = width
+        self.x_axe = x_axe
+        self.y_axe = y_axe
+        self.z_axe = z_axe
+        self.net_wetted_area = net_wetted_area
+        self.usable_volume = usable_volume
+        self.gas_type = gas_type
+        self.gas_mass = gas_mass
+        self.buoyancy_force = buoyancy_force
+        self.mass = mass
+        self.c_g = c_g
+
+
+#--------------------------------------------------------------------------------------------------------------------------------
+class Pte2PowerElectricChain(object):
     """
     Electric chain data
     """
@@ -57,7 +102,7 @@ class Pte1PowerElectricChain(object):
 
 
 #--------------------------------------------------------------------------------------------------------------------------------
-class Pte1Battery(object):
+class Pte2Battery(object):
     """
     Battery data
     """

@@ -76,6 +76,8 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.cost_mission.range = init.cost_mission_range(design_range)
     aircraft.cost_mission.req_battery_mass = init.battery_mass()
 
+    aircraft.nominal_mission.nominal_cruise_mach = cruise_mach                              # TLR
+    aircraft.nominal_mission.nominal_cruise_altp = init.ref_cruise_altp(propu_config)       # TLR
     aircraft.nominal_mission.req_battery_mass = init.battery_mass()
 
     aircraft.economics.fuel_price = init.fuel_price()
@@ -114,7 +116,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.wing.attachment = init.wing_attachment()
     aircraft.wing.morphing = init.wing_morphing()
-    aircraft.wing.hld_type = init.hld_type(n_pax_ref)
+    aircraft.wing.hld_type = init.hld_type(propu_config,n_pax_ref)
 
     aircraft.wing.area = init.wing_area(n_pax_ref,design_range)                                              # Main design variable
     aircraft.wing.aspect_ratio = init.wing_aspect_ratio()
@@ -170,6 +172,23 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.pte1_battery.energy_density = init.battery_energy_density()
     aircraft.pte1_battery.power_density = init.battery_power_density()
 
+    aircraft.pte2_blimp_body.length = init.blimp_body_length(aircraft.wing.span)
+    aircraft.pte2_blimp_body.width = init.blimp_body_width(aircraft.wing.span)
+    aircraft.pte2_blimp_body.gas_type = init.blimp_body_gas()
+
+    aircraft.pte2_power_elec_chain.overall_efficiency = init.e_chain_efficiency()
+    aircraft.pte2_power_elec_chain.generator_pw_density = init.generator_power_density()
+    aircraft.pte2_power_elec_chain.rectifier_pw_density = init.rectifier_pw_density()
+    aircraft.pte2_power_elec_chain.wiring_pw_density = init.wiring_pw_density()
+    aircraft.pte2_power_elec_chain.cooling_pw_density = init.cooling_pw_density()
+
+    aircraft.pte2_battery.strategy = init.battery_strategy()
+    aircraft.pte2_battery.power_feed = init.battery_power_feed()
+    aircraft.pte2_battery.time_feed = init.battery_time_feed()
+    aircraft.pte2_battery.energy_cruise = init.battery_energy_cruise()
+    aircraft.pte2_battery.energy_density = init.battery_energy_density()
+    aircraft.pte2_battery.power_density = init.battery_power_density()
+
     #-----------------------------------------------------------------------------------------------------------
     aircraft.electrofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
 
@@ -206,14 +225,14 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.ef1_battery.density = init.battery_density()
 
 
-    if (propu_config=="TF" or propu_config=="PTE1"):
-
+    if (propu_config=="TF"):
         aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
-
+    elif (propu_config=="PTE1"):
+        aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
+    elif (propu_config=="PTE2"):
+        aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
     elif (propu_config=="EF1"):
-
         aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.electrofan_nacelle.attachment)
-
     else:
 
         raise Exception("Propulsion architecture type is unknown")

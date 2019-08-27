@@ -55,11 +55,15 @@ def sea_level_sound_speed():
     return vc0
 
 #===========================================================================================================
-def gaz_constant():
+def gas_constant(gas="air"):
     """
-    Ideal gaz constant
+    Ideal gas constant (J/kg/K)
     """
-    R = 287.053      # (J/kg/K) Ideal gaz constant for the air
+    R = {
+         "air" : 287.053 ,
+         "helium" : 2077. ,
+         "hydrogen" : 4124.
+         }.get(gas, "Erreur: type of gas is unknown")
     return R
 
 #===========================================================================================================
@@ -119,7 +123,7 @@ def atmosphere(altp,disa):
     Pressure from pressure altitude from ground to 50 km
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
 
     Z = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodz = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
@@ -171,7 +175,7 @@ def atmosphere_geo(altg,disa):
     Pressure from pressure altitude from ground to 50 km
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
 
     Zi = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodzi = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
@@ -218,7 +222,7 @@ def pressure_altitude(pamb):
     Pressure altitude from ground to 50 km
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
 
     Z = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodz = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
@@ -256,7 +260,7 @@ def pressure(altp):
     Pressure from pressure altitude from ground to 50 km
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
 
     Z = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodz = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
@@ -287,9 +291,9 @@ def pressure(altp):
 #===========================================================================================================
 def air_density(pamb,tamb):
     """
-    Ideal gaz density
+    Ideal gas density
     """
-    R = gaz_constant()
+    R = gas_constant()
     rho0 = sea_level_density()
     rho = pamb / ( R * tamb )
     sig = rho / rho0
@@ -298,9 +302,9 @@ def air_density(pamb,tamb):
 #===========================================================================================================
 def sound_speed(tamb):
     """
-    Sound speed for ideal gaz
+    Sound speed for ideal gas
     """
-    R = gaz_constant()
+    R = gas_constant()
     gam = heat_ratio()
     vsnd = numpy.sqrt( gam * R * tamb )
     return vsnd
@@ -391,7 +395,7 @@ def climb_mode(speed_mode,dtodz,tstd,disa,mach):
     WARNING : input is mach number whatever SpeedMode
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
     gam = heat_ratio()
 
     if (speed_mode==1):

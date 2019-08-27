@@ -132,9 +132,9 @@ def eval_ef1_nacelle_design(aircraft):
 
     # Electric nacelle is design by cruise conditions
     #-----------------------------------------------------------------------------------------------------------
-    disa = 0.
-    altp = design_driver.ref_cruise_altp
-    mach = design_driver.cruise_mach
+    disa = propulsion.flight_data["disa"][MCR]
+    altp = propulsion.flight_data["altp"][MCR]
+    mach = propulsion.flight_data["mach"][MCR]
 
     (Pamb,Tamb,Tstd,dTodZ) = earth.atmosphere(altp,disa)
 
