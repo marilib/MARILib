@@ -10,7 +10,7 @@ Changed name from "design.py" to "assembly.py" on 21:05:2019
 
 from marilib import numpy as np
 from marilib import fsolve
-from scipy.optimize import minimize,SR1, NonlinearConstraint
+from scipy.optimize import minimize
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth
@@ -920,6 +920,7 @@ def mdf_process(aircraft,search_domain,criterion,mda_type):
     """
     Compute criterion and constraints
     """
+    from scipy.optimize import SR1, NonlinearConstraint
 
     if (aircraft.propulsion.architecture=="TF"):
         start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)

@@ -7,13 +7,17 @@ Created on Thu Jan 24 23:22:21 2019
          ROCHES Pascal : portage to Python
 """
 
-from marilib import numpy
+import warnings
 
+from ad.linalg.linalg import solve
+from numpy.linalg.linalg import LinAlgError
+
+from marilib import numpy
 import marilib
+
 
 # from autograd import jacobian
 # from autograd.numpy.numpy_boxes import ArrayBox
-
 #===========================================================================================================
 def lin_interp_1d(x,X,Y):
     """
@@ -128,6 +132,7 @@ def newton_solve(res_func, x0, dres_dy=None, args=(),
     elif dres_dy is None:
         res_func, dres_dy = get_jac_func(res_func, args)
 
+    msg = ""
     ier = 1
     k = 0
     y_curr = numpy.atleast_1d(1.0 * x0)
@@ -162,6 +167,7 @@ def newton_solve(res_func, x0, dres_dy=None, args=(),
         stop_crit = norm(curr_res) / n0
         k += 1
     if k == max_iter and stop_crit > res_max:
+        ier = 0
         msg = "Failed to converge Newton solver within " + str(max_iter) + " iterations "
         if marilib.is_driven_by_gems:
             raise LinAlgError(msg)
