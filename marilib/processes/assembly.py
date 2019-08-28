@@ -2,15 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jan 24 23:22:21 2019
-
 @author: DRUOT Thierry
-
 Changed name from "design.py" to "assembly.py" on 21:05:2019
 """
 
 from marilib import numpy as np
 from marilib import fsolve
-from scipy.optimize import minimize,SR1, NonlinearConstraint
+from scipy.optimize import minimize
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth
@@ -47,9 +45,6 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.design_driver.ref_cruise_altp = init.ref_cruise_altp(propu_config)        # TLR
     aircraft.design_driver.top_of_climb_altp = init.top_of_climb_altp(propu_config)    # TLR
 
-    aircraft.aerodynamics.hld_conf_clean = init.hld_conf_clean()
-    aircraft.aerodynamics.hld_conf_ld = init.hld_conf_ld()
-
     aircraft.low_speed.altp_tofl = init.altp_tofl()
     aircraft.low_speed.disa_tofl = init.disa_tofl()
     aircraft.low_speed.kvs1g_tofl = regul.kvs1g_min_take_off()       # Regulation
@@ -63,6 +58,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.low_speed.disa_oei = init.disa_oei()
     aircraft.low_speed.req_oei_path = regul.ceil_oei_min_path(n_engine)     # Regulation
     aircraft.low_speed.req_oei_altp = init.req_oei_altp(propu_config)       # TLR
+    aircraft.low_speed.oei_best_speed = init.oei_best_speed(cruise_mach)
 
     aircraft.high_speed.disa_climb = init.disa_climb()
     aircraft.high_speed.req_vz_climb = init.req_vz_climb()           # TLR
@@ -114,17 +110,22 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
     aircraft.center_of_gravity.cg_range_optimization = init.cg_range_optimization()
 
-    aircraft.wing.attachment = init.wing_attachment()
+    aircraft.wing.attachment = init.wing_attachment(propu_config)
     aircraft.wing.morphing = init.wing_morphing()
     aircraft.wing.hld_type = init.hld_type(propu_config,n_pax_ref)
 
     aircraft.wing.area = init.wing_area(n_pax_ref,design_range)                                              # Main design variable
-    aircraft.wing.aspect_ratio = init.wing_aspect_ratio()
+    aircraft.wing.aspect_ratio = init.wing_aspect_ratio(propu_config)
     aircraft.wing.span = init.wing_span(aircraft.wing.area,aircraft.wing.aspect_ratio)
     aircraft.wing.x_root = init.wing_x_root(aircraft.wing.aspect_ratio,aircraft.wing.span)
 
     aircraft.horizontal_tail.area = init.htp_area(aircraft.wing.area)
     aircraft.vertical_tail.area = init.vtp_area(aircraft.wing.area)
+
+    #-----------------------------------------------------------------------------------------------------------
+    aircraft.aerodynamics.hld_conf_clean = init.hld_conf_clean()
+    aircraft.aerodynamics.hld_conf_to = init.hld_conf_to()
+    aircraft.aerodynamics.hld_conf_ld = init.hld_conf_ld()
 
     #-----------------------------------------------------------------------------------------------------------
     aircraft.turbofan_engine.bpr = init.bpr(n_pax_ref)
@@ -172,23 +173,6 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.pte1_battery.energy_density = init.battery_energy_density()
     aircraft.pte1_battery.power_density = init.battery_power_density()
 
-    aircraft.pte2_blimp_body.length = init.blimp_body_length(aircraft.wing.span)
-    aircraft.pte2_blimp_body.width = init.blimp_body_width(aircraft.wing.span)
-    aircraft.pte2_blimp_body.gas_type = init.blimp_body_gas()
-
-    aircraft.pte2_power_elec_chain.overall_efficiency = init.e_chain_efficiency()
-    aircraft.pte2_power_elec_chain.generator_pw_density = init.generator_power_density()
-    aircraft.pte2_power_elec_chain.rectifier_pw_density = init.rectifier_pw_density()
-    aircraft.pte2_power_elec_chain.wiring_pw_density = init.wiring_pw_density()
-    aircraft.pte2_power_elec_chain.cooling_pw_density = init.cooling_pw_density()
-
-    aircraft.pte2_battery.strategy = init.battery_strategy()
-    aircraft.pte2_battery.power_feed = init.battery_power_feed()
-    aircraft.pte2_battery.time_feed = init.battery_time_feed()
-    aircraft.pte2_battery.energy_cruise = init.battery_energy_cruise()
-    aircraft.pte2_battery.energy_density = init.battery_energy_density()
-    aircraft.pte2_battery.power_density = init.battery_power_density()
-
     #-----------------------------------------------------------------------------------------------------------
     aircraft.electrofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
 
@@ -228,8 +212,6 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     if (propu_config=="TF"):
         aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
     elif (propu_config=="PTE1"):
-        aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
-    elif (propu_config=="PTE2"):
         aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
     elif (propu_config=="EF1"):
         aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.electrofan_nacelle.attachment)
@@ -613,6 +595,7 @@ def eval_performance_analysis(aircraft):
     # Nominal mission
     #------------------------------------------------------------------------------------------------------
     mission.eval_nominal_mission(aircraft)
+    mission.eval_nominal_climb_constraints(aircraft)
 
     # Take off field length
     #------------------------------------------------------------------------------------------------------
@@ -625,6 +608,10 @@ def eval_performance_analysis(aircraft):
     # Climb performances
     #------------------------------------------------------------------------------------------------------
     sub_proc.eval_climb_performances(aircraft)
+
+    # One engine inoperative performances
+    #------------------------------------------------------------------------------------------------------
+    sub_proc.eval_oei_performances(aircraft)
 
     # Environment
     #------------------------------------------------------------------------------------------------------
@@ -920,6 +907,7 @@ def mdf_process(aircraft,search_domain,criterion,mda_type):
     """
     Compute criterion and constraints
     """
+    from scipy.optimize import SR1, NonlinearConstraint
 
     if (aircraft.propulsion.architecture=="TF"):
         start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
@@ -1023,4 +1011,3 @@ def plot_mdf_process(aircraft,search_domain,criterion):
     pylab.plt.plot(sref,func_vals2,label="sref obj")
     pylab.legend()
     pylab.show()
-

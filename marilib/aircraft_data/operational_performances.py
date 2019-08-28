@@ -191,6 +191,8 @@ class NominalMission(object):
     "payload":{"unit":"kg", "om":1.e4, "txt":"Payload of the nominal mission"},
     "nominal_cruise_mach":{"unit":"mach", "om":1.e0, "txt":"Cruise mach of nominal mission"},
     "nominal_cruise_altp":{"unit":"ft", "om":1.e0, "txt":"Cruise altitude of nominal mission"},
+    "vz_cruise_margin":{"unit":"ft/min", "om":1.e2, "txt":"Margin versus required climb speed at 97%MTOW, nominal cruise altitude and MCR rating"},
+    "vz_climb_margin":{"unit":"ft/min", "om":1.e2, "txt":"Margin versus required climb speed at 97%MTOW, nominal cruise altitude and MCL rating"},
     "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the nominal mission"},
     "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the nominal mission"},
     "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the nominal mission"},
@@ -203,6 +205,8 @@ class NominalMission(object):
                        payload = None,
                        nominal_cruise_mach = None,
                        nominal_cruise_altp = None,
+                       vz_cruise_margin = None,
+                       vz_climb_margin = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
@@ -214,6 +218,8 @@ class NominalMission(object):
         self.payload = payload
         self.nominal_cruise_mach = nominal_cruise_mach
         self.nominal_cruise_altp = nominal_cruise_altp
+        self.vz_cruise_margin = vz_cruise_margin
+        self.vz_climb_margin = vz_climb_margin
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
@@ -359,7 +365,7 @@ class Economics(object):
     "ramp_handling_cost":{"unit":"$/trip", "om":1.e3, "txt":"Ramp handling cost"},
     "standard_operating_cost":{"unit":"$/trip", "om":1.e4, "txt":"Standard operating cost"},
     "cash_operating_cost":{"unit":"$/trip", "om":1.e4, "txt":"Cash operating cost"},
-    "total_investment":{"unit":"$/trip", "om":1.e3, "txt":"Total investment"},
+    "total_investment":{"unit":"$", "om":1.e3, "txt":"Total investment"},
     "interest":{"unit":"$/trip", "om":1.e3, "txt":"Interest"},
     "insurance":{"unit":"$/trip", "om":1.e3, "txt":"Insurance"},
     "depreciation":{"unit":"$/trip", "om":1.e3, "txt":"Depreciation"},

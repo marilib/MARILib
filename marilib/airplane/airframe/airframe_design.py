@@ -14,6 +14,7 @@ from marilib.tools import units as unit
 from marilib.earth import environment as earth
 
 from marilib.aircraft_model.airplane import aerodynamics as airplane_aero
+
 from marilib.airplane.airframe import airframe_models as frame_aero
 
 
@@ -270,7 +271,7 @@ def eval_vtp_design(aircraft):
     vtp.x_tip = vtp.x_root + 0.25*(vtp.c_root-vtp.c_tip) + vtp.height*numpy.tan(vtp.sweep)
 
     vtp.z_root = fuselage.height
-    vtp.z_tip = vtp.z_root+vtp.height
+    vtp.z_tip = vtp.z_root + vtp.height
 
     vtp.mac = vtp.height*(vtp.c_root**2+vtp.c_tip**2+vtp.c_root*vtp.c_tip)/(3*vtp.area)
     vtp.x_mac = vtp.x_root+(vtp.x_tip-vtp.x_root)*vtp.height*(2*vtp.c_tip+vtp.c_root)/(6*vtp.area)
@@ -309,7 +310,7 @@ def eval_vtp_constraint(aircraft):
 
     vtp_area = vtp.volume*(1.e-3*engine.reference_thrust*nacelle.y_ext)/vtp.lever_arm
 
-    vtp.vtp_sizing_constraint_1 = (vtp.area - vtp_area) / vtp.area
+    vtp.vtp_sizing_constraint_1 = (vtp.area - vtp_area) / vtp_area
 
     return
 
@@ -427,7 +428,7 @@ def eval_htp_constraint(aircraft):
 
     htp_area = htp.volume*(wing.area*wing.mac/htp.lever_arm)
 
-    htp.htp_sizing_constraint_1 = (htp.area - htp_area) / htp.area
+    htp.htp_sizing_constraint_1 = (htp.area - htp_area) / htp_area
 
     return
 

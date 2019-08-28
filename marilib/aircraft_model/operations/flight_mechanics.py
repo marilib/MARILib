@@ -23,12 +23,9 @@ def lift_from_speed(aircraft,pamb,tamb,mach,mass):
     g = earth.gravity()
     gam = earth.heat_ratio()
 
-    if (aircraft.propulsion.architecture=="PTE2"):
-        m = mass + aircraft.pte2_blimp_body.buoyancy_force
-    else:
-        m = mass
+    mg = mass*g
 
-    c_z = (2.*m*g)/(gam*pamb*mach**2*wing.area)
+    c_z = (2.*mg)/(gam*pamb*mach**2*wing.area)
     return c_z
 
 
@@ -39,12 +36,9 @@ def speed_from_lift(aircraft,pamb,tamb,cz,mass):
     g = earth.gravity()
     gam = earth.heat_ratio()
 
-    if (aircraft.propulsion.architecture=="PTE2"):
-        m = mass + aircraft.pte2_blimp_body.buoyancy_force
-    else:
-        m = mass
+    mg = mass*g
 
-    mach = numpy.sqrt((m*g)/(0.5*gam*pamb*wing.area*cz))
+    mach = numpy.sqrt((mg)/(0.5*gam*pamb*wing.area*cz))
     return mach
 
 
@@ -155,7 +149,7 @@ def max_path(aircraft,nei,altp,disa,speed_mode,mass,rating):
         if(isformax==True):
             return slope
         elif(isformax==False):
-            return slope,vz,speed
+            return slope,vz,mach
     #---------------------------------------------------------------------------------------
 
     cz_ini = 0.5
@@ -168,9 +162,9 @@ def max_path(aircraft,nei,altp,disa,speed_mode,mass,rating):
 
     isformax=False
 
-    [slope,vz,speed] = fct_max_path(cz,aircraft,nei,altp,disa,speed_mode,mass,rating,isformax)
+    [slope,vz,mach] = fct_max_path(cz,aircraft,nei,altp,disa,speed_mode,mass,rating,isformax)
 
-    return slope,vz,speed,cz
+    return slope,vz,mach,cz
 
 
 #===========================================================================================================

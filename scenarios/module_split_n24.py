@@ -6,8 +6,8 @@ Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry
 
 ------------------------------------------------------------------------------------------------------------
-This scenario allows to play with GEMS a full design process with HQ based empennage sizing treated as an
-optimization problem
+This scenario allows to play with GEMS a full design process with Mass - Mission adaptation AND HQ based empennage
+sizing treated as an optimization problem
 
 All processes must be managed at MDO level
 
@@ -22,9 +22,11 @@ Circular dependencies on : aircraft.turbofan_nacelle.width
 Mass design parameter n°1 : aircraft.weights.mtow
 Mass design parameter n°2 : aircraft.weights.mlw
 Mass design parameter n°3 : aircraft.weights.mzfw
-Mass constraint n°1 : aircraft.weights.mass_constraint_1 ==> 0
-Mass constraint n°2 : aircraft.weights.mass_constraint_2 ==> 0
-Mass constraint n°3 : aircraft.weights.mass_constraint_3 ==> 0
+Mass constraint n°1 : aircraft.weights.mass_constraint_1 >= 0
+Mass constraint n°2 : aircraft.weights.mass_constraint_2 >= 0
+Mass constraint n°3 : aircraft.weights.mass_constraint_3 >= 0
+
+Criterion to be used is : aircraft.weights.mtow
 
 
 HQ design parameter n°1 : aircraft.wing.x_root
@@ -54,6 +56,20 @@ Possible criteria : aircraft.weights.mtow
                   : aircraft.environmental_impact.CO2_metric
                   : aircraft.economics.cash_operating_cost
                   : aircraft.economics.direct_operating_cost
+
+Additionally :
+It is possible to experiment bi-level optimization by managing two disciplinary optimizations :
+
+1- Find best cruise altitude for nominal mission (variable : aircraft.nominal_mission.nominal_cruise_altp)
+   which minimizes the mission block fuel (variable : aircraft.nominal_mission.block_fuel)
+   under no bound constraints
+   under ceiling constraints which must be kept positive :  (aircraft.nominal_mission.vz_climb_margin >= 0)
+                                                            (aircraft.nominal_mission.vz_cruise_margin >= 0)
+
+2- Find best flying mach number when one engine is inoperative (variable : aircraft.low_speed.oei_best_speed)
+   which maximizes the fly path (variable : aircraft.low_speed.eff_oei_path)
+   under the following bound constraints : 0.25 <= mach <= aircraft.nominal_mission.nominal_cruise_mach
+
 ------------------------------------------------------------------------------------------------------------
 """
 
@@ -72,11 +88,11 @@ from marilib.aircraft_model.airplane.airplane_design \
     import eval_aerodynamics_design, eval_mass_coupling
 
 from marilib.aircraft_model.operations.mission \
-    import eval_nominal_mission, eval_cost_mission
+    import eval_nominal_mission, eval_nominal_climb_constraints, eval_cost_mission
 
 from marilib.processes.component \
     import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
-           eval_oei_performances, eval_co2_metric, eval_economics
+           eval_oei_path, eval_co2_metric, eval_economics
 
 from marilib.processes.assembly \
     import aircraft_initialize, eval_mass_breakdown, eval_payload_range_analysis, \
@@ -132,15 +148,20 @@ def handling_quality_analysis(aircraft):
 #-----------------------------------------------------------------------------------------------------------
 def nominal_mission(aircraft):
     eval_nominal_mission(aircraft)
+    eval_nominal_climb_constraints(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def performance_analysis(aircraft):
     eval_take_off_performances(aircraft)
     eval_climb_performances(aircraft)
-    eval_oei_performances(aircraft)
     eval_landing_performances(aircraft)
     eval_payload_range_analysis(aircraft)
+    return
+
+#-----------------------------------------------------------------------------------------------------------
+def oei_performance_analysis(aircraft):
+    eval_oei_path(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
@@ -164,6 +185,12 @@ propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
 n_engine = 2           # Number of engine
 
 aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
+
+#---------------------------------------------------------------------------
+aircraft.nominal_mission.nominal_cruise_altp = unit.m_ft(35000)
+
+aircraft.low_speed.oei_best_speed = 0.77        # Mach number
+
 
 #---------------------------------------------------------------------------
 # Setting HQ optimization mode
@@ -190,6 +217,13 @@ nominal_mission(aircraft)
 
 performance_analysis(aircraft)
 
+oei_performance_analysis(aircraft)
+
 criteria(aircraft)
 
 
+print(aircraft.nominal_mission.block_fuel)
+print(aircraft.nominal_mission.vz_climb_margin)
+print(aircraft.nominal_mission.vz_cruise_margin)
+
+print(aircraft.low_speed.eff_oei_path)

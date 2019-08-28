@@ -142,9 +142,7 @@ def eval_pte1_nacelle_design(aircraft):
 
             nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
 
-            nacelle.z_ext = - 0.5 * fuselage.height \
-                            + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
-                            - 0.5*nacelle.width
+            nacelle.z_ext = (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) - 0.5*nacelle.width
 
         elif (nacelle.n_engine==4):
 
@@ -152,17 +150,13 @@ def eval_pte1_nacelle_design(aircraft):
 
             nacelle.x_int = wing.x_root + (nacelle.y_int-wing.y_root)*tan_phi0 - 0.7*nacelle.length
 
-            nacelle.z_int = - 0.5 * fuselage.height \
-                            + (nacelle.y_int - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
-                            - 0.5*nacelle.width
+            nacelle.z_int = (nacelle.y_int - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) - 0.5*nacelle.width
 
             nacelle.y_ext = 2.0 * fuselage.width + 1.5 * nacelle.width      # statistical regression
 
             nacelle.x_ext = wing.x_root + (nacelle.y_ext-wing.y_root)*tan_phi0 - 0.7*nacelle.length
 
-            nacelle.z_ext = - 0.5 * fuselage.height \
-                            + (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) \
-                            - 0.5*nacelle.width
+            nacelle.z_ext = (nacelle.y_ext - 0.5 * fuselage.width) * numpy.tan(wing.dihedral) - 0.5*nacelle.width
         else:
             raise Exception("nacelle.n_engine, number of engine not supported")
 
@@ -174,7 +168,7 @@ def eval_pte1_nacelle_design(aircraft):
 
             nacelle.x_ext = vtp.x_root - 0.5*nacelle.length
 
-            nacelle.z_ext = 0.5 * fuselage.height
+            nacelle.z_ext = fuselage.height
 
         else:
             raise Exception("nacelle.n_engine, number of engine not supported")

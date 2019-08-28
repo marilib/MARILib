@@ -19,8 +19,6 @@ def ref_cruise_altp(propulsive_architecture):
         ref_cruise_altp_i = unit.m_ft(35000.)
     elif (propulsive_architecture=="PTE1"):
         ref_cruise_altp_i = unit.m_ft(35000.)
-    elif (propulsive_architecture=="PTE2"):
-        ref_cruise_altp_i = unit.m_ft(10000.)
     elif (propulsive_architecture=="EF1"):
         ref_cruise_altp_i = unit.m_ft(25000.)
     else:
@@ -33,8 +31,6 @@ def top_of_climb_altp(propulsive_architecture):
         top_of_climb_altp_i = unit.m_ft(31000.)
     elif (propulsive_architecture=="PTE1"):
         top_of_climb_altp_i = unit.m_ft(31000.)
-    elif (propulsive_architecture=="PTE2"):
-        top_of_climb_altp_i = unit.m_ft(10000.)
     elif (propulsive_architecture=="EF1"):
         top_of_climb_altp_i = unit.m_ft(25000.)
     else:
@@ -91,7 +87,7 @@ def cg_range_optimization():
     return cg_range_optimization_i
 
 #===========================================================================================================
-def wing_attachment():
+def wing_attachment(propulsive_architecture):
     """
     wing_attachment = 1 : low wing
     wing_attachment = 2 : high wing
@@ -123,13 +119,10 @@ def hld_type(propulsive_architecture,n_pax_ref):
     hld_type = 9  : Slat + Fowler                      (A320)
     hld_type = 10 : Slat + Slotted Fowler (A321)
     """
-    if (propulsive_architecture=="PTE2"):
-        hld_type_i = 2
+    if (n_pax_ref>100):
+        hld_type_i = 9
     else:
-        if (n_pax_ref>100):
-            hld_type_i = 9
-        else:
-            hld_type_i = 7
+        hld_type_i = 7
     return hld_type_i
 
 #===========================================================================================================
@@ -168,12 +161,17 @@ def hld_conf_clean():
     return hld_conf_clean_i
 
 #===========================================================================================================
+def hld_conf_to():
+    hld_conf_to_i = 0.3       # by definition (0=<hld_conf=<1)
+    return hld_conf_to_i
+
+#===========================================================================================================
 def hld_conf_ld():
     hld_conf_ld_i = 1       # by definition (0=<hld_conf=<1)
     return hld_conf_ld_i
 
 #===========================================================================================================
-def wing_aspect_ratio():
+def wing_aspect_ratio(propulsive_architecture):
     wing_aspect_ratio_i = 9
     return wing_aspect_ratio_i
 
@@ -457,6 +455,11 @@ def req_oei_altp(propulsive_architecture):
     req_oei_altp_i = unit.m_ft(11000.)
     return req_oei_altp_i
 
+#===========================================================================================================
+def oei_best_speed(cruise_mach):
+    oei_best_speed_i = cruise_mach - 0.01
+    return oei_best_speed_i
+
 
 #===========================================================================================================
 def altp_tofl():
@@ -517,7 +520,7 @@ def cas2_ttc(cruise_mach):
     elif (cruise_mach>=0.4):
         cas2_ttc_i = unit.mps_kt(240.)
     else:
-        cas2_ttc_i = unit.mps_kt(80.)
+        cas2_ttc_i = unit.mps_kt(70.)
     return cas2_ttc_i
 
 #===========================================================================================================

@@ -205,13 +205,10 @@ def eval_aerodynamics_design(aircraft):
 
     aerodynamics.cruise_lod_max, aerodynamics.cz_cruise_lod_max = airplane_aero.lod_max(aircraft, pamb, tamb, mach)
 
-    aerodynamics.hld_conf_clean = 0.0   # By definition (0=<hld_conf=<1)
     aerodynamics.cz_max_clean,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_clean)
 
-    aerodynamics.hld_conf_to = 0.3      # Take off (empirical setting)
     aerodynamics.cz_max_to,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_to)
 
-    aerodynamics.hld_conf_ld = 1.0      # By definition (0=<hld_conf=<1), 1 is full landing
     aerodynamics.cz_max_ld,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_ld)
 
     return

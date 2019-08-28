@@ -69,7 +69,7 @@ from marilib.aircraft_model.operations.mission \
 
 from marilib.processes.component \
     import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
-           eval_co2_metric, eval_economics
+           eval_oei_performances, eval_co2_metric, eval_economics
 
 from marilib.processes.assembly \
     import aircraft_initialize, eval_mass_breakdown, eval_payload_range_analysis, \
@@ -131,6 +131,7 @@ def nominal_mission(aircraft):
 def performance_analysis(aircraft):
     eval_take_off_performances(aircraft)
     eval_climb_performances(aircraft)
+    eval_oei_performances(aircraft)
     eval_landing_performances(aircraft)
     eval_payload_range_analysis(aircraft)
     return

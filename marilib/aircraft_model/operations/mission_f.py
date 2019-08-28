@@ -54,8 +54,6 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
         fn,sfc,data = propu.turbofan_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
     elif (propulsion.architecture=="PTE1"):
         fn,sfc,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
-    elif (propulsion.architecture=="PTE2"):
-        fn,sfc,sec,data = propu.pte2_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
     else:
         raise Exception("mission_f, propulsive architecture not allowed")
 
@@ -68,13 +66,6 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     elif (propulsion.architecture=="PTE1"):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
                         - (sfc/sec)*aircraft.pte1_battery.energy_cruise
-    elif (propulsion.architecture=="PTE2"):
-        if (nacelle.rear_nacelle==1):
-            fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
-                            - (sfc/sec)*aircraft.pte2_battery.energy_cruise
-        else:
-            fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
-
     else:
         raise Exception("propulsion.architecture index is out of range")
 

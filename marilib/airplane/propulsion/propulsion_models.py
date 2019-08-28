@@ -20,9 +20,6 @@ from marilib.airplane.propulsion.turbofan.turbofan_models \
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_models \
     import pte1_sfc, pte1_thrust
 
-from marilib.airplane.propulsion.hybrid_pte2.hybrid_pte2_models \
-    import pte2_sfc, pte2_thrust, blimp_body_drag, pte2_oei_drag
-
 from marilib.airplane.propulsion.electric_ef1.electric_ef1_models \
     import ef1_sec, ef1_thrust, electrofan_oei_drag
 
@@ -41,8 +38,6 @@ def sfc(aircraft,pamb,tamb,mach,rating,thrust,nei):
         sfc = turbofan_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei)
     elif (propulsion.architecture=="PTE1"):
         sfc = pte1_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei)
-    elif (propulsion.architecture=="PTE2"):
-        sfc = pte2_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei)
     elif (propulsion.architecture=="EF1"):
         sfc = ef1_sec(aircraft,pamb,tamb,mach,rating,thrust,nei)
     else:
@@ -64,8 +59,6 @@ def thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
         sec = 0.
     elif (propulsion.architecture=="PTE1"):
         fn,sfc,sec,data = pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
-    elif (propulsion.architecture=="PTE2"):
-        fn,sfc,sec,data = pte2_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
     elif (propulsion.architecture=="EF1"):
         sfc = 0.
         fn,sec,data = ef1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
@@ -93,19 +86,6 @@ def nacelle_drag(aircraft,Re,Mach):
         r_nacelle_cxf,r_nacelle_nwa = jet.nacelle_generic_drag(aircraft,r_nacelle,Re,Mach)
         nacelle_nwa = t_nacelle_nwa + r_nacelle_nwa
         nacelle_cxf = (t_nacelle_cxf*t_nacelle_nwa + r_nacelle_cxf*r_nacelle_nwa)/nacelle_nwa
-    elif (propulsion.architecture=="PTE2"):
-        # REMARK : Blimp drag is included into nacelle mass
-        blimp_cxf,blimp_nwa = blimp_body_drag(aircraft,Re,Mach)
-        nacelle = aircraft.turbofan_nacelle
-        t_nacelle_cxf,t_nacelle_nwa = jet.nacelle_generic_drag(aircraft,nacelle,Re,Mach)
-        if (nacelle.rear_nacelle==1):
-            r_nacelle = aircraft.rear_electric_nacelle
-            r_nacelle_cxf,r_nacelle_nwa = jet.nacelle_generic_drag(aircraft,r_nacelle,Re,Mach)
-        else:
-            r_nacelle_cxf = 0.
-            r_nacelle_nwa = 0.
-        nacelle_nwa = blimp_nwa + t_nacelle_nwa + r_nacelle_nwa
-        nacelle_cxf = (blimp_cxf*blimp_nwa + t_nacelle_cxf*t_nacelle_nwa + r_nacelle_cxf*r_nacelle_nwa)/nacelle_nwa
     elif (propulsion.architecture=="EF1"):
         e_nacelle = aircraft.electrofan_nacelle
         e_nacelle_cxf,e_nacelle_nwa = jet.nacelle_generic_drag(aircraft,e_nacelle,Re,Mach)
@@ -137,9 +117,6 @@ def oei_drag(aircraft,pamb,tamb):
     elif (propulsion.architecture=="PTE1"):
         nacelle = aircraft.turbofan_nacelle
         dcx = turbofan_oei_drag(aircraft,nacelle,pamb,tamb)
-    elif (propulsion.architecture=="PTE2"):
-        nacelle = aircraft.turbofan_nacelle
-        dcx = pte2_oei_drag(aircraft,nacelle,pamb,tamb)
     elif (propulsion.architecture=="EF1"):
         nacelle = aircraft.electrofan_nacelle
         dcx = electrofan_oei_drag(aircraft,nacelle,pamb,tamb)
@@ -160,8 +137,6 @@ def thrust_pitch_moment(aircraft,fn,pamb,mach,dcx_oei):
     if (propulsion.architecture=="TF"):
         nacelle = aircraft.turbofan_nacelle
     elif (propulsion.architecture=="PTE1"):
-        nacelle = aircraft.turbofan_nacelle
-    elif (propulsion.architecture=="PTE2"):
         nacelle = aircraft.turbofan_nacelle
     elif (propulsion.architecture=="EF1"):
         nacelle = aircraft.electrofan_nacelle
@@ -188,8 +163,6 @@ def thrust_yaw_moment(aircraft,fn,pamb,mach,dcx_oei):
         nacelle = aircraft.turbofan_nacelle
     elif (propulsion.architecture=="PTE1"):
         nacelle = aircraft.turbofan_nacelle
-    elif (propulsion.architecture=="PTE2"):
-        nacelle = aircraft.turbofan_nacelle
     elif (propulsion.architecture=="EF1"):
         nacelle = aircraft.electrofan_nacelle
     else:
@@ -214,26 +187,12 @@ def tail_cone_drag_effect(aircraft):
         dfus = aircraft.fuselage.width
         dhub = aircraft.rear_electric_nacelle.hub_width
         fac = (1.-(dhub/dfus)**2)
-    elif (propulsion.architecture=="PTE2"):
-        fac = 1.
     elif (propulsion.architecture=="EF1"):
         fac = 1.
     else:
         raise Exception("propulsion.architecture index is out of range")
 
     return fac
-
-
-#===========================================================================================================
-def buoyancy(aircraft,pamb,tamb):
-    """
-    Buoyancy (Archimedes thrust)
-    """
-
-    blimp_body = aircraft.pte2_blimp_body
-
-    r_air = earth.gas_constant("air")
-    r_he = earth.gas_constant("helium")
 
 
 

@@ -13,6 +13,8 @@ from marilib.tools.math import maximize_1d
 
 from marilib.aircraft_model.operations import mission_b, mission_f
 
+from marilib.aircraft_model.operations import other_performances as perfo
+
 
 #===========================================================================================================
 def eval_payload_range_missions(aircraft):
@@ -24,6 +26,24 @@ def eval_payload_range_missions(aircraft):
         mission_b.eval_payload_range_b_missions(aircraft)
     else:
         mission_f.eval_payload_range_f_missions(aircraft)
+
+    return
+
+
+#===========================================================================================================
+def eval_nominal_climb_constraints(aircraft):
+    """
+    Nominal mission climb constraints evaluation
+    """
+
+    disa = 0.
+    altp = aircraft.nominal_mission.nominal_cruise_altp
+    mach = aircraft.nominal_mission.nominal_cruise_mach
+
+    vz_clb,vz_crz = perfo.climb_speeds(aircraft,disa,altp,mach)
+
+    aircraft.nominal_mission.vz_cruise_margin = vz_crz - aircraft.high_speed.req_vz_cruise
+    aircraft.nominal_mission.vz_climb_margin = vz_clb - aircraft.high_speed.req_vz_climb
 
     return
 
