@@ -8,7 +8,7 @@ Created on Thu Jan 24 23:22:21 2019
 
 import warnings
 
-#from ad.linalg.linalg import solve
+from numpy.linalg import solve
 from numpy.linalg.linalg import LinAlgError
 
 from marilib import numpy

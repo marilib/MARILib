@@ -62,7 +62,7 @@ It is possible to experiment bi-level optimization by managing two disciplinary 
 
 1- Find best cruise altitude for nominal mission (variable : aircraft.nominal_mission.nominal_cruise_altp)
    which minimizes the mission block fuel (variable : aircraft.nominal_mission.block_fuel)
-   under no bound constraints
+   under the following bound constraints : m_ft(25000) <= aircraft.nominal_mission.nominal_cruise_altp <= m_ft(45000)
    under ceiling constraints which must be kept positive :  (aircraft.nominal_mission.vz_climb_margin >= 0)
                                                             (aircraft.nominal_mission.vz_cruise_margin >= 0)
 
