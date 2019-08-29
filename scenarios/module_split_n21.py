@@ -101,34 +101,55 @@ def geometry_coupling(aircraft):
 
 #-----------------------------------------------------------------------------------------------------------
 def propulsion(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_propulsion_design(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def aircraft_aerodynamics(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_aerodynamics_design(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def aircraft_mass(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_mass_breakdown(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def mass_coupling(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_mass_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def handling_quality_analysis(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_handling_quality_analysis(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def nominal_mission(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_nominal_mission(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def performance_analysis(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_take_off_performances(aircraft)
     eval_climb_performances(aircraft)
     eval_oei_performances(aircraft)
@@ -138,6 +159,9 @@ def performance_analysis(aircraft):
 
 #-----------------------------------------------------------------------------------------------------------
 def criteria(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_co2_metric(aircraft)
     eval_cost_mission(aircraft)
     eval_economics(aircraft)
