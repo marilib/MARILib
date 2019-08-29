@@ -61,6 +61,21 @@ def eval_nominal_mission(aircraft):
 
 
 #===========================================================================================================
+def eval_mission_coupling(aircraft):
+    """
+    Mass-Mission coupling
+    This relation is put apart from nominal_mission because GEMS does not manage functions that compute their own input
+    """
+
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_b_mission_coupling(aircraft)
+    else:
+        mission_f.eval_f_mission_coupling(aircraft)
+
+    return
+
+
+#===========================================================================================================
 def eval_cost_mission(aircraft):
     """
     Cost mission evaluation
