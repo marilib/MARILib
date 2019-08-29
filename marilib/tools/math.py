@@ -6,13 +6,14 @@ Created on Thu Jan 24 23:22:21 2019
          ROCHES Pascal : portage to Python
 """
 
+import marilib
+
 import warnings
+
+from marilib import numpy
 
 from numpy.linalg import solve
 from numpy.linalg.linalg import LinAlgError
-
-from marilib import numpy
-import marilib
 
 
 # from autograd import jacobian
@@ -192,7 +193,7 @@ def approx_jac(res, y, args=(), step=1e-7):
     myargs = (y,) + args
     res_ref = res(*myargs)
     pert = numpy.zeros_like(y)
-    for i in xrange(n):
+    for i in range(n):
         yi = y[i]
         if hasattr(yi, "_value"):
             yi = yi._value

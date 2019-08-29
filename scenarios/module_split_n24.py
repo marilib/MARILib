@@ -72,6 +72,10 @@ It is possible to experiment bi-level optimization by managing two disciplinary 
 
 ------------------------------------------------------------------------------------------------------------
 """
+import marilib
+
+marilib.use_newton_solve()
+
 
 from marilib.tools import units as unit
 
