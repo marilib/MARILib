@@ -74,9 +74,6 @@ It is possible to experiment bi-level optimization by managing two disciplinary 
 """
 import marilib
 
-marilib.use_newton_solve()
-
-
 from marilib.tools import units as unit
 
 from marilib.aircraft_data.aircraft_description import Aircraft
@@ -92,7 +89,8 @@ from marilib.aircraft_model.airplane.airplane_design \
     import eval_aerodynamics_design, eval_mass_coupling
 
 from marilib.aircraft_model.operations.mission \
-    import eval_nominal_mission, eval_nominal_climb_constraints, eval_cost_mission
+    import eval_nominal_mission, eval_nominal_climb_constraints, eval_cost_mission, \
+           eval_mission_coupling
 
 from marilib.processes.component \
     import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
@@ -128,35 +126,63 @@ def geometry_coupling(aircraft):
 
 #-----------------------------------------------------------------------------------------------------------
 def propulsion(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_propulsion_design(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def aircraft_aerodynamics(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_aerodynamics_design(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def aircraft_mass(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_mass_breakdown(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def mass_coupling(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_mass_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def handling_quality_analysis(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_handling_quality_analysis(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def nominal_mission(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_nominal_mission(aircraft)
     eval_nominal_climb_constraints(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
+def mission_coupling(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
+    eval_mission_coupling(aircraft)
+
+#-----------------------------------------------------------------------------------------------------------
 def performance_analysis(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_take_off_performances(aircraft)
     eval_climb_performances(aircraft)
     eval_landing_performances(aircraft)
@@ -165,69 +191,75 @@ def performance_analysis(aircraft):
 
 #-----------------------------------------------------------------------------------------------------------
 def oei_performance_analysis(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_oei_path(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------
 def criteria(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_co2_metric(aircraft)
     eval_cost_mission(aircraft)
     eval_economics(aircraft)
     return
 
 
-
-# Initialize aircraft data structure
-#---------------------------------------------------------------------------
-aircraft = Aircraft()
-
-n_pax_ref = 150                     # Reference number of passengers
-design_range = unit.m_NM(3000)      # Design range
-cruise_mach = 0.78                  # Nominal cruise mach number
-
-propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
-n_engine = 2           # Number of engine
-
-aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
-
-#---------------------------------------------------------------------------
-aircraft.nominal_mission.nominal_cruise_altp = unit.m_ft(35000)
-
-aircraft.low_speed.oei_best_speed = 0.77        # Mach number
-
-
-#---------------------------------------------------------------------------
-# Setting HQ optimization mode
-aircraft.center_of_gravity.cg_range_optimization = 1
-#---------------------------------------------------------------------------
-
-fuselage_design(aircraft)
-
-lifting_plane_design(aircraft)
-
-propulsion(aircraft)
-
-geometry_coupling(aircraft)
-
-aircraft_aerodynamics(aircraft)
-
-aircraft_mass(aircraft)
-
-mass_coupling(aircraft)
-
-handling_quality_analysis(aircraft)
-
-nominal_mission(aircraft)
-
-performance_analysis(aircraft)
-
-oei_performance_analysis(aircraft)
-
-criteria(aircraft)
-
-
-print(aircraft.nominal_mission.block_fuel)
-print(aircraft.nominal_mission.vz_climb_margin)
-print(aircraft.nominal_mission.vz_cruise_margin)
-
-print(aircraft.low_speed.eff_oei_path)
+if __name__ == "__main__":
+    # Initialize aircraft data structure
+    #---------------------------------------------------------------------------
+    aircraft = Aircraft()
+    
+    n_pax_ref = 150                     # Reference number of passengers
+    design_range = unit.m_NM(3000)      # Design range
+    cruise_mach = 0.78                  # Nominal cruise mach number
+    
+    propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
+    n_engine = 2           # Number of engine
+    
+    aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
+    
+    #---------------------------------------------------------------------------
+    aircraft.nominal_mission.nominal_cruise_altp = unit.m_ft(35000)
+    
+    aircraft.low_speed.oei_best_speed = 0.77        # Mach number
+    
+    
+    #---------------------------------------------------------------------------
+    # Setting HQ optimization mode
+    aircraft.center_of_gravity.cg_range_optimization = 1
+    #---------------------------------------------------------------------------
+    
+    fuselage_design(aircraft)
+    
+    lifting_plane_design(aircraft)
+    
+    propulsion(aircraft)
+    
+    geometry_coupling(aircraft)
+    
+    aircraft_aerodynamics(aircraft)
+    
+    aircraft_mass(aircraft)
+    
+    mass_coupling(aircraft)
+    
+    handling_quality_analysis(aircraft)
+    
+    nominal_mission(aircraft)
+    
+    performance_analysis(aircraft)
+    
+    oei_performance_analysis(aircraft)
+    
+    criteria(aircraft)
+    
+    
+    print(aircraft.nominal_mission.block_fuel)
+    print(aircraft.nominal_mission.vz_climb_margin)
+    print(aircraft.nominal_mission.vz_cruise_margin)
+    
+    print(aircraft.low_speed.eff_oei_path)
