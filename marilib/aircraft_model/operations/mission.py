@@ -59,6 +59,16 @@ def eval_nominal_mission(aircraft):
     else:
         mission_f.eval_nominal_f_mission(aircraft)
 
+#===========================================================================================================
+def eval_mission_coupling(aircraft):
+    """
+    Nominal mission evaluation
+    """
+
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_b_mission_coupling(aircraft)
+    else:
+        mission_f.eval_f_mission_coupling(aircraft)
 
 #===========================================================================================================
 def eval_cost_mission(aircraft):
