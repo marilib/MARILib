@@ -238,6 +238,16 @@ def rating_code():
     return rating_code_i
 
 #===========================================================================================================
+def rating_factor(propulsive_architecture):
+    if (propulsive_architecture=="TF"):
+        rating_factor_i = {"MTO":0.800, "MCN":0.688, "MCL":0.624, "MCR":0.560, "FID":0.100}
+    elif (propulsive_architecture=="EF1"):
+        rating_factor_i = {"MTO":1.00, "MCN":0.80, "MCL":0.80, "MCR":0.80, "FID":0.05}
+    else:
+        rating_factor_i = None
+    return rating_factor_i
+
+#===========================================================================================================
 def efficiency_fan():
     efficiency_fan_i = 0.95     # efficiency to convert shaft power into kinetic energy
     return efficiency_fan_i
@@ -337,8 +347,11 @@ def battery_energy_cruise():
     return battery_energy_cruise_i
 
 #===========================================================================================================
-def battery_energy_density():
-    battery_energy_density_i = unit.J_kWh(0.5)    # Battery energy density (kWh/kg)
+def battery_energy_density(propulsive_architecture):
+    if (propulsive_architecture in ("PTE1", "EF1")):
+        battery_energy_density_i = unit.J_kWh(0.5)    # Battery energy density (kWh/kg)
+    else:
+        battery_energy_density_i = 0. # TF propulsion has no battery
     return battery_energy_density_i
 
 #===========================================================================================================
