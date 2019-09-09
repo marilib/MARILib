@@ -55,14 +55,14 @@ from marilib.tools import units as unit
 from marilib.aircraft_data.aircraft_description import Aircraft
 
 from marilib.airplane.airframe.airframe_design \
-    import eval_cabin_design, eval_fuselage_design, eval_vtp_design, eval_vtp_statistical_sizing, \
-           eval_htp_design, eval_htp_statistical_sizing, eval_wing_design
+    import eval_cabin_design, eval_fuselage_design, eval_vtp_design, \
+           eval_htp_design, eval_wing_design
 
 from marilib.airplane.propulsion.propulsion_design \
     import eval_propulsion_design
 
 from marilib.aircraft_model.airplane.airplane_design \
-    import eval_aerodynamics_design, eval_mass_coupling
+    import eval_aerodynamics_design
 
 from marilib.aircraft_model.operations.mission \
     import eval_nominal_mission, eval_cost_mission
@@ -94,12 +94,6 @@ def lifting_plane_design(aircraft):
     return
 
 #-----------------------------------------------------------------------------------------------------------
-def geometry_coupling(aircraft):
-    eval_vtp_statistical_sizing(aircraft)
-    eval_htp_statistical_sizing(aircraft)
-    return
-
-#-----------------------------------------------------------------------------------------------------------
 def propulsion(aircraft):
     """
     @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
@@ -122,13 +116,6 @@ def aircraft_mass(aircraft):
     """
     eval_mass_breakdown(aircraft)
     return
-
-#-----------------------------------------------------------------------------------------------------------
-def mass_coupling(aircraft):
-    """
-    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
-    """
-    eval_mass_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def handling_quality_analysis(aircraft):
@@ -168,45 +155,39 @@ def criteria(aircraft):
     return
 
 
+if __name__ == "__main__":
+    # Initialize aircraft data structure
+    #---------------------------------------------------------------------------
+    aircraft = Aircraft()
 
-# Initialize aircraft data structure
-#---------------------------------------------------------------------------
-aircraft = Aircraft()
+    n_pax_ref = 150                     # Reference number of passengers
+    design_range = unit.m_NM(3000)      # Design range
+    cruise_mach = 0.78                  # Nominal cruise mach number
 
-n_pax_ref = 150                     # Reference number of passengers
-design_range = unit.m_NM(3000)      # Design range
-cruise_mach = 0.78                  # Nominal cruise mach number
+    propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
+    n_engine = 2           # Number of engine
 
-propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
-n_engine = 2           # Number of engine
+    aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
 
-aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
+    #---------------------------------------------------------------------------
+    # Setting HQ optimization mode
+    aircraft.center_of_gravity.cg_range_optimization = 1
+    #---------------------------------------------------------------------------
 
-#---------------------------------------------------------------------------
-# Setting HQ optimization mode
-aircraft.center_of_gravity.cg_range_optimization = 1
-#---------------------------------------------------------------------------
+    fuselage_design(aircraft)
 
-fuselage_design(aircraft)
+    lifting_plane_design(aircraft)
 
-lifting_plane_design(aircraft)
+    propulsion(aircraft)
 
-propulsion(aircraft)
+    aircraft_aerodynamics(aircraft)
 
-geometry_coupling(aircraft)
+    aircraft_mass(aircraft)
 
-aircraft_aerodynamics(aircraft)
+    handling_quality_analysis(aircraft)
 
-aircraft_mass(aircraft)
+    nominal_mission(aircraft)
 
-mass_coupling(aircraft)
+    performance_analysis(aircraft)
 
-handling_quality_analysis(aircraft)
-
-nominal_mission(aircraft)
-
-performance_analysis(aircraft)
-
-criteria(aircraft)
-
-
+    criteria(aircraft)
