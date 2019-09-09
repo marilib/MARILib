@@ -130,6 +130,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     #-----------------------------------------------------------------------------------------------------------
     aircraft.turbofan_engine.bpr = init.bpr(n_pax_ref)
     aircraft.turbofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
+    aircraft.turbofan_engine.rating_factor = init.rating_factor(propu_config)
 
     aircraft.turbofan_engine.core_thrust_ratio = init.core_thrust_ratio()
     aircraft.turbofan_engine.core_width_ratio = init.core_width_ratio()
@@ -144,6 +145,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.turbofan_nacelle.y_ext = init.nacelle_y_ext(aircraft.turbofan_nacelle.attachment,
                                                                   aircraft.fuselage.width,
                                                                   aircraft.turbofan_nacelle.width)
+    aircraft.propulsion.battery_energy_density = init.battery_energy_density(propu_config)
 
     #-----------------------------------------------------------------------------------------------------------
     aircraft.rear_electric_nacelle.efficiency_fan = init.efficiency_fan()
@@ -170,7 +172,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.pte1_battery.power_feed = init.battery_power_feed()
     aircraft.pte1_battery.time_feed = init.battery_time_feed()
     aircraft.pte1_battery.energy_cruise = init.battery_energy_cruise()
-    aircraft.pte1_battery.energy_density = init.battery_energy_density()
+    aircraft.pte1_battery.energy_density = init.battery_energy_density(propu_config)
     aircraft.pte1_battery.power_density = init.battery_power_density()
 
     #-----------------------------------------------------------------------------------------------------------
@@ -196,6 +198,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.electrofan_engine.mcl_e_shaft_power = init.electric_shaft_power()       # Watts, fan shaft power
     aircraft.electrofan_engine.mcr_e_shaft_power = init.electric_shaft_power()       # Watts, fan shaft power
     aircraft.electrofan_engine.fid_e_shaft_power = init.idle_electric_shaft_power()
+    aircraft.electrofan_engine.rating_factor = init.rating_factor(propu_config)
 
     aircraft.ef1_power_elec_chain.overall_efficiency = init.e_chain_efficiency()
     aircraft.ef1_power_elec_chain.generator_pw_density = init.generator_power_density()
@@ -204,7 +207,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.ef1_power_elec_chain.cooling_pw_density = init.cooling_pw_density()
 
     aircraft.ef1_battery.stacking = init.battery_stacking()
-    aircraft.ef1_battery.energy_density = init.battery_energy_density()
+    aircraft.ef1_battery.energy_density = init.battery_energy_density(propu_config)
     aircraft.ef1_battery.power_density = init.battery_power_density()
     aircraft.ef1_battery.density = init.battery_density()
 
