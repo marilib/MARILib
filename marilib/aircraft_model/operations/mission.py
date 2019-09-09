@@ -7,8 +7,6 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 
-from marilib import fsolve
-
 from marilib.tools.math import maximize_1d
 
 from marilib.aircraft_model.operations import mission_b, mission_f
