@@ -45,7 +45,7 @@ def eval_turbofan_engine_design(aircraft):
     engine = aircraft.turbofan_engine
     propulsion = aircraft.propulsion
 
-    engine.rating_factor = {"MTO":0.800, "MCN":0.688, "MCL":0.624, "MCR":0.560, "FID":0.100}
+#    engine.rating_factor = {"MTO":0.800, "MCN":0.688, "MCL":0.624, "MCR":0.560, "FID":0.100}
 
     # Propulsion architecture design, definition reference conditions for engine performances
     #-----------------------------------------------------------------------------------------------------------
