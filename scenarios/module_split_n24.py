@@ -79,18 +79,17 @@ from marilib.tools import units as unit
 from marilib.aircraft_data.aircraft_description import Aircraft
 
 from marilib.airplane.airframe.airframe_design \
-    import eval_cabin_design, eval_fuselage_design, eval_vtp_design, eval_vtp_statistical_sizing, \
-           eval_htp_design, eval_htp_statistical_sizing, eval_wing_design
+    import eval_cabin_design, eval_fuselage_design, eval_vtp_design, \
+           eval_htp_design, eval_wing_design
 
 from marilib.airplane.propulsion.propulsion_design \
     import eval_propulsion_design
 
 from marilib.aircraft_model.airplane.airplane_design \
-    import eval_aerodynamics_design, eval_mass_coupling
+    import eval_aerodynamics_design
 
 from marilib.aircraft_model.operations.mission \
-    import eval_nominal_mission, eval_nominal_climb_constraints, eval_cost_mission, \
-           eval_mission_coupling
+    import eval_nominal_mission, eval_nominal_climb_constraints, eval_cost_mission
 
 from marilib.processes.component \
     import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
@@ -119,12 +118,6 @@ def lifting_plane_design(aircraft):
     return
 
 #-----------------------------------------------------------------------------------------------------------
-def geometry_coupling(aircraft):
-    eval_vtp_statistical_sizing(aircraft)
-    eval_htp_statistical_sizing(aircraft)
-    return
-
-#-----------------------------------------------------------------------------------------------------------
 def propulsion(aircraft):
     """
     @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
@@ -149,13 +142,6 @@ def aircraft_mass(aircraft):
     return
 
 #-----------------------------------------------------------------------------------------------------------
-def mass_coupling(aircraft):
-    """
-    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
-    """
-    eval_mass_coupling(aircraft)
-
-#-----------------------------------------------------------------------------------------------------------
 def handling_quality_analysis(aircraft):
     """
     @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
@@ -170,13 +156,6 @@ def nominal_mission(aircraft):
     eval_nominal_mission(aircraft)
     eval_nominal_climb_constraints(aircraft)
     return
-
-#-----------------------------------------------------------------------------------------------------------
-def mission_coupling(aircraft):
-    """
-    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
-    """
-    eval_mission_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def performance_analysis(aircraft):
@@ -238,15 +217,11 @@ if __name__ == "__main__":
     lifting_plane_design(aircraft)
     
     propulsion(aircraft)
-    
-    geometry_coupling(aircraft)
-    
+        
     aircraft_aerodynamics(aircraft)
     
     aircraft_mass(aircraft)
-    
-    mass_coupling(aircraft)
-    
+        
     handling_quality_analysis(aircraft)
     
     nominal_mission(aircraft)

@@ -52,11 +52,10 @@ from marilib.airplane.propulsion.propulsion_design \
     import eval_propulsion_design
 
 from marilib.aircraft_model.airplane.airplane_design \
-    import eval_aerodynamics_design, eval_mass_coupling
+    import eval_aerodynamics_design
 
 from marilib.aircraft_model.operations.mission \
-    import eval_nominal_mission, eval_nominal_climb_constraints, eval_cost_mission, \
-           eval_mission_coupling
+    import eval_nominal_mission, eval_cost_mission
 
 from marilib.processes.component \
     import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
@@ -111,25 +110,12 @@ def aircraft_mass(aircraft):
     eval_mass_breakdown(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
-def mass_coupling(aircraft):
-    """
-    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
-    """
-    eval_mass_coupling(aircraft)
-
-#-----------------------------------------------------------------------------------------------------------
 def nominal_mission(aircraft):
     """
     @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
     """
     eval_nominal_mission(aircraft)
 
-##-----------------------------------------------------------------------------------------------------------
-def mission_coupling(aircraft):
-    """
-    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
-    """
-    eval_mission_coupling(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def climb_performances(aircraft):
@@ -196,8 +182,6 @@ if __name__ == "__main__":
     aircraft_aerodynamics(aircraft)
     
     aircraft_mass(aircraft)
-    
-    mass_coupling(aircraft)
     
     nominal_mission(aircraft)
     
