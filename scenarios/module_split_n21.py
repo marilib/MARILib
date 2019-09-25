@@ -65,7 +65,7 @@ from marilib.aircraft_model.airplane.airplane_design \
     import eval_aerodynamics_design
 
 from marilib.aircraft_model.operations.mission \
-    import eval_nominal_mission, eval_cost_mission
+    import eval_nominal_mission, eval_mission_coupling, eval_cost_mission
 
 from marilib.processes.component \
     import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
@@ -130,6 +130,11 @@ def nominal_mission(aircraft):
     @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
     """
     eval_nominal_mission(aircraft)
+    return
+
+#-----------------------------------------------------------------------------------------------------------
+def mission_coupling(aircraft):
+    eval_mission_coupling(aircraft)
     return
 
 #-----------------------------------------------------------------------------------------------------------

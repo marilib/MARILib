@@ -72,7 +72,7 @@ from marilib.aircraft_model.airplane.airplane_design \
     import eval_aerodynamics_design, eval_mass_coupling
 
 from marilib.aircraft_model.operations.mission \
-    import eval_nominal_mission, eval_cost_mission
+    import eval_nominal_mission, eval_mission_coupling, eval_cost_mission
 
 from marilib.processes.component \
     import eval_take_off_performances, eval_landing_performances, eval_climb_performances, \
