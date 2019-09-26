@@ -342,12 +342,17 @@ def to_user_format(value, dec_format=STANDARD_FORMAT):
         else:
             V = abs(value)
             if V > 1:
+                if V > 1e6:
+                    return convert_to_scientific_notation(value,dec_format)
                 correction_factor = 1e-4  # to correct 10^n values format
-                nb_dec = int(
-                    max((0, (dec_format + 1) - ceil(log10(V + correction_factor)))))
+                nb_dec = int(max((0, (dec_format + 1) - ceil(log10(V + correction_factor)))))
             else:
+                if V < 1e-3:
+                    return convert_to_scientific_notation(value,dec_format)
                 nb_dec = int((dec_format - 1) - floor(log10(V)))
             return format(value, "".join((".", str(nb_dec), "f")))
+    elif isinstance(value, int) and abs(value) > 1e6:
+        return convert_to_scientific_notation(value,dec_format)
     else:
         return value
 
