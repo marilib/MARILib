@@ -8,7 +8,7 @@ Created on Thu Jan 24 23:22:21 2019
 
 from marilib.tools import units as unit
 
-from marilib.aircraft_data.aircraft_description import Aircraft
+from marilib.aircraft_data.aircraft_description import Aircraft, to_user_format
 
 from marilib.processes import assembly as run
 
@@ -39,13 +39,13 @@ run.eval_payload_range_analysis(aircraft)
 
 
 #------------------------------------------------------------------------------------------------------
-print(unit.user_format(unit.convert_to(aircraft.design_driver.INFO["design_range"]["unit"],aircraft.design_driver.design_range)),
+print(to_user_format(unit.convert_to(aircraft.design_driver.INFO["design_range"]["unit"],aircraft.design_driver.design_range)),
       aircraft.design_driver.INFO["design_range"]["unit"],":",aircraft.design_driver.INFO["design_range"]["txt"])
 
-print(unit.user_format(unit.convert_to(aircraft.wing.INFO["area"]["unit"],aircraft.wing.area)),
+print(to_user_format(unit.convert_to(aircraft.wing.INFO["area"]["unit"],aircraft.wing.area)),
       aircraft.wing.INFO["area"]["unit"],":",aircraft.wing.INFO["area"]["txt"])
 
 
 #------------------------------------------------------------------------------------------------------
-aircraft.export_to_file(file = "aircraft_data.txt")
+aircraft.export_to_file(filename = "aircraft_data.txt")
 
