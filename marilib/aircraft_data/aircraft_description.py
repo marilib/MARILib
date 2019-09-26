@@ -324,8 +324,7 @@ def convert_to_scientific_notation(value, dec_format=STANDARD_FORMAT):
     return str_value
 
 #-------------------------------------------------------------------------
-def to_user_format(value, dec_format):
-
+def to_user_format(value, dec_format=STANDARD_FORMAT):
     if isinstance(value, (tuple, list, ndarray)):
         lst = list(value)
         for i in arange(len(lst)):
