@@ -314,6 +314,14 @@ def convert_to_orig_type(lst, orig_seq):
     else:
         return lst
 
+def convert_to_scientific_notation(value, dec_format=STANDARD_FORMAT):
+    str_value = format(value, "".join((".", str(dec_format), "E")))
+    str_value+= "}"
+    str_value = str_value.replace("E", " x10^{")
+    str_value = str_value.replace("10^{-0", "10^{-")
+    str_value = str_value.replace("10^{+", "10^{")
+    str_value = str_value.replace("10^{0", "10^{")
+    return str_value
 
 #-------------------------------------------------------------------------
 def to_user_format(value, dec_format):
