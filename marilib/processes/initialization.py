@@ -17,6 +17,8 @@ from marilib.earth import environment as earth
 def ref_cruise_altp(propulsive_architecture):
     if (propulsive_architecture=="TF"):
         ref_cruise_altp_i = unit.m_ft(35000.)
+    elif (propulsive_architecture=="TP"):
+        ref_cruise_altp_i = unit.m_ft(20000.)
     elif (propulsive_architecture=="PTE1"):
         ref_cruise_altp_i = unit.m_ft(35000.)
     elif (propulsive_architecture=="EF1"):
@@ -29,6 +31,8 @@ def ref_cruise_altp(propulsive_architecture):
 def top_of_climb_altp(propulsive_architecture):
     if (propulsive_architecture=="TF"):
         top_of_climb_altp_i = unit.m_ft(31000.)
+    elif (propulsive_architecture=="TP"):
+        top_of_climb_altp_i = unit.m_ft(15000.)
     elif (propulsive_architecture=="PTE1"):
         top_of_climb_altp_i = unit.m_ft(31000.)
     elif (propulsive_architecture=="EF1"):
@@ -42,7 +46,7 @@ def top_of_climb_altp(propulsive_architecture):
 def n_pax_front(n_pax_ref):
     if  (n_pax_ref<=8):   n_pax_front_i = 2
     elif(n_pax_ref<=16):  n_pax_front_i = 3
-    elif(n_pax_ref<=50):  n_pax_front_i = 4
+    elif(n_pax_ref<=70):  n_pax_front_i = 4
     elif(n_pax_ref<=120): n_pax_front_i = 5
     elif(n_pax_ref<=225): n_pax_front_i = 6
     elif(n_pax_ref<=300): n_pax_front_i = 8
@@ -63,7 +67,9 @@ def fuselage_width(n_pax_front,n_aisle):
 
 #===========================================================================================================
 def m_pax_nominal(design_range):
-    if(design_range <= unit.m_NM(3500.)):
+    if(design_range <= unit.m_NM(1500.)):
+        m_pax_nominal_i = 95.
+    elif(design_range <= unit.m_NM(3500.)):
         m_pax_nominal_i = 100.
     elif(design_range <= unit.m_NM(5500.)):
         m_pax_nominal_i = 105.
@@ -92,7 +98,10 @@ def wing_attachment(propulsive_architecture):
     wing_attachment = 1 : low wing
     wing_attachment = 2 : high wing
     """
-    wing_attachment_i = 1
+    if (propulsive_architecture=="TP"):
+        wing_attachment_i = 2
+    else:
+        wing_attachment_i = 1
     return wing_attachment_i
 
 #===========================================================================================================
@@ -112,7 +121,7 @@ def hld_type(propulsive_architecture,n_pax_ref):
     hld_type = 2  : Flap only, Rotation with slot      (ATR)
     hld_type = 3  : Flap only, Rotation double slot
     hld_type = 4  : Flap only, Fowler
-    hld_type = 5  : Slap only
+    hld_type = 5  : Slat only
     hld_type = 6  : Slat + Flap rotation double slot
     hld_type = 7  : Slat + Flap rotation with slot
     hld_type = 8  : Slat + Flap rotation double slot
@@ -225,11 +234,14 @@ def ef1_rear_nacelle():
     return efi_rear_nacelle_i
 
 #===========================================================================================================
-def nacelle_attachment(n_pax_ref):
-    if (80<n_pax_ref):
+def nacelle_attachment(propulsive_architecture,n_pax_ref):
+    if (propulsive_architecture=="TP"):
         nacelle_attachment_i = 1     # 1: underwing
     else:
-        nacelle_attachment_i = 2     # 2: on rear fuselage
+        if (80<n_pax_ref):
+            nacelle_attachment_i = 1     # 1: underwing
+        else:
+            nacelle_attachment_i = 2     # 2: on rear fuselage
     return nacelle_attachment_i
 
 #===========================================================================================================
@@ -260,11 +272,18 @@ def n_engine():
     return n_engine_i
 
 #===========================================================================================================
-def bpr(n_pax_ref):
-    if (80<n_pax_ref):
-        bpr_i = 9.
+def bpr(n_pax_ref,propulsive_architecture):
+    if (propulsive_architecture=="TF" or \
+        propulsive_architecture=="PTE1" or \
+        propulsive_architecture=="EF1"):
+        if (80<n_pax_ref):
+            bpr_i = 9.
+        else:
+            bpr_i = 5.
+    elif (propulsive_architecture=="TP"):
+        bpr_i = 30.
     else:
-        bpr_i = 5.
+        raise Exception("propulsive architecture is not supported")
     return bpr_i
 
 #===========================================================================================================
@@ -278,11 +297,25 @@ def nacelle_width(bpr,reference_thrust):
     return turbofan_nacelle_width_i
 
 #===========================================================================================================
-def nacelle_y_ext(attachment,fuselage_width_i,nacelle_width_i):
-    if attachment == 1 :
-        nacelle_y_ext_i = 0.7 * fuselage_width_i + 1.5 * nacelle_width_i
+def propeller_width(reference_thrust):
+    propeller_width_i = numpy.sqrt((4./numpy.pi)*(reference_thrust/3000.))      # Assuming 3000 N/m2
+    return propeller_width_i
+
+#===========================================================================================================
+def nacelle_y_ext(propulsive_architecture,n_engine,attachment,fuselage_width_i,width_i):
+    if (propulsive_architecture=="TP"):
+        if (n_engine==2):
+            nacelle_y_ext_i = 0.5 * fuselage_width_i + 0.7 * width_i
+        elif (n_engine==4):
+            nacelle_y_ext_i = 0.5 * fuselage_width_i + 1.9 * width_i
     else:
-        nacelle_y_ext_i = 0.5 * fuselage_width_i + 0.5 * nacelle_width_i
+        if (attachment==1):
+            if (n_engine==2):
+                nacelle_y_ext_i = 0.7 * fuselage_width_i + 1.5 * width_i
+            elif (n_engine==4):
+                nacelle_y_ext_i = 1.9 * fuselage_width_i + 1.5 * width_i
+        else:
+            nacelle_y_ext_i = 0.5 * fuselage_width_i + 0.5 * width_i
     return nacelle_y_ext_i
 
 #===========================================================================================================
@@ -408,11 +441,14 @@ def boundary_layer_effect():
 
 
 #===========================================================================================================
-def htp_attachment(nacelle_attachment_i):
-    if (nacelle_attachment_i == 1):
-        htp_attachment_i = 1        # 1: Classical (on fuselage tail cone)
-    else:
+def htp_attachment(propulsive_architecture,nacelle_attachment_i):
+    if (propulsive_architecture=="TP"):
         htp_attachment_i = 2        # 2: T-tail (on top of fin)
+    else:
+        if (nacelle_attachment_i == 1):
+            htp_attachment_i = 1        # 1: Classical (on fuselage tail cone)
+        else:
+            htp_attachment_i = 2        # 2: T-tail (on top of fin)
     return htp_attachment_i
 
 
@@ -473,7 +509,9 @@ def disa_tofl():
 
 #===========================================================================================================
 def req_tofl(design_range):
-    if(design_range <= unit.m_NM(3500.)):
+    if(design_range <= unit.m_NM(1500.)):
+        req_tofl_i = 1500.
+    elif(design_range <= unit.m_NM(3500.)):
         req_tofl_i = 2000.
     elif(design_range <= unit.m_NM(5500.)):
         req_tofl_i = 2500.
@@ -495,7 +533,7 @@ def disa_app_speed():
 #===========================================================================================================
 def req_app_speed(n_pax_ref):
     if (n_pax_ref<=100):
-        req_app_speed_i = unit.mps_kt(135.)
+        req_app_speed_i = unit.mps_kt(120.)
     elif (n_pax_ref<=200):
         req_app_speed_i = unit.mps_kt(137.)
     else:
@@ -508,7 +546,7 @@ def cas1_ttc(cruise_mach):
     if (cruise_mach>=0.6):
         cas1_ttc_i = unit.mps_kt(250.)
     elif (cruise_mach>=0.4):
-        cas1_ttc_i = unit.mps_kt(190.)
+        cas1_ttc_i = unit.mps_kt(180.)
     else:
         cas1_ttc_i = unit.mps_kt(70.)
     return cas1_ttc_i
@@ -518,7 +556,7 @@ def cas2_ttc(cruise_mach):
     if (cruise_mach>=0.6):
         cas2_ttc_i = unit.mps_kt(300.)
     elif (cruise_mach>=0.4):
-        cas2_ttc_i = unit.mps_kt(240.)
+        cas2_ttc_i = unit.mps_kt(200.)
     else:
         cas2_ttc_i = unit.mps_kt(70.)
     return cas2_ttc_i

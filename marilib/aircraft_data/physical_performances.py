@@ -49,7 +49,9 @@ class Propulsion(object):
     "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of main engines"},
     "fuel_type":{"unit":"string", "om":1.e0, "txt":"Type of fuel, Kerosene, Hydrogene, Methane, Battery"},
     "battery_energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
+    "reference_thrust":{"unit":"daN", "om":1.e5, "txt":"Reference_thrust that drives the engine size and assocoated systems"},
     "reference_thrust_effective":{"unit":"daN", "om":1.e5, "txt":"Effective reference_thrust computed as max thrust(Mach = 0.25, ISA+15, Sea Level) / 0.8"},
+    "y_ext_nacelle":{"unit":"m", "om":1.e1, "txt":"Span wise position of the out most right engine nacelle"},
     "sfc_cruise_ref":{"unit":"kg/daN/h", "om":1.e0, "txt":"Specific Fuel Consumption in cruise condition, isa, ref_cruise_altp, cruise_mach"},
     "sec_cruise_ref":{"unit":"kW/daN/h", "om":1.e0, "txt":"Specific Energy Consumption of the electric chain (if any) in cruise condition, isa, ref_cruise_altp, cruise_mach"},
     "bli_effect":{"unit":"int", "om":1.e0, "txt":"BLI effect switch, 0: without, 1: with"},
@@ -69,7 +71,9 @@ class Propulsion(object):
                        n_engine = None,
                        fuel_type = None,
                        battery_energy_density = None,
+                       reference_thrust = None,
                        reference_thrust_effective = None,
+                       y_ext_nacelle = None,
                        sfc_cruise_ref = None,
                        sec_cruise_ref = None,
                        bli_effect = None,
@@ -88,7 +92,9 @@ class Propulsion(object):
         self.n_engine = n_engine
         self.fuel_type = fuel_type
         self.battery_energy_density = battery_energy_density
+        self.reference_thrust = reference_thrust
         self.reference_thrust_effective = reference_thrust_effective
+        self.y_ext_nacelle = y_ext_nacelle
         self.sfc_cruise_ref = sfc_cruise_ref
         self.sec_cruise_ref = sec_cruise_ref
         self.bli_effect = bli_effect

@@ -17,6 +17,10 @@ from marilib.airplane.propulsion.turbofan.turbofan_design \
     import eval_turbofan_nacelle_design, eval_turbofan_engine_design, \
            eval_turbofan_pylon_mass, eval_turbofan_nacelle_mass
 
+from marilib.airplane.propulsion.turboprop.turboprop_design \
+    import eval_turboprop_nacelle_design, eval_turboprop_engine_design, \
+           eval_turboprop_nacelle_mass
+
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_design \
     import eval_pte1_nacelle_design, eval_pte1_engine_design, \
            eval_pte1_nacelle_mass, eval_pte1_battery_mass
@@ -37,21 +41,18 @@ def eval_propulsion_design(aircraft):
     propulsion = aircraft.propulsion
 
     if (propulsion.architecture=="TF"):
-
         eval_turbofan_engine_design(aircraft)
         eval_turbofan_nacelle_design(aircraft)
-
+    elif (propulsion.architecture=="TP"):
+        eval_turboprop_engine_design(aircraft)
+        eval_turboprop_nacelle_design(aircraft)
     elif (propulsion.architecture=="PTE1"):
-
         eval_turbofan_engine_design(aircraft)
         eval_pte1_engine_design(aircraft)
         eval_pte1_nacelle_design(aircraft)
-
     elif (propulsion.architecture=="EF1"):
-
         eval_ef1_engine_design(aircraft)
         eval_ef1_nacelle_design(aircraft)
-
     else:
         raise Exception("propulsion.architecture index is out of range")
 
@@ -117,6 +118,10 @@ def eval_propulsion_design(aircraft):
         fn,sfc,data = propu.turbofan_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
         propulsion.sfc_cruise_ref = sfc
         propulsion.sec_cruise_ref = 0.
+    elif (propulsion.architecture=="TP"):
+        fn,sfc,data = propu.turboprop_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+        propulsion.sfc_cruise_ref = sfc
+        propulsion.sec_cruise_ref = 0.
     elif (propulsion.architecture=="PTE1"):
         fn,sfc,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
         propulsion.sfc_cruise_ref = sfc
@@ -167,6 +172,15 @@ def eval_propulsion_mass(aircraft):
 
         propulsion.mass = pylon.mass + nacelle.mass
         propulsion.c_g = (pylon.c_g*pylon.mass + nacelle.c_g*nacelle.mass)/propulsion.mass
+
+    elif (propulsion.architecture=="TP"):
+
+        nacelle = aircraft.turboprop_nacelle
+
+        eval_turboprop_nacelle_mass(aircraft)
+
+        propulsion.mass = nacelle.mass
+        propulsion.c_g = nacelle.c_g
 
     elif (propulsion.architecture=="PTE1"):
 
@@ -229,6 +243,10 @@ def eval_battery_mass(aircraft):
     """
 
     if (aircraft.propulsion.architecture=="TF"):
+       aircraft.propulsion.battery_energy_density = 0.
+       aircraft.center_of_gravity.battery = 0.
+       aircraft.weights.battery_in_owe = 0.
+    elif (aircraft.propulsion.architecture=="TP"):
        aircraft.propulsion.battery_energy_density = 0.
        aircraft.center_of_gravity.battery = 0.
        aircraft.weights.battery_in_owe = 0.

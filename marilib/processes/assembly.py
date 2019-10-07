@@ -36,6 +36,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.propulsion.n_engine = n_engine
 
     aircraft.propulsion.fuel_type = init.fuel_type(propu_config)
+    aircraft.propulsion.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
 
     aircraft.name = "my_test_airplane"
     aircraft.design_driver.design_range = design_range        # TLR
@@ -128,22 +129,32 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.aerodynamics.hld_conf_ld = init.hld_conf_ld()
 
     #-----------------------------------------------------------------------------------------------------------
-    aircraft.turbofan_engine.bpr = init.bpr(n_pax_ref)
-    aircraft.turbofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
+    aircraft.turbofan_engine.bpr = init.bpr(n_pax_ref,propu_config)
 
     aircraft.turbofan_engine.core_thrust_ratio = init.core_thrust_ratio()
     aircraft.turbofan_engine.core_width_ratio = init.core_width_ratio()
     aircraft.turbofan_engine.core_weight_ratio = init.core_weight_ratio()
 
-    aircraft.turbofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
+    aircraft.turbofan_nacelle.attachment = init.nacelle_attachment(propu_config,n_pax_ref)
     aircraft.turbofan_nacelle.n_engine = n_engine
     aircraft.turbofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.turbofan_nacelle.efficiency_prop = init.efficiency_prop()
     aircraft.turbofan_nacelle.width = init.nacelle_width(aircraft.turbofan_engine.bpr,
-                                                                  aircraft.turbofan_engine.reference_thrust)
-    aircraft.turbofan_nacelle.y_ext = init.nacelle_y_ext(aircraft.turbofan_nacelle.attachment,
-                                                                  aircraft.fuselage.width,
-                                                                  aircraft.turbofan_nacelle.width)
+                                                                  aircraft.propulsion.reference_thrust)
+    aircraft.turbofan_nacelle.y_ext = init.nacelle_y_ext(propu_config,n_engine,
+                                                         aircraft.turbofan_nacelle.attachment,
+                                                         aircraft.fuselage.width,
+                                                         aircraft.turbofan_nacelle.width)
+
+    #-----------------------------------------------------------------------------------------------------------
+    aircraft.turboprop_nacelle.attachment = init.nacelle_attachment(propu_config,n_pax_ref)
+    aircraft.turboprop_nacelle.n_engine = n_engine
+    aircraft.turboprop_nacelle.efficiency_prop = init.efficiency_prop()
+    aircraft.turboprop_nacelle.propeller_width = init.propeller_width(aircraft.propulsion.reference_thrust)
+    aircraft.turboprop_nacelle.y_ext = init.nacelle_y_ext(propu_config,n_engine,
+                                                          aircraft.turboprop_nacelle.attachment,
+                                                          aircraft.fuselage.width,
+                                                          aircraft.turboprop_nacelle.propeller_width)
 
     #-----------------------------------------------------------------------------------------------------------
     aircraft.rear_electric_nacelle.efficiency_fan = init.efficiency_fan()
@@ -174,9 +185,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.pte1_battery.power_density = init.battery_power_density()
 
     #-----------------------------------------------------------------------------------------------------------
-    aircraft.electrofan_engine.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
-
-    aircraft.electrofan_nacelle.attachment = init.nacelle_attachment(n_pax_ref)
+    aircraft.electrofan_nacelle.attachment = init.nacelle_attachment(propu_config,n_pax_ref)
     aircraft.electrofan_nacelle.n_engine = n_engine
     aircraft.electrofan_nacelle.rear_nacelle = init.ef1_rear_nacelle()
     aircraft.electrofan_nacelle.efficiency_fan = init.efficiency_fan()
@@ -186,10 +195,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.electrofan_nacelle.controller_pw_density = init.controller_pw_density()
     aircraft.electrofan_nacelle.motor_pw_density = init.e_motor_pw_density()
     aircraft.electrofan_nacelle.nacelle_pw_density = init.e_nacelle_pw_density()
-    aircraft.electrofan_nacelle.width = init.nacelle_width(9,aircraft.electrofan_engine.reference_thrust)
-    aircraft.turbofan_nacelle.y_ext = init.nacelle_y_ext(aircraft.electrofan_nacelle.attachment,
-                                                         aircraft.fuselage.width,
-                                                         aircraft.electrofan_nacelle.width)
+    aircraft.electrofan_nacelle.width = init.nacelle_width(9,aircraft.propulsion.reference_thrust)
+    aircraft.electrofan_nacelle.y_ext = init.nacelle_y_ext(propu_config,n_engine,
+                                                           aircraft.electrofan_nacelle.attachment,
+                                                           aircraft.fuselage.width,
+                                                           aircraft.electrofan_nacelle.width)
 
     aircraft.electrofan_engine.mto_e_shaft_power = init.electric_shaft_power()       # Watts, fan shaft power
     aircraft.electrofan_engine.mcn_e_shaft_power = init.electric_shaft_power()       # Watts, fan shaft power
@@ -210,11 +220,13 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
 
 
     if (propu_config=="TF"):
-        aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
+        aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.turbofan_nacelle.attachment)
+    elif (propu_config=="TP"):
+        aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.turboprop_nacelle.attachment)
     elif (propu_config=="PTE1"):
-        aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.turbofan_nacelle.attachment)
+        aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.turbofan_nacelle.attachment)
     elif (propu_config=="EF1"):
-        aircraft.horizontal_tail.attachment = init.htp_attachment(aircraft.electrofan_nacelle.attachment)
+        aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.electrofan_nacelle.attachment)
     else:
 
         raise Exception("Propulsion architecture type is unknown")
@@ -242,13 +254,13 @@ def eval_geometrical_analysis(aircraft):
 
     airframe.eval_vtp_design(aircraft)
 
-    airframe.eval_vtp_statistical_sizing(aircraft)
-
     airframe.eval_htp_design(aircraft)
 
     airframe.eval_htp_statistical_sizing(aircraft)
 
     propulsion.eval_propulsion_design(aircraft)
+
+    airframe.eval_vtp_statistical_sizing(aircraft)
 
     airplane.eval_aerodynamics_design(aircraft)
 
@@ -818,31 +830,44 @@ def eval_mda3(aircraft):
 
 
 #===========================================================================================================
+def eval_mda(aircraft,mda_type,mda_allowed):
+    """
+    Run the requested design sequence
+    """
+
+    if mda_type in mda_allowed:
+
+        if (mda_type=="MDA0"):
+            eval_mda0(aircraft)
+        elif (mda_type=="MDA1"):
+            eval_mda1(aircraft)
+        elif (mda_type=="MDA2"):
+            eval_mda2(aircraft)
+        elif (mda_type=="MDA3"):
+            eval_mda3(aircraft)
+        else:
+            raise Exception("Type of MDA not exists")
+
+    else:
+        raise Exception("Type of MDA not allowed")
+
+    return
+
+
+#===========================================================================================================
 def eval_optim_data(x_in,ac,crit_index,crit_ref,mda_type):
     """
     Compute criterion and constraints
     """
 
-    if (ac.propulsion.architecture=="TF"):
-        ac.turbofan_engine.reference_thrust = x_in[0]
-    elif (ac.propulsion.architecture=="PTE1"):
-        ac.turbofan_engine.reference_thrust = x_in[0]
-    elif (ac.propulsion.architecture=="EF1"):
-        ac.electrofan_engine.reference_thrust = x_in[0]
-    else:
-        raise Exception("propulsion.architecture index is out of range")
+    ac.propulsion.reference_thrust = x_in[0]
 
     ac.wing.area = x_in[1]
 
     # Run MDA
     #------------------------------------------------------------------------------------------------------
 
-    if (mda_type=="MDA2"):
-        eval_mda2(ac)
-    elif (mda_type=="MDA3"):
-        eval_mda3(ac)
-    else:
-        raise Exception("Type of MDA not allowed")
+    eval_mda(ac,mda_type,["MDA2","MDA3"])
 
     # Constraints are violated if negative
     #------------------------------------------------------------------------------------------------------
@@ -909,19 +934,12 @@ def mdf_process(aircraft,search_domain,criterion,mda_type):
     """
     from scipy.optimize import SR1, NonlinearConstraint
 
-    if (aircraft.propulsion.architecture=="TF"):
-        start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture=="PTE1"):
-        start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture=="EF1"):
-        start_value = (aircraft.electrofan_engine.reference_thrust,aircraft.wing.area)
-    else:
-        raise Exception("propulsion.architecture index is out of range")
+    start_value = (aircraft.propulsion.reference_thrust, aircraft.wing.area)
 
 
     if (criterion=="MTOW"):
         crit_index = 0
-    elif (criterion=="block_fuel"):
+    elif (criterion=="Block_fuel"):
         crit_index = 1
     elif (criterion=="CO2_metric"):
         crit_index = 2
@@ -964,19 +982,11 @@ def plot_mdf_process(aircraft,search_domain,criterion):
     Compute criterion and constraints
     """
 
-    if (aircraft.propulsion.architecture=="TF"):
-        start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture=="PTE1"):
-        start_value = (aircraft.turbofan_engine.reference_thrust,aircraft.wing.area)
-    elif (aircraft.propulsion.architecture=="TP"):
-        start_value = (aircraft.turboprop_engine.reference_thrust,aircraft.wing.area)
-    else:
-        raise Exception("propulsion.architecture index is out of range")
-
+    start_value = (aircraft.propulsion.reference_thrust, aircraft.wing.area)
 
     if (criterion=="MTOW"):
         crit_index = 0
-    elif (criterion=="block_fuel"):
+    elif (criterion=="Block_fuel"):
         crit_index = 1
     elif (criterion=="CO2_metric"):
         crit_index = 2
@@ -1011,3 +1021,76 @@ def plot_mdf_process(aircraft,search_domain,criterion):
     pylab.plt.plot(sref,func_vals2,label="sref obj")
     pylab.legend()
     pylab.show()
+
+
+#===========================================================================================================
+def explore_design_space(aircraft, res, step, mda_type, file):
+
+    slst_list = [res[0]*(1-1.5*step[0]), res[0]*(1-0.5*step[0]), res[0]*(1+0.5*step[0]), res[0]*(1+1.5*step[0])]
+    area_list = [res[1]*(1-1.5*step[1]), res[1]*(1-0.5*step[1]), res[1]*(1+0.5*step[1]), res[1]*(1+1.5*step[1])]
+
+    print(slst_list)
+    print(area_list)
+
+    txt = np.array([["SLST","daN"],
+                    ["Wing_area","m2"],
+                    ["Wing_span","m"],
+                    ["MTOW","kg"],
+                    ["MLW","kg"],
+                    ["OWE","kg"],
+                    ["MWE","kg"],
+                    ["Cruise_SFC","kg/daN/h"],
+                    ["Cruise_LoD","no_dim"],
+                    ["TOFL","m"],
+                    ["App_speed","kt"],
+                    ["OEI_path","%"],
+                    ["Vz_MCL","ft/min"],
+                    ["Vz_MCR","ft/min"],
+                    ["TTC","min"],
+                    ["Block_fuel","kg"],
+                    ["COC","$/trip"],
+                    ["CO2_metric","10e-3uc"]])
+
+    for area in area_list:
+        for thrust in slst_list:
+
+            aircraft.propulsion.reference_thrust = thrust
+            aircraft.wing.area = area
+
+            print("-------------------------------------------")
+            print("Doing case for : thrust = ",thrust/10.," daN    area = ",area, " m")
+
+            # Perform MDA
+            #------------------------------------------------------------------------------------------------------
+
+            eval_mda(aircraft,mda_type,["MDA2","MDA3"])
+
+            print("Done")
+
+            # Store results
+            #------------------------------------------------------------------------------------------------------
+            res = np.array([["%8.1f"%(aircraft.propulsion.reference_thrust/10.)],
+                            ["%8.1f"%aircraft.wing.area],
+                            ["%8.1f"%aircraft.wing.span],
+                            ["%8.1f"%aircraft.weights.mtow],
+                            ["%8.1f"%aircraft.weights.mlw],
+                            ["%8.1f"%aircraft.weights.owe],
+                            ["%8.1f"%aircraft.weights.mwe],
+                            ["%8.4f"%(aircraft.propulsion.sfc_cruise_ref*36000)],
+                            ["%8.4f"%(aircraft.aerodynamics.cruise_lod_max)],
+                            ["%8.1f"%aircraft.low_speed.eff_tofl],
+                            ["%8.1f"%unit.kt_mps(aircraft.low_speed.eff_app_speed)],
+                            ["%8.2f"%(aircraft.low_speed.eff_oei_path*100)],
+                            ["%8.1f"%unit.ftpmin_mps(aircraft.high_speed.eff_vz_climb)],
+                            ["%8.1f"%unit.ftpmin_mps(aircraft.high_speed.eff_vz_cruise)],
+                            ["%8.1f"%unit.min_s(aircraft.high_speed.eff_ttc)],
+                            ["%8.1f"%aircraft.cost_mission.block_fuel],
+                            ["%8.1f"%aircraft.economics.cash_operating_cost],
+                            ["%8.1f"%(aircraft.environmental_impact.CO2_metric*1000000)]])
+
+            txt = np.hstack([txt,res])
+
+    #------------------------------------------------------------------------------------------------------
+    np.savetxt(file,txt,delimiter=";",fmt='%10s')
+
+

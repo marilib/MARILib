@@ -39,13 +39,22 @@ run.eval_payload_range_analysis(aircraft)
 
 
 #------------------------------------------------------------------------------------------------------
-print(unit.user_format(unit.convert_to(aircraft.design_driver.INFO["design_range"]["unit"],aircraft.design_driver.design_range)),
-      aircraft.design_driver.INFO["design_range"]["unit"],":",aircraft.design_driver.INFO["design_range"]["txt"])
+print(unit.smart_format(unit.convert_to(aircraft.design_driver.INFO["design_range"]["unit"],
+                                        aircraft.design_driver.design_range)),
+      aircraft.design_driver.INFO["design_range"]["unit"],
+      ":",aircraft.design_driver.INFO["design_range"]["txt"])
 
-print(unit.user_format(unit.convert_to(aircraft.wing.INFO["area"]["unit"],aircraft.wing.area)),
-      aircraft.wing.INFO["area"]["unit"],":",aircraft.wing.INFO["area"]["txt"])
+print(unit.smart_format(unit.convert_to(aircraft.wing.INFO["area"]["unit"],
+                                        aircraft.wing.area)),
+      aircraft.wing.INFO["area"]["unit"],
+      ":",aircraft.wing.INFO["area"]["txt"])
+
+print(unit.smart_format(unit.convert_to(aircraft.propulsion.INFO["reference_thrust_effective"]["unit"],
+                                        aircraft.propulsion.reference_thrust_effective)),
+      aircraft.propulsion.INFO["reference_thrust_effective"]["unit"],
+      ":",aircraft.propulsion.INFO["reference_thrust_effective"]["txt"])
 
 
 #------------------------------------------------------------------------------------------------------
-aircraft.export_to_file(file = "aircraft_data.txt")
+aircraft.export_to_file(filename = "aircraft_data.txt", write_detail = True)
 

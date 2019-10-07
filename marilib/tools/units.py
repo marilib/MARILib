@@ -9,6 +9,7 @@ Created on Thu Jan 24 23:22:21 2019
 
 from marilib import numpy
 from copy import deepcopy
+from marilib.aircraft_data.aircraft_description import STANDARD_FORMAT, to_user_format
 
       
 def s_min(min): return min*60.   # Translate minutes into seconds
@@ -54,6 +55,14 @@ def J_MWh(MWh): return MWh*3.6e9   # Translate MWh into J
 def kWh_J(J): return J/3.6e6   # Translate J into kWh
 
 def MWh_J(J): return J/3.6e9   # Translate J into MWh
+
+def daN_N(N): return N/10.   # Translate N into daN
+
+def N_daN(N): return daN*10.   # Translate daN into N
+
+def pc_no_dim(no_dim): return no_dim*100.   # Translate no dimension value into percentile
+
+def no_dim_pc(no_dim): return no_dim/100.   # Translate percentile into no dimension value
 
 
 def smart_round(X, S):
@@ -355,6 +364,10 @@ UNIT["NM/t"] = 1.852
 UNIT["NM/kg"] = 1852.
 UNIT["NM/lb"] = 4082.8923
 
+# dim = "EnergeticDistance"
+UNIT["m/J"] = 1.
+UNIT["km/kWh"] = 3600.
+
 # dim = "SurfacicMass"
 UNIT["kg/m2"] = 1.
 UNIT["lb/ft2"] = 4.8825102
@@ -488,8 +501,6 @@ UNIT["array"] = 1
 
 # Conversion functions
 #-------------------------------------------------------------------------
-
-
 def convert_from(ulab, val):
     # Convert val expressed in ulab to corresponding standard unit
     if isinstance(val, (type(None), str)):
@@ -524,3 +535,9 @@ def convert_to(ulab, val):
             dic_val[k] = convert_to(ulab, v)
         return dic_val
     return val / UNIT[ulab]
+
+
+def smart_format(value):
+    # Convert val expressed in standard unit to ulab
+    return to_user_format(value, STANDARD_FORMAT)
+

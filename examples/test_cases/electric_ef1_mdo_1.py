@@ -42,7 +42,7 @@ print("Initialization : done")
 #======================================================================================================
 # Design process
 #======================================================================================================
-# Global design parameter n°1 : aircraft.turbofan_engine.reference_thrust, bounds = (50000,150000)
+# Global design parameter n°1 : aircraft.propulsion.reference_thrust, bounds = (50000,150000)
 # Global design parameter n°2 : aircraft.wing.area, bounds = (50,200)
 #
 # Geometrical coupling on : aircraft.horizontal_tail.area     (statistical sizing of HTP area)

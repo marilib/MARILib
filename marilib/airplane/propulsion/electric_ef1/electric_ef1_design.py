@@ -56,6 +56,8 @@ def eval_ef1_engine_design(aircraft):
 
     engine.rating_factor = {"MTO":1.00, "MCN":0.80, "MCL":0.80, "MCR":0.80, "FID":0.05}
 
+    engine.reference_thrust = propulsion.reference_thrust
+
     # Propulsion architecture design, definition reference conditions for engine performances
     #-----------------------------------------------------------------------------------------------------------
 
@@ -66,7 +68,7 @@ def eval_ef1_engine_design(aircraft):
     roa = low_speed.req_oei_altp
 
     #                      MTO   MCN    MCL  MCR  FID
-    fd_disa = {"MTO":15. , "MCN":0.   , "MCL":0. , "MCR":0. , "FID":0. }
+    fd_disa = {"MTO":15. , "MCN":15.  , "MCL":0. , "MCR":0. , "FID":0. }
     fd_altp = {"MTO":0.  , "MCN":roa  , "MCL":toc, "MCR":rca, "FID":rca}
     fd_mach = {"MTO":0.25, "MCN":crm/2, "MCL":crm, "MCR":crm, "FID":crm}
     fd_nei  = {"MTO":0.  , "MCN":1.   , "MCL":0. , "MCR":0. , "FID":0. }
@@ -187,6 +189,8 @@ def eval_ef1_nacelle_design(aircraft):
 
     else:
         raise Exception("nacelle.attachment, index is out of range")
+
+    propulsion.y_ext_nacelle = nacelle.y_ext
 
     # Main fan max thrust on each rating
     #-----------------------------------------------------------------------------------------------------------

@@ -45,11 +45,11 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
-    enrg_taxi_out = e_factor*(34. + 2.3e-4*engine.reference_thrust)*propulsion.n_engine
+    enrg_taxi_out = e_factor*(34. + 2.3e-4*propulsion.reference_thrust)*propulsion.n_engine
     time_taxi_out = 540.
 
     enrg_take_off = e_factor*1e-4*(2.8+2.3/engine.bpr)*tow
-    time_take_off = 220.*tow/(engine.reference_thrust*propulsion.n_engine)
+    time_take_off = 220.*tow/(propulsion.reference_thrust*propulsion.n_engine)
 
     # Mission leg
     #-----------------------------------------------------------------------------------------------------------
@@ -70,6 +70,8 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
     c_z = flight.lift_from_speed(aircraft,pamb,tamb,mach,mass)
     c_x,lod_cruise = airplane_aero.drag(aircraft, pamb, tamb, mach, c_z)
 
+    sar = (tas*lod_cruise)/(mass*g*sec)
+
     if (propulsion.architecture=="EF1"):
         enrg_mission = (tow*sec*g*dist_range)/(tas*lod_cruise)
     else:
@@ -82,7 +84,7 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
     enrg_landing = e_factor*1e-4*(0.5+2.3/engine.bpr)*tow
     time_landing = 180.
 
-    enrg_taxi_in = e_factor*(26. + 1.8e-4*engine.reference_thrust)*propulsion.n_engine
+    enrg_taxi_in = e_factor*(26. + 1.8e-4*propulsion.reference_thrust)*propulsion.n_engine
     time_taxi_in = 420.
 
     # Block fuel and time
@@ -109,7 +111,7 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
     total_enrg = enrg_mission*(1.+regul.reserve_fuel_ratio(design_range)) + enrg_diversion + enrg_holding
 
     #-----------------------------------------------------------------------------------------------------------
-    return block_enrg,block_time,total_enrg
+    return block_enrg,block_time,total_enrg,sar
 
 
 #===========================================================================================================
@@ -145,7 +147,7 @@ def b_specific_air_range(aircraft,altp,mass,mach,disa):
 
 
 #===========================================================================================================
-def eval_nominal_b_mission(aircraft):
+def nominal_b_mission(aircraft):
     """
     Compute nominal mission with range as input
     """
@@ -162,11 +164,12 @@ def eval_nominal_b_mission(aircraft):
     range = aircraft.nominal_mission.range
     tow = aircraft.nominal_mission.tow
 
-    block_enrg,block_time,total_enrg = b_mission(aircraft,range,tow,altp,mach,disa)
+    block_enrg,block_time,total_enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
 
     aircraft.nominal_mission.total_enrg = total_enrg
     aircraft.nominal_mission.block_enrg = block_enrg
     aircraft.nominal_mission.block_time = block_time
+    aircraft.nominal_mission.unified_sar = sar
 
     payload = aircraft.nominal_mission.payload
     owe = aircraft.weights.owe
@@ -184,7 +187,7 @@ def eval_nominal_b_mission(aircraft):
 
 
 #===========================================================================================================
-def eval_b_mission_coupling(aircraft):
+def b_mission_coupling(aircraft):
     """
     Mass-Mission coupling
     This relation is put apart from nominal_mission because GEMS does not manage functions that compute their own input
@@ -199,7 +202,7 @@ def eval_b_mission_coupling(aircraft):
 
 
 #===========================================================================================================
-def eval_payload_range_b_missions(aircraft):
+def payload_range_b_missions(aircraft):
     """
     Compute Payload - Range diagram corner points
     """
@@ -266,7 +269,7 @@ def eval_payload_range_b_missions(aircraft):
 
 
 #===========================================================================================================
-def eval_cost_b_mission(aircraft):
+def cost_b_mission(aircraft):
     """
     Compute climb performances
     """
@@ -307,7 +310,7 @@ def b_mission_payload(aircraft,tow,range,altp,mach,disa):
 
     weights = aircraft.weights
 
-    [block_enrg,block_time,total_enrg] = b_mission(aircraft,range,tow,altp,mach,disa)
+    block_enrg,block_time,total_enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
 
     if (aircraft.ef1_battery.stacking=="Variable"):
         req_battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
@@ -329,7 +332,7 @@ def b_mission_tow(aircraft,payload,range,altp,mach,disa):
     def fct_mission(tow,aircraft,payload,range,altp,mach,disa):
     #=======================================================================================
         weights = aircraft.weights
-        [block_enrg,block_time,total_enrg] = b_mission(aircraft,range,tow,altp,mach,disa)
+        block_enrg,block_time,total_enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
         req_battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
         Y = tow - weights.owe - payload - req_battery_mass
         return Y
@@ -345,13 +348,13 @@ def b_mission_tow(aircraft,payload,range,altp,mach,disa):
 
         tow = output_dict[0][0]
 
-        [block_enrg,block_time,total_enrg] = b_mission(aircraft,range,tow,altp,mach,disa)
+        block_enrg,block_time,total_enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
 
     else:
 
         tow = weights.owe + payload
 
-        [block_enrg,block_time,total_enrg] = b_mission(aircraft,range,tow,altp,mach,disa)
+        block_enrg,block_time,total_enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
 
     return tow,block_enrg,block_time,total_enrg
 
@@ -367,7 +370,7 @@ def b_mission_range(aircraft,tow,payload,altp,mach,disa):
     def fct_mission(range,aircraft,tow,payload,altp,mach,disa):
     #=======================================================================================
         weights = aircraft.weights
-        [block_enrg,block_time,total_enrg] = b_mission(aircraft,range,tow,altp,mach,disa)
+        block_enrg,block_time,total_enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
         req_battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
         if (aircraft.ef1_battery.stacking=="Variable"):
             Y = tow - weights.owe - payload - req_battery_mass
@@ -384,7 +387,7 @@ def b_mission_range(aircraft,tow,payload,altp,mach,disa):
 
     range = output_dict[0][0]
 
-    [block_enrg,block_time,total_enrg] = b_mission(aircraft,range,tow,altp,mach,disa)
+    block_enrg,block_time,total_enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
 
     return range,block_enrg,block_time,total_enrg
 
@@ -401,7 +404,7 @@ def b_mission_energy_limited(aircraft,tow,total_enrg,altp,mach,disa):
     def fct_mission(range,aircraft,tow,total_enrg,altp,mach,disa):
     #=======================================================================================
         weights = aircraft.weights
-        [block_enrg,block_time,enrg] = b_mission(aircraft,range,tow,altp,mach,disa)
+        block_enrg,block_time,enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
         Y = total_enrg - enrg
         return Y
     #---------------------------------------------------------------------------------------
@@ -414,7 +417,7 @@ def b_mission_energy_limited(aircraft,tow,total_enrg,altp,mach,disa):
 
     range = output_dict[0][0]
 
-    block_enrg,block_time,total_enrg = b_mission(aircraft,range,tow,altp,mach,disa)
+    block_enrg,block_time,total_enrg,sar = b_mission(aircraft,range,tow,altp,mach,disa)
 
     req_battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
 

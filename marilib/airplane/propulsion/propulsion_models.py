@@ -17,6 +17,9 @@ from marilib.earth import environment as earth
 from marilib.airplane.propulsion.turbofan.turbofan_models \
     import turbofan_sfc, turbofan_thrust, turbofan_oei_drag
 
+from marilib.airplane.propulsion.turboprop.turboprop_models \
+    import turboprop_sfc, turboprop_thrust, turboprop_oei_drag
+
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_models \
     import pte1_sfc, pte1_thrust
 
@@ -36,6 +39,8 @@ def sfc(aircraft,pamb,tamb,mach,rating,thrust,nei):
 
     if (propulsion.architecture=="TF"):
         sfc = turbofan_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei)
+    elif (propulsion.architecture=="TP"):
+        sfc = turboprop_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei)
     elif (propulsion.architecture=="PTE1"):
         sfc = pte1_sfc(aircraft,pamb,tamb,mach,rating,thrust,nei)
     elif (propulsion.architecture=="EF1"):
@@ -56,6 +61,9 @@ def thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     if (propulsion.architecture=="TF"):
         fn,sfc,data = turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
+        sec = 0.
+    elif (propulsion.architecture=="TP"):
+        fn,sfc,data = turboprop_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
         sec = 0.
     elif (propulsion.architecture=="PTE1"):
         fn,sfc,sec,data = pte1_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei)
@@ -78,6 +86,9 @@ def nacelle_drag(aircraft,Re,Mach):
 
     if (propulsion.architecture=="TF"):
         nacelle = aircraft.turbofan_nacelle
+        nacelle_cxf,nacelle_nwa = jet.nacelle_generic_drag(aircraft,nacelle,Re,Mach)
+    elif (propulsion.architecture=="TP"):
+        nacelle = aircraft.turboprop_nacelle
         nacelle_cxf,nacelle_nwa = jet.nacelle_generic_drag(aircraft,nacelle,Re,Mach)
     elif (propulsion.architecture=="PTE1"):
         nacelle = aircraft.turbofan_nacelle
@@ -114,6 +125,9 @@ def oei_drag(aircraft,pamb,tamb):
     if (propulsion.architecture=="TF"):
         nacelle = aircraft.turbofan_nacelle
         dcx = turbofan_oei_drag(aircraft,nacelle,pamb,tamb)
+    elif (propulsion.architecture=="TP"):
+        nacelle = aircraft.turboprop_nacelle
+        dcx = turboprop_oei_drag(aircraft,nacelle,pamb,tamb)
     elif (propulsion.architecture=="PTE1"):
         nacelle = aircraft.turbofan_nacelle
         dcx = turbofan_oei_drag(aircraft,nacelle,pamb,tamb)
@@ -136,6 +150,8 @@ def thrust_pitch_moment(aircraft,fn,pamb,mach,dcx_oei):
 
     if (propulsion.architecture=="TF"):
         nacelle = aircraft.turbofan_nacelle
+    elif (propulsion.architecture=="TP"):
+        nacelle = aircraft.turboprop_nacelle
     elif (propulsion.architecture=="PTE1"):
         nacelle = aircraft.turbofan_nacelle
     elif (propulsion.architecture=="EF1"):
@@ -161,6 +177,8 @@ def thrust_yaw_moment(aircraft,fn,pamb,mach,dcx_oei):
 
     if (propulsion.architecture=="TF"):
         nacelle = aircraft.turbofan_nacelle
+    elif (propulsion.architecture=="TP"):
+        nacelle = aircraft.turboprop_nacelle
     elif (propulsion.architecture=="PTE1"):
         nacelle = aircraft.turbofan_nacelle
     elif (propulsion.architecture=="EF1"):
@@ -183,12 +201,19 @@ def tail_cone_drag_effect(aircraft):
 
     if (propulsion.architecture=="TF"):
         fac = 1.
+    elif (propulsion.architecture=="TP"):
+        fac = 1.
     elif (propulsion.architecture=="PTE1"):
         dfus = aircraft.fuselage.width
         dhub = aircraft.rear_electric_nacelle.hub_width
         fac = (1.-(dhub/dfus)**2)
     elif (propulsion.architecture=="EF1"):
-        fac = 1.
+        if (aircraft.electrofan_nacelle.rear_nacelle):
+            dfus = aircraft.fuselage.width
+            dhub = aircraft.rear_electric_nacelle.hub_width
+            fac = (1.-(dhub/dfus)**2)
+        else:
+            fac = 1.
     else:
         raise Exception("propulsion.architecture index is out of range")
 

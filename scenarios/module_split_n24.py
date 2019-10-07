@@ -207,13 +207,9 @@ lifting_plane_design(aircraft)
 
 propulsion(aircraft)
 
-geometry_coupling(aircraft)
-
 aircraft_aerodynamics(aircraft)
 
 aircraft_mass(aircraft)
-
-mass_coupling(aircraft)
 
 handling_quality_analysis(aircraft)
 
@@ -226,8 +222,3 @@ oei_performance_analysis(aircraft)
 criteria(aircraft)
 
 
-print(aircraft.nominal_mission.block_fuel)
-print(aircraft.nominal_mission.vz_climb_margin)
-print(aircraft.nominal_mission.vz_cruise_margin)
-
-print(aircraft.low_speed.eff_oei_path)

@@ -4,8 +4,7 @@
 Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry
 
-This study illustrates the impact of wing deformation mode on
-wing mass and aerodynamics and thus airplane mission performance
+This study illustrates the mass mission adaptation process
 """
 
 from marilib.tools import units as unit
@@ -36,22 +35,12 @@ n_engine = 2
 run.aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
 
 
-# Get the values that have been set by initialization
+# Possibility to modify initial values
 #------------------------------------------------------------------------------------------------------
-morphing_i = 1 #aircraft.wing.morphing     # (1: AR is fixed, 2: Span is fixed)
-wing_span_i = aircraft.wing.span
-wing_aspect_ratio_i = aircraft.wing.aspect_ratio
-wing_area_i = aircraft.wing.area
-mtow_i = aircraft.weights.mtow
+mtow_i = 72000.  # aircraft.weights.mtow
 
-# Eventual update of some values
+# Reloading updated values
 #------------------------------------------------------------------------------------------------------
-aircraft.wing.morphing = morphing_i
-
-aircraft.wing.area = wing_area_i
-aircraft.wing.span = wing_span_i
-aircraft.wing.aspect_ratio = wing_aspect_ratio_i
-
 aircraft.weights.mtow = mtow_i
 
 
@@ -70,35 +59,19 @@ miss.eval_nominal_mission(aircraft)
 mtow_req = aircraft.weights.owe + aircraft.nominal_mission.payload + aircraft.nominal_mission.total_fuel
 
 
-# Print relevant data
+# Print relevant output
 #------------------------------------------------------------------------------------------------------
-disa = 0
-altp = aircraft.design_driver.ref_cruise_altp
-mach = aircraft.design_driver.cruise_mach
-vtas = earth.vtas_from_mach(altp,disa,mach)
+print("")
+print("MTOW input = ","%.2f"%mtow_i," kg")
+print("OWE structure = ","%.2f"%aircraft.weights.owe," kg")
 
 print("")
-print("Morphing = ","%i"%aircraft.wing.morphing," (1: AR mode, 2: Span mode)")
-print("wing span = ","%.2f"%aircraft.wing.span," m")
-print("wing aspect ratio = ","%.2f"%aircraft.wing.aspect_ratio," no_dim")
-print("Wing area = ","%.2f"%aircraft.wing.area," m2")
-
-print("")
-print("Initial MTOW = ","%.0f"%mtow_i," kg")
-print("required MTOW = ","%.0f"%mtow_req," kg")
-
-print("")
-print("Wing span = ","%.2f"%aircraft.wing.span," m")
-print("Wing aspect ratio = ","%.2f"%aircraft.wing.aspect_ratio," no_dim")
-print("Wing mass = ","%.2f"%aircraft.wing.mass," kg")
-
-print("")
-print("True air speed = ","%.2f"%unit.kt_mps(vtas)," kt")
-print("Fuel mission = ","%.2f"%aircraft.nominal_mission.block_fuel," kg")
-print("LoD cruise (LoD max) = ","%.2f"%aircraft.aerodynamics.cruise_lod_max," no_dim")
-print("SFC cruise = ","%.3f"%(aircraft.propulsion.sfc_cruise_ref*36000)," kg/daN/h")
+print("Total mission fuel = ","%.2f"%aircraft.nominal_mission.total_fuel," kg")
+print("Payload = ","%.3f"%aircraft.nominal_mission.payload," kg")
+print("MTOW required = ","%.2f"%mtow_req," kg")
+print("OWE mission = ","%.2f"%(mtow_i-aircraft.nominal_mission.payload-aircraft.nominal_mission.total_fuel)," kg")
 
 # airplane 3D view
 #------------------------------------------------------------------------------------------------------
-show.draw_3d_view(aircraft,"study_n1","This plane")
+#show.draw_3d_view(aircraft,"study_n2","This plane")
 

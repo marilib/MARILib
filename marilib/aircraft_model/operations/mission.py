@@ -23,9 +23,9 @@ def eval_payload_range_missions(aircraft):
     """
 
     if (aircraft.propulsion.fuel_type=="Battery"):
-        mission_b.eval_payload_range_b_missions(aircraft)
+        mission_b.payload_range_b_missions(aircraft)
     else:
-        mission_f.eval_payload_range_f_missions(aircraft)
+        mission_f.payload_range_f_missions(aircraft)
 
     return
 
@@ -55,9 +55,9 @@ def eval_nominal_mission(aircraft):
     """
 
     if (aircraft.propulsion.fuel_type=="Battery"):
-        mission_b.eval_nominal_b_mission(aircraft)
+        mission_b.nominal_b_mission(aircraft)
     else:
-        mission_f.eval_nominal_f_mission(aircraft)
+        mission_f.nominal_f_mission(aircraft)
 
 
 #===========================================================================================================
@@ -68,9 +68,9 @@ def eval_mission_coupling(aircraft):
     """
 
     if (aircraft.propulsion.fuel_type=="Battery"):
-        mission_b.eval_b_mission_coupling(aircraft)
+        mission_b.b_mission_coupling(aircraft)
     else:
-        mission_f.eval_f_mission_coupling(aircraft)
+        mission_f.f_mission_coupling(aircraft)
 
     return
 
@@ -82,9 +82,9 @@ def eval_cost_mission(aircraft):
     """
 
     if (aircraft.propulsion.fuel_type=="Battery"):
-        mission_b.eval_cost_b_mission(aircraft)
+        mission_b.cost_b_mission(aircraft)
     else:
-        mission_f.eval_cost_f_mission(aircraft)
+        mission_f.cost_f_mission(aircraft)
 
 
 #===========================================================================================================

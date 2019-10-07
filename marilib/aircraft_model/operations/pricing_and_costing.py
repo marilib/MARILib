@@ -32,9 +32,9 @@ def one_engine_price(aircraft):
     Regression on catalog prices
     """
 
-    enigne = aircraft.turbofan_engine
+    propulsion = aircraft.propulsion
 
-    engine_price = ((2.115e-4*enigne.reference_thrust + 78.85)*enigne.reference_thrust)
+    engine_price = ((2.115e-4*propulsion.reference_thrust + 78.85)*propulsion.reference_thrust)
 
     return engine_price
 

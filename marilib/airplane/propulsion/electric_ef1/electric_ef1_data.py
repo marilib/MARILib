@@ -17,7 +17,7 @@ Three modes of battery stacking are possible :
 1- "Variable"
    For each typical missions (nominal, max payload, max fuel, zero payload, cost) the mass of the battery
    which is put on board is exactly what is required for the mission, which supposes that the battery
-   stacking system allows this ...
+   stacking system allows it ...
    In this case, battery mass is not accounted into OWE
 2- "Max"
    Battery occupies the maximum available volume into the wing box. In this case, battery mass is fixed whatever the mission

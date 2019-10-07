@@ -3,14 +3,26 @@
 """
 Created on Thu Jan 24 23:22:21 2019
 
-@author: DRUOT Thierry : original Scilab implementation
-         PETEILH Nicolas : portage to Python
+@author: DRUOT Thierry
+         PETEILH Nicolas
+         MONROLIN Nicolas
 """
 
 from marilib import numpy as np
 
+from scipy import interpolate
+
+import pandas
+
+import six
+
+import matplotlib as mpl
+
 import matplotlib.pyplot as plt
 
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+from marilib.tools import units
 
 #===========================================================================================================
 def print_text(text,window_title,plot_title,x=0,y=0,fontsize=12):
@@ -88,6 +100,8 @@ def draw_3d_view(aircraft,window_title,plot_title):
 
     if (aircraft.propulsion.architecture=="TF"):
         nacelle = aircraft.turbofan_nacelle
+    elif (aircraft.propulsion.architecture=="TP"):
+        nacelle = aircraft.turboprop_nacelle
     elif (aircraft.propulsion.architecture=="PTE1"):
         nacelle = aircraft.turbofan_nacelle
     elif (aircraft.propulsion.architecture=="PTE2"):
@@ -270,9 +284,8 @@ def draw_3d_view(aircraft,window_title,plot_title):
     #-----------------------------------------------------------------------------------------------------------
     nac_xz_ext,nac_xy_ext,nac_yz_ext,fan_yz_ext = nacelle_shape(nac_x_ext,nac_y_ext,nac_z_ext,nac_width,nac_height,nac_length,cyl)
 
-    if (aircraft.propulsion.architecture=="TF"):
-        if (aircraft.propulsion.n_engine==4):
-            nac_xz_int,nac_xy_int,nac_yz_int,fan_yz_int = nacelle_shape(nac_x_int,nac_y_int,nac_z_int,nac_width,nac_height,nac_length,cyl)
+    if (aircraft.propulsion.n_engine==4):
+        nac_xz_int,nac_xy_int,nac_yz_int,fan_yz_int = nacelle_shape(nac_x_int,nac_y_int,nac_z_int,nac_width,nac_height,nac_length,cyl)
 
     # Rear nacelle
     #-----------------------------------------------------------------------------------------------------------
@@ -377,7 +390,15 @@ def draw_3d_view(aircraft,window_title,plot_title):
         plt.fill(xSideView+r_nac_xz[0:,0], ySideView+r_nac_xz[0:,1], color="white", zorder=4)   # rear nacelle side view
         plt.plot(xSideView+r_nac_xz[0:,0], ySideView+r_nac_xz[0:,1], color="grey", zorder=5)    # rear nacelle side view
 
-    if (aircraft.propulsion.architecture!="TP"):
+    if (aircraft.propulsion.architecture=="TP"):
+        if (aircraft.propulsion.n_engine==4):
+            plt.fill(xSideView+nac_xz_int[0:,0], ySideView+nac_xz_int[0:,1], color="white", zorder=4)     # nacelle side view
+            plt.plot(xSideView+nac_xz_int[0:,0], ySideView+nac_xz_int[0:,1], color="grey", zorder=4)      # nacelle side view
+        plt.fill(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="white", zorder=5)     # nacelle side view
+        plt.plot(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="grey", zorder=5)      # nacelle side view
+        plt.fill(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="white", zorder=6)   # wing_ side view
+        plt.plot(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="grey", zorder=7)    # wing_ side view
+    else:
         plt.fill(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="white", zorder=4)   # wing_ side view
         plt.plot(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="grey", zorder=5)    # wing_ side view
         if (aircraft.propulsion.n_engine==4):
@@ -385,11 +406,6 @@ def draw_3d_view(aircraft,window_title,plot_title):
             plt.plot(xSideView+nac_xz_int[0:,0], ySideView+nac_xz_int[0:,1], color="grey", zorder=6)      # nacelle side view
         plt.fill(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="white", zorder=7)     # nacelle side view
         plt.plot(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="grey", zorder=7)      # nacelle side view
-    else:
-        plt.fill(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="white", zorder=4)     # nacelle side view
-        plt.plot(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="grey", zorder=5)      # nacelle side view
-        plt.fill(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="white", zorder=6)   # wing_ side view
-        plt.plot(xSideView+wing_xz[0:,0], ySideView+wing_xz[0:,1], color="grey", zorder=7)    # wing_ side view
 
     plt.fill(xSideView+htp_xz[0:,0], ySideView+htp_xz[0:,1], color="white", zorder=4)     # htp_ side view
     plt.plot(xSideView+htp_xz[0:,0], ySideView+htp_xz[0:,1], color="grey", zorder=5)      # htp_ side view
@@ -578,4 +594,143 @@ def get_shape():
                     [- 0.5000000 , 0.0000000 ,  0.0000000 ]])
 
     return nose1,nose2,nose3,cone1,cone2,cyl
+
+
+#===========================================================================================================
+def draw_design_space(file, mark, field, const, color, limit, bound):
+
+    # Read information
+    #------------------------------------------------------------------------------------------------------
+    #dat = numpy.genfromtxt(file,delimiter = ";")
+    data_frame = pandas.read_csv(file, delimiter = ";",skipinitialspace=True, header=None)
+
+    # Create figure
+    #------------------------------------------------------------------------------------------------------
+    name = [el.strip() for el in data_frame[0]]
+    unit = [el.strip() for el in data_frame[1]]
+    data = data_frame.iloc[:,2:].values
+
+    abs = list(set(data[0,:]))
+    abs.sort()
+    nx = len(abs)
+
+    ord = list(set(data[1,:]))
+    ord.sort()
+    ny = len(ord)
+
+    dat = {}
+    for j in range(2,len(data)):
+       dat[name[j]] = data[j,:]
+
+    uni = {}
+    for j in range(2,len(data)):
+       uni[name[j]] = unit[j]
+
+    res = []
+    res.append(units.convert_to(unit[0],mark[0]))
+    res.append(units.convert_to(unit[1],mark[1]))
+
+    mpl.rcParams['hatch.linewidth'] = 0.3
+
+    fig, axs = plt.subplots(figsize=(7,7))
+    gs = mpl.gridspec.GridSpec(2,1, height_ratios=[3,1])
+
+    F = {}
+    typ = 'cubic'
+
+    axe = plt.subplot(gs[0])
+    X, Y = np.meshgrid(abs, ord)
+    Z = dat[field].reshape(ny,nx)
+    F[field] = interpolate.interp2d(X, Y, Z, kind=typ)
+    ctf = axe.contourf(X, Y, Z, cmap=mpl.cm.Greens, levels=100)
+    axins = inset_axes(axe,
+                       width="5%",  # width = 5% of parent_bbox width
+                       height="60%",  # height : 50%
+                       loc='upper left',
+                       bbox_to_anchor=(1.03, 0., 1, 1),
+                       bbox_transform=axe.transAxes,
+                       borderpad=0,
+                       )
+    plt.colorbar(ctf,cax=axins)
+    axe.set_title("Criterion : "+field+" ("+uni[field]+")")
+    axe.set_xlabel(name[0]+" ("+unit[0]+")")
+    axe.set_ylabel(name[1]+" ("+unit[1]+")")
+
+    axe.plot(res[0],res[1],'ok',ms='10',mfc='none')             # Draw solution point
+    marker, = axe.plot(res[0],res[1],'+k',ms='10',mfc='none')     # Draw plot marker
+
+    bnd = [{"ub":1.e10,"lb":-1.e10}.get(s) for s in bound]
+
+    ctr = []
+    hdl = []
+    for j in range(0,len(const),1):
+        Z = dat[const[j]].reshape(ny,nx)
+        F[const[j]] = interpolate.interp2d(X, Y, Z, kind=typ)
+        ctr.append(axe.contour(X, Y, Z, levels=[limit[j]], colors=color[j]))
+        levels = [limit[j],bnd[j]]
+        levels.sort()
+        axe.contourf(X, Y, Z, levels=levels,alpha=0.,hatches=['/'])
+        h,_ = ctr[j].legend_elements()
+        hdl.append(h[0])
+
+    handle = [hl for hl in hdl]
+
+    axe.legend(handle,const, loc = "lower left", bbox_to_anchor=(1.02, 0.))
+
+    # Set introspection
+    #------------------------------------------------------------------------------------------------------
+    axe =  plt.subplot(gs[1])
+    axe.axis('off')
+    val1 = [["%6.0f"%12000., unit[0]], ["%5.2f"%135.4, unit[1]], ["%6.0f"%70000., uni[field]]]
+    rowlabel=(name[0], name[1], field)
+
+    the_table = axe.table(cellText=val1,rowLabels=rowlabel, rowLoc='right', cellLoc='left', bbox=[0.18,0.25,0.4,0.6])
+    the_table.auto_set_font_size(False)
+    the_table.set_fontsize(10)
+
+    for k,cell in six.iteritems(the_table._cells):
+        cell.set_edgecolor("silver")
+
+    cst_uni = [uni[c] for c in const]
+
+    val2 = np.random.random(len(const))*100.
+    val2 = ["%8.1f" %v for v in val2]
+    val2 = list(map(list, zip(*[val2,cst_uni])))
+
+    the_table2 = axe.table(cellText=val2,rowLabels=const, rowLoc='right', cellLoc='left', bbox=[0.85,0.,0.4,1.])
+    the_table2.auto_set_font_size(False)
+    the_table2.set_fontsize(10)
+
+    for k,cell in six.iteritems(the_table2._cells):
+        cell.set_edgecolor("silver")
+
+    the_table[0,0].get_text().set_text("%6.0f" %res[0])
+    the_table[1,0].get_text().set_text("%5.2f" %res[1])
+    the_table[2,0].get_text().set_text("%6.0f" %F[field](res[0],res[1]))
+    for j in range(len(const)):
+        the_table2[j,0].get_text().set_text("%8.1f" %F[const[j]](res[0],res[1]))
+
+
+    def onclick(event):
+    #    global ix, iy
+        try:
+            ix, iy = event.xdata, event.ydata
+            the_table[0,0].get_text().set_text("%6.0f" %ix)
+            the_table[1,0].get_text().set_text("%5.2f" %iy)
+            the_table[2,0].get_text().set_text("%6.0f" %F[field](ix,iy))
+            for j in range(len(const)):
+                the_table2[j,0].get_text().set_text("%8.1f" %F[const[j]](ix,iy))
+            marker.set_xdata(ix)
+            marker.set_ydata(iy)
+            plt.draw()
+        except TypeError:
+            no_op = 0
+
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+
+    # Pack and draw
+    #------------------------------------------------------------------------------------------------------
+    plt.tight_layout()
+    plt.show()
+
 

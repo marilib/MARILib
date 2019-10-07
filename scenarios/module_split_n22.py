@@ -176,8 +176,6 @@ lifting_plane_design(aircraft)
 
 propulsion(aircraft)
 
-geometry_coupling(aircraft)
-
 aircraft_aerodynamics(aircraft)
 
 aircraft_mass(aircraft)

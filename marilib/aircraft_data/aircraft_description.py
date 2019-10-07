@@ -35,6 +35,9 @@ from marilib.airplane.airframe.airframe_data \
 from marilib.airplane.propulsion.turbofan.turbofan_data \
     import TurbofanPylon, TurbofanNacelle, TurbofanEngine
 
+from marilib.airplane.propulsion.turboprop.turboprop_data \
+    import TurbopropNacelle, TurbopropEngine
+
 from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_data \
     import Pte1PowerElectricChain, Pte1Battery
 
@@ -96,6 +99,9 @@ class Aircraft(object):
         self.turbofan_pylon = TurbofanPylon()
         self.turbofan_nacelle = TurbofanNacelle()
         self.turbofan_engine = TurbofanEngine()
+
+        self.turboprop_nacelle = TurbopropNacelle()
+        self.turboprop_engine = TurbopropEngine()
 
         self.rear_electric_nacelle = RearElectricNacelle()
         self.rear_electric_engine = RearElectricEngine()
@@ -269,14 +275,10 @@ def write_data_line(value, key, out_parser, info_dict,
             if write_detail and 'txt' in info_dict[key]:
                 comment_line += " " + info_dict[key]['txt']
             comment_inline = True
-    if not user_format or user_format is -1:
-        out_parser[key] = "{0}{1}".format(value,
-                                          unit_str)
-    elif user_format:
-        if user_format is True:
-            user_format = STANDARD_FORMAT
-        out_parser[key] = "{0}{1}".format(to_user_format(value, user_format),
-                                          unit_str)
+    if user_format:
+        out_parser[key] = "{0}{1}".format(to_user_format(value, STANDARD_FORMAT),unit_str)
+    else:
+        out_parser[key] = "{0}{1}".format(value,unit_str)
     if comment_inline:
         out_parser.inline_comments[key] = comment_line
 

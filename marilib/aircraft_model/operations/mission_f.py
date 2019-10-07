@@ -26,20 +26,20 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     """
 
     engine = aircraft.turbofan_engine
-    nacelle = aircraft.turbofan_nacelle
     propulsion = aircraft.propulsion
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
     g = earth.gravity()
+    fhv = earth.fuel_heat(propulsion.fuel_type)
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
-    fuel_taxi_out = (34. + 2.3e-4*engine.reference_thrust)*propulsion.n_engine
+    fuel_taxi_out = (34. + 2.3e-4*propulsion.reference_thrust)*propulsion.n_engine
     time_taxi_out = 540.
 
     fuel_take_off = 1e-4*(2.8+2.3/engine.bpr)*tow
-    time_take_off = 220.*tow/(engine.reference_thrust*propulsion.n_engine)
+    time_take_off = 220.*tow/(propulsion.reference_thrust*propulsion.n_engine)
 
     # Mission leg
     #-----------------------------------------------------------------------------------------------------------
@@ -52,6 +52,8 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     if (propulsion.architecture=="TF"):
         fn,sfc,data = propu.turbofan_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+    elif (propulsion.architecture=="TP"):
+        fn,sfc,data = propu.turboprop_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
     elif (propulsion.architecture=="PTE1"):
         fn,sfc,sec,data = propu.pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
     else:
@@ -61,7 +63,11 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     c_z = flight.lift_from_speed(aircraft,pamb,tamb,mach,mass)
     c_x,lod_cruise = airplane_aero.drag(aircraft, pamb, tamb, mach, c_z)
 
+    sar = (tas*lod_cruise)/(mass*g*sfc*fhv)
+
     if (propulsion.architecture=="TF"):
+        fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
+    elif (propulsion.architecture=="TP"):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise)))
     elif (propulsion.architecture=="PTE1"):
         fuel_mission = tow*(1-numpy.exp(-(sfc*g*dist_range)/(tas*lod_cruise))) \
@@ -78,7 +84,7 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     fuel_landing = 1e-4*(0.5+2.3/engine.bpr)*mass
     time_landing = 180.
 
-    fuel_taxi_in = (26. + 1.8e-4*engine.reference_thrust)*propulsion.n_engine
+    fuel_taxi_in = (26. + 1.8e-4*propulsion.reference_thrust)*propulsion.n_engine
     time_taxi_in = 420.
 
     # Block fuel and time
@@ -105,7 +111,7 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     fuel_total = fuel_mission*(1.+regul.reserve_fuel_ratio(design_range)) + fuel_diversion + fuel_holding
 
     #-----------------------------------------------------------------------------------------------------------
-    return block_fuel,time_block,fuel_total
+    return block_fuel,time_block,fuel_total,sar
 
 
 #===========================================================================================================
@@ -137,7 +143,7 @@ def f_specific_air_range(aircraft,altp,mass,mach,disa):
 
 
 #===========================================================================================================
-def eval_nominal_f_mission(aircraft):
+def nominal_f_mission(aircraft):
     """
     Compute nominal mission with range as input
     """
@@ -154,11 +160,12 @@ def eval_nominal_f_mission(aircraft):
     range = aircraft.nominal_mission.range
     tow = aircraft.nominal_mission.tow
 
-    block_fuel,block_time,total_fuel = f_mission(aircraft,range,tow,altp,mach,disa)
+    block_fuel,block_time,total_fuel,sar = f_mission(aircraft,range,tow,altp,mach,disa)
 
     aircraft.nominal_mission.total_fuel = total_fuel
     aircraft.nominal_mission.block_fuel = block_fuel
     aircraft.nominal_mission.block_time = block_time
+    aircraft.nominal_mission.unified_sar = sar
 
     payload = aircraft.nominal_mission.payload
     owe = aircraft.weights.owe
@@ -171,7 +178,7 @@ def eval_nominal_f_mission(aircraft):
 
 
 #===========================================================================================================
-def eval_f_mission_coupling(aircraft):
+def f_mission_coupling(aircraft):
     """
     Mass-Mission coupling
     This relation is put apart from nominal_mission because GEMS does not manage functions that compute their own input
@@ -183,7 +190,7 @@ def eval_f_mission_coupling(aircraft):
 
 
 #===========================================================================================================
-def eval_payload_range_f_missions(aircraft):
+def payload_range_f_missions(aircraft):
     """
     Compute Payload - Range diagram corner points
     """
@@ -239,7 +246,7 @@ def eval_payload_range_f_missions(aircraft):
 
 
 #===========================================================================================================
-def eval_cost_f_mission(aircraft):
+def cost_f_mission(aircraft):
     """
     Compute climb performances
     """
@@ -277,7 +284,7 @@ def f_mission_payload(aircraft,tow,range,altp,mach,disa):
 
     weights = aircraft.weights
 
-    [block_fuel,block_time,total_fuel] = f_mission(aircraft,range,tow,altp,mach,disa)
+    block_fuel,block_time,total_fuel,sar = f_mission(aircraft,range,tow,altp,mach,disa)
 
     payload = tow - weights.owe - total_fuel
 
@@ -295,7 +302,7 @@ def f_mission_tow(aircraft,payload,range,altp,mach,disa):
     def fct_mission(tow,aircraft,payload,range,altp,mach,disa):
     #=======================================================================================
         weights = aircraft.weights
-        [block_fuel,block_time,total_fuel] = f_mission(aircraft,range,tow,altp,mach,disa)
+        block_fuel,block_time,total_fuel,sar = f_mission(aircraft,range,tow,altp,mach,disa)
         Y = tow - weights.owe - payload - total_fuel
         return Y
     #---------------------------------------------------------------------------------------
@@ -308,7 +315,7 @@ def f_mission_tow(aircraft,payload,range,altp,mach,disa):
 
     tow = output_dict[0][0]
 
-    [block_fuel,block_time,total_fuel] = f_mission(aircraft,range,tow,altp,mach,disa)
+    block_fuel,block_time,total_fuel,sar = f_mission(aircraft,range,tow,altp,mach,disa)
 
     return tow,block_fuel,block_time,total_fuel
 
@@ -324,7 +331,7 @@ def f_mission_range(aircraft,tow,payload,altp,mach,disa):
     def fct_mission(range,aircraft,tow,payload,altp,mach,disa):
     #=======================================================================================
         weights = aircraft.weights
-        [block_fuel,block_time,total_fuel] = f_mission(aircraft,range,tow,altp,mach,disa)
+        block_fuel,block_time,total_fuel,sar = f_mission(aircraft,range,tow,altp,mach,disa)
         Y = tow - weights.owe - payload - total_fuel
         return Y
     #---------------------------------------------------------------------------------------
@@ -337,7 +344,7 @@ def f_mission_range(aircraft,tow,payload,altp,mach,disa):
 
     range = output_dict[0][0]
 
-    [block_fuel,block_time,total_fuel] = f_mission(aircraft,range,tow,altp,mach,disa)
+    block_fuel,block_time,total_fuel,sar = f_mission(aircraft,range,tow,altp,mach,disa)
 
     return range,block_fuel,block_time,total_fuel
 
@@ -354,7 +361,7 @@ def mission_fuel_limited(aircraft,tow,total_fuel,altp,mach,disa):
     def fct_mission(range,aircraft,tow,total_fuel,altp,mach,disa):
     #=======================================================================================
         weights = aircraft.weights
-        [block_fuel,block_time,fuel] = f_mission(aircraft,range,tow,altp,mach,disa)
+        block_fuel,block_time,fuel,sar = f_mission(aircraft,range,tow,altp,mach,disa)
         Y = total_fuel - fuel
         return Y
     #---------------------------------------------------------------------------------------
@@ -367,7 +374,7 @@ def mission_fuel_limited(aircraft,tow,total_fuel,altp,mach,disa):
 
     range = output_dict[0][0]
 
-    block_fuel,block_time,total_fuel = f_mission(aircraft,range,tow,altp,mach,disa)
+    block_fuel,block_time,total_fuel,sar = f_mission(aircraft,range,tow,altp,mach,disa)
 
     payload = tow - weights.owe - total_fuel
 

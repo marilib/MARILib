@@ -38,13 +38,13 @@ print("Initialization : done")
 # Modify initial values here
 #======================================================================================================
 
-# aircraft.turbofan_engine.reference_thrust = 119000.
+# aircraft.propulsion.reference_thrust = 119000.
 # aircraft.wing.area = 151.9
 
 #======================================================================================================
 # Design process
 #======================================================================================================
-# Global design parameter n°1 : aircraft.turbofan_engine.reference_thrust, bounds = (50000,150000)
+# Global design parameter n°1 : aircraft.propulsion.reference_thrust, bounds = (50000,150000)
 # Global design parameter n°2 : aircraft.wing.area, bounds = (50,200)
 #
 # Geometrical coupling on : aircraft.horizontal_tail.area     (statistical sizing of HTP area)
@@ -80,7 +80,7 @@ search_domain = (thrust_bnd,area_bnd)
 
 # Perform MDF optimization
 #------------------------------------------------------------------------------------------------------
-criterion = "block_fuel"
+criterion = "Block_fuel"
 mda_type = "MDA2"
 
 run.mdf_process(aircraft,search_domain,criterion,mda_type)
@@ -97,7 +97,7 @@ print("Number of passengers = ","%.0f"%aircraft.cabin.n_pax_ref," int")
 print("Design range = ","%.0f"%unit.NM_m(aircraft.design_driver.design_range)," NM")
 print("Cruise Mach number = ","%.2f"%aircraft.design_driver.cruise_mach," Mach")
 print("-------------------------------------------")
-print("Reference thrust turbofan = ","%.0f"%aircraft.turbofan_engine.reference_thrust," N")
+print("Reference thrust turbofan = ","%.0f"%aircraft.propulsion.reference_thrust," N")
 print("Reference thrust effective = ","%.0f"%aircraft.propulsion.reference_thrust_effective," N")
 print("Turbofan mass = ","%.0f"%aircraft.turbofan_nacelle.mass," kg")
 print("Cruise SFC = ","%.4f"%(aircraft.propulsion.sfc_cruise_ref*36000)," kg/daN/h")

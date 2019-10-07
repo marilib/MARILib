@@ -180,8 +180,8 @@ def atmosphere_geo(altg,disa):
     Zi = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodzi = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
 
-    Z = numpy.array([0., 0., 0., 0., 0., 0.])
-    dtodz = numpy.array([0., 0., 0., 0., 0.])
+    Z = numpy.zeros_like(Zi)
+    dtodz = numpy.zeros_like(dtodzi)
 
     P = numpy.array([sea_level_pressure(), 0., 0., 0., 0., 0.])
     T = numpy.array([sea_level_temperature(), 0., 0., 0., 0., 0.])

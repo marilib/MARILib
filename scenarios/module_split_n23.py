@@ -178,13 +178,9 @@ lifting_plane_design(aircraft)
 
 propulsion(aircraft)
 
-geometry_coupling(aircraft)
-
 aircraft_aerodynamics(aircraft)
 
 aircraft_mass(aircraft)
-
-mass_coupling(aircraft)
 
 handling_quality_analysis(aircraft)
 
@@ -194,6 +190,3 @@ performance_analysis(aircraft)
 
 criteria(aircraft)
 
-
-print(aircraft.low_speed.oei_best_speed)
-print(aircraft.low_speed.eff_oei_path)

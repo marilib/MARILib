@@ -199,6 +199,7 @@ class NominalMission(object):
     "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the nominal mission"},
     "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the nominal mission"},
     "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the nominal mission"},
+    "unified_sar":{"unit":"m/J", "om":1.e0, "txt":"Specific Air Range in meter per Joule (SAR/FLHV for fuelled airplanes)"},
     "req_battery_mass":{"unit":"kg", "om":1.e3, "txt":"Required battery mass of the nominal mission"}
     }
     def __init__(self, range = None,
@@ -213,6 +214,7 @@ class NominalMission(object):
                        block_time = None,
                        block_enrg = None,
                        total_enrg = None,
+                       unified_sar = None,
                        req_battery_mass = None):
         self.range = range
         self.payload = payload
@@ -226,6 +228,7 @@ class NominalMission(object):
         self.block_time = block_time 
         self.block_enrg = block_enrg
         self.total_enrg = total_enrg
+        self.unified_sar = unified_sar
         self.req_battery_mass = req_battery_mass
 
 #--------------------------------------------------------------------------------------------------------------------------------
