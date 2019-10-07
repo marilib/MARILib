@@ -7,8 +7,6 @@ Created on Thu Jan 24 23:22:21 2019
 """
 
 
-from marilib import fsolve
-
 from marilib.tools.math import maximize_1d
 
 from marilib.aircraft_model.operations import mission_b, mission_f
@@ -59,6 +57,16 @@ def eval_nominal_mission(aircraft):
     else:
         mission_f.nominal_f_mission(aircraft)
 
+#===========================================================================================================
+def eval_mission_coupling(aircraft):
+    """
+    Nominal mission evaluation
+    """
+
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        mission_b.eval_b_mission_coupling(aircraft)
+    else:
+        mission_f.eval_f_mission_coupling(aircraft)
 
 #===========================================================================================================
 def eval_mission_coupling(aircraft):

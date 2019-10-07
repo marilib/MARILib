@@ -15,9 +15,6 @@ from marilib import numpy
 from numpy.linalg import solve
 from numpy.linalg.linalg import LinAlgError
 
-
-# from autograd import jacobian
-# from autograd.numpy.numpy_boxes import ArrayBox
 #===========================================================================================================
 def lin_interp_1d(x,X,Y):
     """
@@ -30,8 +27,8 @@ def lin_interp_1d(x,X,Y):
     n = numpy.size(X)
     for j in range(1,n):
         if x<X[j] :
-           y = Y[j-1]+(Y[j]-Y[j-1])*(x-X[j-1])/(X[j]-X[j-1])
-           return y
+            y = Y[j-1]+(Y[j]-Y[j-1])*(x-X[j-1])/(X[j]-X[j-1])
+            return y
     y = Y[n-2]+(Y[n-1]-Y[n-2])*(x-X[n-2])/(X[n-1]-X[n-2])
     return y
 
@@ -155,6 +152,7 @@ def newton_solve(res_func, x0, dres_dy=None, args=(),
     while k < max_iter and stop_crit > res_max:
         drdy = dres_dy(*myargs)
         if marilib.is_using_autograd:
+            from autograd.numpy.numpy_boxes import ArrayBox
             if isinstance(drdy, ArrayBox):
                 drdy = drdy._value
             if isinstance(curr_res, ArrayBox):
@@ -212,6 +210,8 @@ def approx_jac(res, y, args=(), step=1e-7):
 
 def get_jac_func(res, args=(), step=1e-6):
     if marilib.is_using_autograd:
+        from autograd import jacobian
+        from autograd.numpy.numpy_boxes import ArrayBox
         jac = jacobian(res, argnum=0)
 
         def j_func(*args):

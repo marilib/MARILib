@@ -534,6 +534,8 @@ def convert_to(ulab, val):
         for k, v in dic_val.items():
             dic_val[k] = convert_to(ulab, v)
         return dic_val
+    if ulab in ["integer", "int", "entier", "numeric"]:
+        val = int(val)
     return val / UNIT[ulab]
 
 

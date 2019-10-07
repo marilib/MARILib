@@ -54,7 +54,7 @@ def eval_ef1_engine_design(aircraft):
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
-    engine.rating_factor = {"MTO":1.00, "MCN":0.80, "MCL":0.80, "MCR":0.80, "FID":0.05}
+#    engine.rating_factor = {"MTO":1.00, "MCN":0.80, "MCL":0.80, "MCR":0.80, "FID":0.05}
 
     engine.reference_thrust = propulsion.reference_thrust
 

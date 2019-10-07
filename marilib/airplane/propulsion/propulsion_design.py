@@ -251,9 +251,9 @@ def eval_battery_mass(aircraft):
        aircraft.center_of_gravity.battery = 0.
        aircraft.weights.battery_in_owe = 0.
     elif (aircraft.propulsion.architecture=="PTE1"):
-       eval_pte1_battery_mass(aircraft)
+        eval_pte1_battery_mass(aircraft)
     elif (aircraft.propulsion.architecture=="EF1"):
-       eval_ef1_battery_mass(aircraft)
+        eval_ef1_battery_mass(aircraft)
 
     return
 

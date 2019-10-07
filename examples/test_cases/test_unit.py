@@ -8,7 +8,7 @@ Created on Thu Jan 24 23:22:21 2019
 
 from marilib.tools import units as unit
 
-from marilib.aircraft_data.aircraft_description import Aircraft
+from marilib.aircraft_data.aircraft_description import Aircraft, to_user_format
 
 from marilib.processes import assembly as run
 

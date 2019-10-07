@@ -52,7 +52,7 @@ from marilib.airplane.propulsion.propulsion_design \
     import eval_propulsion_design
 
 from marilib.aircraft_model.airplane.airplane_design \
-    import eval_aerodynamics_design, eval_mass_coupling
+    import eval_aerodynamics_design
 
 from marilib.aircraft_model.operations.mission \
     import eval_nominal_mission, eval_cost_mission
@@ -90,86 +90,107 @@ def geometry_coupling(aircraft):
 
 #-----------------------------------------------------------------------------------------------------------
 def propulsion(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_propulsion_design(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def aircraft_aerodynamics(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_aerodynamics_design(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def aircraft_mass(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_mass_breakdown(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
-def mass_coupling(aircraft):
-    eval_mass_coupling(aircraft)
-
-#-----------------------------------------------------------------------------------------------------------
 def nominal_mission(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_nominal_mission(aircraft)
+
 
 #-----------------------------------------------------------------------------------------------------------
 def climb_performances(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_climb_performances(aircraft)
     eval_oei_performances(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def low_speed_performances(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_take_off_performances(aircraft)
     eval_landing_performances(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def co2_metric(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_co2_metric(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def economics(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_cost_mission(aircraft)
     eval_economics(aircraft)
 
 #-----------------------------------------------------------------------------------------------------------
 def payload_range_analysis(aircraft):
+    """
+    @constants : [rating_factor,rating_code,architecture,fuel_type,flight_data]
+    """
     eval_payload_range_analysis(aircraft)
 
 
-# Initialize aircraft data structure
-#---------------------------------------------------------------------------
-aircraft = Aircraft()
-
-n_pax_ref = 150                     # Reference number of passengers
-design_range = unit.m_NM(3000)      # Design range
-cruise_mach = 0.78                  # Nominal cruise mach number
-
-propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
-n_engine = 2           # Number of engine
-
-
-aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
-
-fuselage_design(aircraft)
-
-lifting_plane_design(aircraft)
-
-propulsion(aircraft)
-
-geometry_coupling(aircraft)
-
-aircraft_aerodynamics(aircraft)
-
-aircraft_mass(aircraft)
-
-mass_coupling(aircraft)
-
-nominal_mission(aircraft)
-
-climb_performances(aircraft)
-
-low_speed_performances(aircraft)
-
-co2_metric(aircraft)
-
-economics(aircraft)
-
-payload_range_analysis(aircraft)
-
-
+if __name__ == "__main__":
+    # Initialize aircraft data structure
+    #---------------------------------------------------------------------------
+    aircraft = Aircraft()
+    
+    n_pax_ref = 150                     # Reference number of passengers
+    design_range = unit.m_NM(3000)      # Design range
+    cruise_mach = 0.78                  # Nominal cruise mach number
+    
+    propu_config = "TF"    # "TF": turbofan, "PTE1": partial turbo electric
+    n_engine = 2           # Number of engine
+    
+    
+    aircraft_initialization(aircraft, n_pax_ref, design_range, cruise_mach, propu_config, n_engine)
+    
+    fuselage_design(aircraft)
+    
+    lifting_plane_design(aircraft)
+    
+    propulsion(aircraft)
+    
+    geometry_coupling(aircraft)
+    
+    aircraft_aerodynamics(aircraft)
+    
+    aircraft_mass(aircraft)
+    
+    nominal_mission(aircraft)
+    
+    climb_performances(aircraft)
+    
+    low_speed_performances(aircraft)
+    
+    co2_metric(aircraft)
+    
+    economics(aircraft)
+    
+    payload_range_analysis(aircraft)

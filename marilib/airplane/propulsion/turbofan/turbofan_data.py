@@ -109,7 +109,7 @@ class TurbofanEngine(object):
     INFO = {\
     "reference_thrust":{"unit":"daN", "om":1.e4, "txt":"Design Reference Thrust of the engines"},
     "bpr":{"unit":"no_dim", "om":1.e0, "txt":"By Pass Ratio of the turbofan"},
-    "rating_factor":{"unit":"int", "om":1.e0, "txt":"Array of rating factors versus reference thrust"},
+    "rating_factor":{"unit":"dict", "om":1.e0, "txt":"Dictionary of rating factors versus reference thrust"},
     "core_thrust_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total thrust of a turbofan which is due to the core (typically between 10% & 16% for BPR>5)"},
     "core_width_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total nacelle diameter which is taken by the core"},
     "core_weight_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Fraction of the total nacelle mass which is taken by the core"},

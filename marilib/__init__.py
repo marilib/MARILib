@@ -26,8 +26,8 @@ def use_newton_solve():
     marilib.is_using_newton_solve = True
 
 def use_autograd():
-    from autograd import numpy as __agnpy
-    sys.modules["marilib"].numpy = __agnpy
-    sys.modules["marilib.numpy"] = __agnpy
+    from autograd import numpy as __agnp
+    sys.modules["marilib"].numpy = __agnp
+    sys.modules["marilib.numpy"] = __agnp
     marilib.is_using_autograd = True
     use_newton_solve()
