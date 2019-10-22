@@ -35,6 +35,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.propulsion.architecture = propu_config
     aircraft.propulsion.n_engine = n_engine
 
+    aircraft.propulsion.nacelle_attachment = init.nacelle_attachment(propu_config,n_pax_ref)
     aircraft.propulsion.fuel_type = init.fuel_type(propu_config)
     aircraft.propulsion.reference_thrust = init.reference_thrust(n_pax_ref,design_range,n_engine)                                            # Main design variable
 
@@ -120,7 +121,10 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.wing.span = init.wing_span(aircraft.wing.area,aircraft.wing.aspect_ratio)
     aircraft.wing.x_root = init.wing_x_root(aircraft.wing.aspect_ratio,aircraft.wing.span)
 
+    aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.propulsion.nacelle_attachment)
     aircraft.horizontal_tail.area = init.htp_area(aircraft.wing.area)
+
+    aircraft.vertical_tail.attachment = init.vtp_attachment()
     aircraft.vertical_tail.area = init.vtp_area(aircraft.wing.area)
 
     #-----------------------------------------------------------------------------------------------------------
@@ -135,24 +139,20 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.turbofan_engine.core_width_ratio = init.core_width_ratio()
     aircraft.turbofan_engine.core_weight_ratio = init.core_weight_ratio()
 
-    aircraft.turbofan_nacelle.attachment = init.nacelle_attachment(propu_config,n_pax_ref)
-    aircraft.turbofan_nacelle.n_engine = n_engine
     aircraft.turbofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.turbofan_nacelle.efficiency_prop = init.efficiency_prop()
     aircraft.turbofan_nacelle.width = init.nacelle_width(aircraft.turbofan_engine.bpr,
                                                                   aircraft.propulsion.reference_thrust)
     aircraft.turbofan_nacelle.y_ext = init.nacelle_y_ext(propu_config,n_engine,
-                                                         aircraft.turbofan_nacelle.attachment,
+                                                         aircraft.propulsion.nacelle_attachment,
                                                          aircraft.fuselage.width,
                                                          aircraft.turbofan_nacelle.width)
 
     #-----------------------------------------------------------------------------------------------------------
-    aircraft.turboprop_nacelle.attachment = init.nacelle_attachment(propu_config,n_pax_ref)
-    aircraft.turboprop_nacelle.n_engine = n_engine
     aircraft.turboprop_nacelle.efficiency_prop = init.efficiency_prop()
     aircraft.turboprop_nacelle.propeller_width = init.propeller_width(aircraft.propulsion.reference_thrust)
     aircraft.turboprop_nacelle.y_ext = init.nacelle_y_ext(propu_config,n_engine,
-                                                          aircraft.turboprop_nacelle.attachment,
+                                                         aircraft.propulsion.nacelle_attachment,
                                                           aircraft.fuselage.width,
                                                           aircraft.turboprop_nacelle.propeller_width)
 
@@ -185,8 +185,6 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.pte1_battery.power_density = init.battery_power_density()
 
     #-----------------------------------------------------------------------------------------------------------
-    aircraft.electrofan_nacelle.attachment = init.nacelle_attachment(propu_config,n_pax_ref)
-    aircraft.electrofan_nacelle.n_engine = n_engine
     aircraft.electrofan_nacelle.rear_nacelle = init.ef1_rear_nacelle()
     aircraft.electrofan_nacelle.efficiency_fan = init.efficiency_fan()
     aircraft.electrofan_nacelle.efficiency_prop = init.efficiency_prop()
@@ -197,7 +195,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.electrofan_nacelle.nacelle_pw_density = init.e_nacelle_pw_density()
     aircraft.electrofan_nacelle.width = init.nacelle_width(9,aircraft.propulsion.reference_thrust)
     aircraft.electrofan_nacelle.y_ext = init.nacelle_y_ext(propu_config,n_engine,
-                                                           aircraft.electrofan_nacelle.attachment,
+                                                           aircraft.propulsion.nacelle_attachment,
                                                            aircraft.fuselage.width,
                                                            aircraft.electrofan_nacelle.width)
 
@@ -218,19 +216,6 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.ef1_battery.energy_density = init.battery_energy_density(propu_config)
     aircraft.ef1_battery.power_density = init.battery_power_density()
     aircraft.ef1_battery.density = init.battery_density()
-
-
-    if (propu_config=="TF"):
-        aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.turbofan_nacelle.attachment)
-    elif (propu_config=="TP"):
-        aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.turboprop_nacelle.attachment)
-    elif (propu_config=="PTE1"):
-        aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.turbofan_nacelle.attachment)
-    elif (propu_config=="EF1"):
-        aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.electrofan_nacelle.attachment)
-    else:
-
-        raise Exception("Propulsion architecture type is unknown")
 
     #-----------------------------------------------------------------------------------------------------------
     aircraft.propulsion.bli_effect = init.boundary_layer_effect()
@@ -253,9 +238,7 @@ def eval_geometrical_analysis(aircraft):
 
     airframe.eval_wing_design(aircraft)
 
-    airframe.eval_vtp_design(aircraft)
-
-    airframe.eval_htp_design(aircraft)
+    airframe.eval_tail_design(aircraft)
 
     airframe.eval_htp_statistical_sizing(aircraft)
 
@@ -287,8 +270,7 @@ def eval_tail_statistical_sizing(aircraft):
         ac.vertical_tail.area = x_in[1]                             # Coupling variable
 
         airframe.eval_wing_design(ac)
-        airframe.eval_vtp_design(ac)
-        airframe.eval_htp_design(ac)
+        airframe.eval_tail_design(ac)
 
         airframe.eval_vtp_constraint(ac)
         airframe.eval_htp_constraint(ac)
@@ -312,8 +294,7 @@ def eval_tail_statistical_sizing(aircraft):
     aircraft.vertical_tail.area = output_dict[0][1]                             # Coupling variable
 
     airframe.eval_wing_design(aircraft)
-    airframe.eval_vtp_design(aircraft)
-    airframe.eval_htp_design(aircraft)
+    airframe.eval_tail_design(aircraft)
 
     propulsion.eval_propulsion_design(aircraft)
 
@@ -341,8 +322,7 @@ def eval_aircraft_pre_design(aircraft):
         ac.turbofan_nacelle.y_ext = x_in[1]                         # Coupling variable
 
         airframe.eval_wing_design(ac)
-        airframe.eval_vtp_design(ac)
-        airframe.eval_htp_design(ac)
+        airframe.eval_tail_design(ac)
 
         propulsion.eval_propulsion_design(ac)
 
@@ -362,8 +342,7 @@ def eval_aircraft_pre_design(aircraft):
     aircraft.turbofan_nacelle.y_ext = output_dict[0][1]                         # Coupling variable
 
     airframe.eval_wing_design(aircraft)
-    airframe.eval_vtp_design(aircraft)
-    airframe.eval_htp_design(aircraft)
+    airframe.eval_tail_design(aircraft)
 
     propulsion.eval_propulsion_design(aircraft)
 
@@ -391,8 +370,7 @@ def eval_aircraft_statistical_pre_design(aircraft):
 
         eval_aircraft_pre_design(ac)
 
-        airframe.eval_vtp_constraint(ac)
-        airframe.eval_htp_constraint(ac)
+        airframe.eval_tail_design(ac)
 
         y_out = np.array([ac.horizontal_tail.htp_sizing_constraint_1,
                           ac.vertical_tail.vtp_sizing_constraint_1])
@@ -413,8 +391,7 @@ def eval_aircraft_statistical_pre_design(aircraft):
     aircraft.vertical_tail.area = output_dict[0][1]                             # Coupling variable
 
     airframe.eval_wing_design(aircraft)
-    airframe.eval_vtp_design(aircraft)
-    airframe.eval_htp_design(aircraft)
+    airframe.eval_tail_design(aircraft)
 
     propulsion.eval_propulsion_design(aircraft)
 
@@ -460,8 +437,7 @@ def eval_aircraft_statistical_pre_design_2(aircraft):
     aircraft.turbofan_nacelle.y_ext = output_dict[0][1]                         # Coupling variable
 
     airframe.eval_wing_design(aircraft)
-    airframe.eval_vtp_design(aircraft)
-    airframe.eval_htp_design(aircraft)
+    airframe.eval_tail_design(aircraft)
 
     propulsion.eval_propulsion_design(aircraft)
 

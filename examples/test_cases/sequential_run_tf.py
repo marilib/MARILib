@@ -37,6 +37,8 @@ print("Initialization : done")
 #======================================================================================================
 # This sequence goes through all models without doing any solving
 
+aircraft.vertical_tail.attachment = 2
+
 # Solve the geometric coupling between airframe and engines
 #------------------------------------------------------------------------------------------------------
 run.eval_geometrical_analysis(aircraft)

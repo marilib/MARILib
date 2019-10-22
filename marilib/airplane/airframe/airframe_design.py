@@ -250,6 +250,7 @@ def eval_vtp_design(aircraft):
 
     fuselage = aircraft.fuselage
     wing = aircraft.wing
+    htp = aircraft.horizontal_tail
 
     vtp = aircraft.vertical_tail
 
@@ -261,22 +262,48 @@ def eval_vtp_design(aircraft):
 
     vtp.net_wetted_area = 2.01*vtp.area     # Factor 2.01 accounts for carmans
 
-    vtp.height = numpy.sqrt(vtp.aspect_ratio*vtp.area)
-    vtp.c_root = 2*vtp.area/(vtp.height*(1+vtp.taper_ratio))
-    vtp.c_tip = vtp.taper_ratio*vtp.c_root
 
-    vtp_x_wise_anchor = 0.85       # Locate VTP versus end fuselage length
+    if (vtp.attachment==1):
+        vtp.height = numpy.sqrt(vtp.aspect_ratio*vtp.area)
+        vtp.c_root = 2*vtp.area/(vtp.height*(1+vtp.taper_ratio))
+        vtp.c_tip = vtp.taper_ratio*vtp.c_root
 
-    vtp.x_root = fuselage.length*(1-fuselage.tail_cone_length/fuselage.length*(1-vtp_x_wise_anchor)) - vtp.c_root
-    vtp.x_tip = vtp.x_root + 0.25*(vtp.c_root-vtp.c_tip) + vtp.height*numpy.tan(vtp.sweep)
+        vtp_x_wise_anchor = 0.85       # Locate VTP versus end fuselage length
+        vtp.x_root = fuselage.length*(1-fuselage.tail_cone_length/fuselage.length*(1-vtp_x_wise_anchor)) - vtp.c_root
+        vtp.x_tip = vtp.x_root + 0.25*(vtp.c_root-vtp.c_tip) + vtp.height*numpy.tan(vtp.sweep)
 
-    vtp.z_root = fuselage.height
-    vtp.z_tip = vtp.z_root + vtp.height
+        vtp.y_root = 0.
+        vtp.y_tip = 0.
 
-    vtp.mac = vtp.height*(vtp.c_root**2+vtp.c_tip**2+vtp.c_root*vtp.c_tip)/(3*vtp.area)
-    vtp.x_mac = vtp.x_root+(vtp.x_tip-vtp.x_root)*vtp.height*(2*vtp.c_tip+vtp.c_root)/(6*vtp.area)
+        vtp.z_root = fuselage.height
+        vtp.z_tip = vtp.z_root + vtp.height
 
-    vtp.lever_arm = (vtp.x_mac + 0.25*vtp.mac) - (wing.x_mac + 0.25*wing.mac)
+        vtp.mac = vtp.height*(vtp.c_root**2+vtp.c_tip**2+vtp.c_root*vtp.c_tip)/(3*vtp.area)
+        vtp.x_mac = vtp.x_root+(vtp.x_tip-vtp.x_root)*vtp.height*(2*vtp.c_tip+vtp.c_root)/(6*vtp.area)
+
+        vtp.lever_arm = (vtp.x_mac + 0.25*vtp.mac) - (wing.x_mac + 0.25*wing.mac)
+
+    elif (vtp.attachment==2):
+        vtp.height = numpy.sqrt(vtp.aspect_ratio*(0.5*vtp.area))
+        vtp.c_root = 2*(0.5*vtp.area)/(vtp.height*(1+vtp.taper_ratio))
+        vtp.c_tip = vtp.taper_ratio*vtp.c_root
+
+        vtp.x_root = htp.x_tip
+        vtp.x_tip = vtp.x_root + 0.25*(vtp.c_root-vtp.c_tip) + vtp.height*numpy.tan(vtp.sweep)
+
+        vtp.y_root = htp.y_tip
+        vtp.y_tip = htp.y_tip
+
+        vtp.z_root = htp.z_tip
+        vtp.z_tip = vtp.z_root + vtp.height
+
+        vtp.mac = vtp.height*(vtp.c_root**2+vtp.c_tip**2+vtp.c_root*vtp.c_tip)/(3*(0.5*vtp.area))
+        vtp.x_mac = vtp.x_root+(vtp.x_tip-vtp.x_root)*vtp.height*(2*vtp.c_tip+vtp.c_root)/(6*(0.5*vtp.area))
+
+        vtp.lever_arm = (vtp.x_mac + 0.25*vtp.mac) - (wing.x_mac + 0.25*wing.mac)
+
+    else:
+        raise Exception("vtp_design, vtp.attachment value is out of range")
 
     vtp.volume = 0.4   # Design rule
 
@@ -346,55 +373,82 @@ def eval_htp_design(aircraft):
 
     htp = aircraft.horizontal_tail
 
-    htp.taper_ratio = 0.35      # Design rule
+    if(vtp.attachment==1):          # Classical
+        htp.taper_ratio = 0.35      # Design rule
+    elif(vtp.attachment==2):        # H-tail
+        htp.taper_ratio = 0.45      # Design rule
+    else:
+        print("htp_design, vtp.attachment value is out of range")
+
     htp.aspect_ratio = 5.       # Design rule
     htp.t_o_c = 0.10            # Design rule
 
     wing_sweep = 1.6*max(0,(design_driver.cruise_mach-0.5))     # Empirical law
     htp.sweep = wing_sweep + unit.rad_deg(5)     # Design rule
 
-    htp.dihedral = unit.rad_deg(5)       # HTP dihedral
-
     if(htp.attachment==1):          # Classical
         htp.net_wetted_area = 1.63*htp.area
     elif(htp.attachment==2):        # T-tail
         htp.net_wetted_area = 2.01*htp.area
     else:
-        print("airframe_predesign_, htp.attachment value is out of range")
+        print("htp_design, htp.attachment value is out of range")
 
     htp.span = numpy.sqrt(htp.aspect_ratio*htp.area)
+    htp.y_tip = 0.5*htp.span
+
+    htp_z_wise_anchor = 0.80       # Locate HTP versus end fuselage height
+
+    if(vtp.attachment==1):    # Classical
+        if(htp.attachment==1):      # Classical
+            htp.z_axe = htp_z_wise_anchor*fuselage.height
+        elif(htp.attachment==2):    # T-tail
+            htp.z_axe = fuselage.height + vtp.height
+        else:
+            raise Exception("htp_design, htp.attachment value is out of range")
+
+    elif(vtp.attachment==2):    # H-tail
+        if(htp.attachment==1):      # Classical
+            htp.z_axe = htp_z_wise_anchor*fuselage.height
+        else:
+            raise Exception("htp_design, htp.attachment value is not permitted")
+
+    else:
+        raise Exception("htp_design, vtp.attachment value is out of range")
+
+    htp.dihedral = unit.rad_deg(5)       # HTP dihedral
+    htp.z_tip = htp.z_axe + htp.y_tip*numpy.tan(htp.dihedral)
 
     htp.c_axe = 2.*htp.area/(htp.span*(1+htp.taper_ratio))
     htp.c_tip = htp.taper_ratio*htp.c_axe
-    htp.y_tip = 0.5*htp.span
 
     htp.mac = htp.span*(htp.c_axe**2+htp.c_tip**2+htp.c_axe*htp.c_tip)/(3.*htp.area)
     htp.y_mac = htp.y_tip**2*(2*htp.c_tip+htp.c_axe)/(3*htp.area)
     x_tip_local = 0.25*(htp.c_axe-htp.c_tip) + htp.y_tip*numpy.tan(htp.sweep)
     x_mac_local = htp.y_tip*x_tip_local*(htp.c_tip*2.+htp.c_axe)/(3.*htp.area)
 
-    if(htp.attachment==1):    # Classical
-        htp.x_axe = vtp.x_root + 0.50*vtp.c_root - 0.2*htp.c_axe
-    elif(htp.attachment==2):  # T-tail
-        htp.x_axe = vtp.x_tip + 0.30*vtp.c_tip - 0.80*htp.c_tip
+    if(vtp.attachment==1):    # Classical
+        if(htp.attachment==1):    # Classical
+            htp.x_axe = vtp.x_root + 0.50*vtp.c_root - 0.2*htp.c_axe
+        elif(htp.attachment==2):  # T-tail
+            htp.x_axe = vtp.x_tip + 0.30*vtp.c_tip - 0.80*htp.c_tip
+        else:
+            raise Exception("htp_design, htp.attachment value is out of range")
+
+    elif(vtp.attachment==2):    # H-tail
+        if(htp.attachment==1):    # Classical
+            tail_x_wise_anchor = 0.85
+            htp.x_axe = fuselage.length*(1-fuselage.tail_cone_length/fuselage.length*(1-tail_x_wise_anchor)) - htp.c_axe
+            # htp.x_axe = vtp.x_root - x_tip_local
+        else:
+            raise Exception("htp_design, htp.attachment value is not permitted")
+
     else:
-        print("airframe_predesign_, HtpType value is out of range")
+        raise Exception("htp_design, vtp.attachment value is out of range")
 
     htp.x_tip = htp.x_axe + x_tip_local
     htp.x_mac = htp.x_axe + x_mac_local
 
     htp.lever_arm = (htp.x_mac + 0.25*htp.mac) - (wing.x_mac + 0.25*wing.mac)
-
-    htp_z_wise_anchor = 0.80       # Locate HTP versus end fuselage height
-
-    if(htp.attachment==1):      # Classical
-        htp.z_axe = htp_z_wise_anchor*fuselage.height
-    elif(htp.attachment==2):    # T-tail
-        htp.z_axe = fuselage.height + vtp.height
-    else:
-        print("airframe_predesign_, htp.attachment value is out of range")
-
-    htp.z_tip = htp.z_axe + htp.y_tip*numpy.tan(htp.dihedral)
 
     htp.volume = 0.94       # Design rule
 
@@ -437,11 +491,36 @@ def eval_htp_mass(aircraft):
     HTP mass & CG estimation
     """
 
+    vtp = aircraft.vertical_tail
+
     htp = aircraft.horizontal_tail
 
-    htp.mass = 22. * htp.area      # Statistical regression
+    if(vtp.attachment==1):         # Classical
+        htp.mass = 22. * htp.area      # Statistical regression
+    elif(vtp.attachment==2):       # T-tail
+        htp.mass = 25. * htp.area  # Heavier because of HTP on top
 
     htp.c_g = htp.x_mac + 0.20*htp.mac
+
+    return
+
+
+#===========================================================================================================
+def eval_tail_design(aircraft):
+    """
+    Perform tail design depending on tail architecture
+    For classical tail architecture or T-tail, VTP must be design first
+    For H-tail, HTP must be design first because fins are plugged on it
+    """
+
+    if(aircraft.vertical_tail.attachment==1):          # Classical
+        eval_vtp_design(aircraft)
+        eval_htp_design(aircraft)
+    elif(aircraft.vertical_tail.attachment==2):        # H-tail
+        eval_htp_design(aircraft)
+        eval_vtp_design(aircraft)
+    else:
+        print("tail_design, vtp.attachment value is out of range")
 
     return
 

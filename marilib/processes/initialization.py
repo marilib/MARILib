@@ -466,6 +466,12 @@ def htp_attachment(propulsive_architecture,nacelle_attachment_i):
 
 
 #===========================================================================================================
+def vtp_attachment():
+    vtp_attachment_i = 1        # 1: Classical (on fuselage tail cone)
+    return vtp_attachment_i
+
+
+#===========================================================================================================
 def mtow(n_pax_ref,design_range):
     mtow_i =  20500. + 67.e-6*n_pax_ref*design_range
     return mtow_i

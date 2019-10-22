@@ -69,9 +69,11 @@ def draw_3d_view(aircraft,window_title,plot_title):
 
     vtp_t_o_c = aircraft.vertical_tail.t_o_c
     vtp_x_root = aircraft.vertical_tail.x_root
+    vtp_y_root = aircraft.vertical_tail.y_root
     vtp_z_root = aircraft.vertical_tail.z_root
     vtp_c_root = aircraft.vertical_tail.c_root
     vtp_x_tip = aircraft.vertical_tail.x_tip
+    vtp_y_tip = aircraft.vertical_tail.y_tip
     vtp_z_tip = aircraft.vertical_tail.z_tip
     vtp_c_tip = aircraft.vertical_tail.c_tip
 
@@ -174,109 +176,111 @@ def draw_3d_view(aircraft,window_title,plot_title):
     # HTP shape
     #-----------------------------------------------------------------------------------------------------------
 
-    htp_xy = np.array([[htp_x_axe           ,  0            ] ,
-                       [htp_x_tip           ,  0.5*htp_span ] ,
-                       [htp_x_tip+htp_c_tip ,  0.5*htp_span ] ,
-                       [htp_x_axe+htp_c_axe ,  0            ] ,
-                       [htp_x_tip+htp_c_tip , -0.5*htp_span ] ,
-                       [htp_x_tip           , -0.5*htp_span ] ,
+    htp_xy = np.array([[htp_x_axe           ,  0            ],
+                       [htp_x_tip           ,  0.5*htp_span ],
+                       [htp_x_tip+htp_c_tip ,  0.5*htp_span ],
+                       [htp_x_axe+htp_c_axe ,  0            ],
+                       [htp_x_tip+htp_c_tip , -0.5*htp_span ],
+                       [htp_x_tip           , -0.5*htp_span ],
                        [htp_x_axe           ,  0            ]])
 
-    htp_xz = np.array([[htp_x_tip              , htp_z_tip                                ] ,
-                       [htp_x_tip+0.1*htp_c_tip , htp_z_tip+0.5*htp_t_o_c*htp_c_tip ] ,
-                       [htp_x_tip+0.7*htp_c_tip , htp_z_tip+0.5*htp_t_o_c*htp_c_tip ] ,
-                       [htp_x_tip+htp_c_tip     , htp_z_tip                               ] ,
-                       [htp_x_tip+0.7*htp_c_tip , htp_z_tip-0.5*htp_t_o_c*htp_c_tip ] ,
-                       [htp_x_tip+0.1*htp_c_tip , htp_z_tip-0.5*htp_t_o_c*htp_c_tip ] ,
-                       [htp_x_tip               , htp_z_tip                               ] ,
-                       [htp_x_axe               , htp_z_axe                               ] ,
-                       [htp_x_axe+0.1*htp_c_axe , htp_z_axe-0.5*htp_t_o_c*htp_c_axe ] ,
-                       [htp_x_axe+0.7*htp_c_axe , htp_z_axe-0.5*htp_t_o_c*htp_c_axe ] ,
-                       [htp_x_axe+htp_c_axe     , htp_z_axe                               ] ,
-                       [htp_x_tip+htp_c_tip     , htp_z_tip                               ] ,
-                       [htp_x_tip+0.7*htp_c_tip , htp_z_tip-0.5*htp_t_o_c*htp_c_tip ] ,
-                       [htp_x_tip+0.1*htp_c_tip , htp_z_tip-0.5*htp_t_o_c*htp_c_tip ] ,
-                       [htp_x_tip               , htp_z_tip                               ]])
+    htp_xz = np.array([[htp_x_tip              , htp_z_tip                          ],
+                       [htp_x_tip+0.1*htp_c_tip , htp_z_tip+0.5*htp_t_o_c*htp_c_tip ],
+                       [htp_x_tip+0.7*htp_c_tip , htp_z_tip+0.5*htp_t_o_c*htp_c_tip ],
+                       [htp_x_tip+htp_c_tip     , htp_z_tip                         ],
+                       [htp_x_tip+0.7*htp_c_tip , htp_z_tip-0.5*htp_t_o_c*htp_c_tip ],
+                       [htp_x_tip+0.1*htp_c_tip , htp_z_tip-0.5*htp_t_o_c*htp_c_tip ],
+                       [htp_x_tip               , htp_z_tip                         ],
+                       [htp_x_axe               , htp_z_axe                         ],
+                       [htp_x_axe+0.1*htp_c_axe , htp_z_axe-0.5*htp_t_o_c*htp_c_axe ],
+                       [htp_x_axe+0.7*htp_c_axe , htp_z_axe-0.5*htp_t_o_c*htp_c_axe ],
+                       [htp_x_axe+htp_c_axe     , htp_z_axe                         ],
+                       [htp_x_tip+htp_c_tip     , htp_z_tip                         ],
+                       [htp_x_tip+0.7*htp_c_tip , htp_z_tip-0.5*htp_t_o_c*htp_c_tip ],
+                       [htp_x_tip+0.1*htp_c_tip , htp_z_tip-0.5*htp_t_o_c*htp_c_tip ],
+                       [htp_x_tip               , htp_z_tip                         ]])
 
-    htp_yz = np.array([[ 0           , htp_z_axe                                                           ] ,
-                       [ 0.5*htp_span , htp_z_axe+0.5*htp_span*np.tan(htp_dihedral)                           ] ,
-                       [ 0.5*htp_span , htp_z_axe+0.5*htp_span*np.tan(htp_dihedral)-htp_t_o_c*htp_c_tip ] ,
-                       [ 0            , htp_z_axe-htp_t_o_c*htp_c_axe                                ] ,
-                       [-0.5*htp_span , htp_z_axe+0.5*htp_span*np.tan(htp_dihedral)-htp_t_o_c*htp_c_tip ] ,
-                       [-0.5*htp_span , htp_z_axe+0.5*htp_span*np.tan(htp_dihedral)                           ] ,
-                       [ 0            , htp_z_axe                                                          ]])
+    htp_yz = np.array([[ 0           , htp_z_axe                                                        ],
+                       [ 0.5*htp_span , htp_z_axe+0.5*htp_span*np.tan(htp_dihedral)                     ],
+                       [ 0.5*htp_span , htp_z_axe+0.5*htp_span*np.tan(htp_dihedral)-htp_t_o_c*htp_c_tip ],
+                       [ 0            , htp_z_axe-htp_t_o_c*htp_c_axe                                   ],
+                       [-0.5*htp_span , htp_z_axe+0.5*htp_span*np.tan(htp_dihedral)-htp_t_o_c*htp_c_tip ],
+                       [-0.5*htp_span , htp_z_axe+0.5*htp_span*np.tan(htp_dihedral)                     ],
+                       [ 0            , htp_z_axe                                                       ]])
 
     # VTP shape
     #-----------------------------------------------------------------------------------------------------------
 
-    vtp_xz = np.array([[vtp_x_root           , vtp_z_root  ] ,
-                       [vtp_x_tip             , vtp_z_tip  ] ,
-                       [vtp_x_tip+vtp_c_tip   , vtp_z_tip  ] ,
-                       [vtp_x_root+vtp_c_root , vtp_z_root ]])
+    vtp_xz = np.array([[vtp_x_root            , vtp_z_root ],
+                       [vtp_x_tip             , vtp_z_tip  ],
+                       [vtp_x_tip+vtp_c_tip   , vtp_z_tip  ],
+                       [vtp_x_root+vtp_c_root , vtp_z_root ],
+                       [vtp_x_root            , vtp_z_root ]])
 
-    vtp_xy = np.array([[vtp_x_root               ,  0                               ] ,
-                       [vtp_x_root+0.1*vtp_c_root ,  0.5*vtp_t_o_c*vtp_c_root ] ,
-                       [vtp_x_root+0.7*vtp_c_root ,  0.5*vtp_t_o_c*vtp_c_root ] ,
-                       [vtp_x_root+vtp_c_root     ,  0                              ] ,
-                       [vtp_x_root+0.7*vtp_c_root , -0.5*vtp_t_o_c*vtp_c_root ] ,
-                       [vtp_x_root+0.1*vtp_c_root , -0.5*vtp_t_o_c*vtp_c_root ] ,
-                       [vtp_x_root                ,  0                              ] ,
-                       [vtp_x_tip                 ,  0                              ] ,
-                       [vtp_x_tip+0.1*vtp_c_tip   ,  0.5*vtp_t_o_c*vtp_c_tip  ] ,
-                       [vtp_x_tip+0.7*vtp_c_tip   ,  0.5*vtp_t_o_c*vtp_c_tip  ] ,
-                       [vtp_x_tip+vtp_c_tip       ,  0                              ] ,
-                       [vtp_x_tip+0.7*vtp_c_tip   , -0.5*vtp_t_o_c*vtp_c_tip  ] ,
-                       [vtp_x_tip+0.1*vtp_c_tip   , -0.5*vtp_t_o_c*vtp_c_tip  ] ,
-                       [vtp_x_tip                 ,  0                              ]])
+    vtp_xy = np.array([[vtp_x_root                , vtp_y_root                            ],
+                       [vtp_x_root+0.1*vtp_c_root , vtp_y_root + 0.5*vtp_t_o_c*vtp_c_root ],
+                       [vtp_x_root+0.7*vtp_c_root , vtp_y_root + 0.5*vtp_t_o_c*vtp_c_root ],
+                       [vtp_x_root+vtp_c_root     , vtp_y_root                            ],
+                       [vtp_x_root+0.7*vtp_c_root , vtp_y_root - 0.5*vtp_t_o_c*vtp_c_root ],
+                       [vtp_x_root+0.1*vtp_c_root , vtp_y_root - 0.5*vtp_t_o_c*vtp_c_root ],
+                       [vtp_x_root                , vtp_y_root                            ],
+                       [vtp_x_tip                 , vtp_y_tip                             ],
+                       [vtp_x_tip+0.1*vtp_c_tip   , vtp_y_tip + 0.5*vtp_t_o_c*vtp_c_tip   ],
+                       [vtp_x_tip+0.7*vtp_c_tip   , vtp_y_tip + 0.5*vtp_t_o_c*vtp_c_tip   ],
+                       [vtp_x_tip+vtp_c_tip       , vtp_y_tip                             ],
+                       [vtp_x_tip+0.7*vtp_c_tip   , vtp_y_tip - 0.5*vtp_t_o_c*vtp_c_tip   ],
+                       [vtp_x_tip+0.1*vtp_c_tip   , vtp_y_tip - 0.5*vtp_t_o_c*vtp_c_tip   ],
+                       [vtp_x_tip                 , vtp_y_tip                             ]])
 
 
-    vtp_yz = np.array([[ 0.5*vtp_t_o_c*vtp_c_root , vtp_z_root ],
-                       [ 0.5*vtp_t_o_c*vtp_c_tip  , vtp_z_tip  ],
-                       [-0.5*vtp_t_o_c*vtp_c_tip  , vtp_z_tip  ],
-                       [-0.5*vtp_t_o_c*vtp_c_root , vtp_z_root ]])
+    vtp_yz = np.array([[vtp_y_root + 0.5*vtp_t_o_c*vtp_c_root , vtp_z_root ],
+                       [vtp_y_tip + 0.5*vtp_t_o_c*vtp_c_tip   , vtp_z_tip  ],
+                       [vtp_y_tip - 0.5*vtp_t_o_c*vtp_c_tip   , vtp_z_tip  ],
+                       [vtp_y_root - 0.5*vtp_t_o_c*vtp_c_root , vtp_z_root ],
+                       [vtp_y_root + 0.5*vtp_t_o_c*vtp_c_root , vtp_z_root ]])
 
     # wing_ shape
     #-----------------------------------------------------------------------------------------------------------
 
-    wing_xy = np.array([[wing_x_root             ,  wing_y_root  ] ,
-                        [wing_x_tip              ,  wing_y_tip  ] ,
-                        [wing_x_tip+wing_c_tip   ,  wing_y_tip  ] ,
-                        [wing_x_kink+wing_c_kink ,  wing_y_kink ] ,
-                        [wing_x_root+wing_c_root ,  wing_y_root  ] ,
-                        [wing_x_root+wing_c_root , -wing_y_root  ] ,
-                        [wing_x_kink+wing_c_kink , -wing_y_kink ] ,
-                        [wing_x_tip+wing_c_tip   , -wing_y_tip  ] ,
-                        [wing_x_tip              , -wing_y_tip  ] ,
-                        [wing_x_root             , -wing_y_root  ] ,
-                        [wing_x_root             ,  wing_y_root  ]])
+    wing_xy = np.array([[wing_x_root             ,  wing_y_root ],
+                        [wing_x_tip              ,  wing_y_tip  ],
+                        [wing_x_tip+wing_c_tip   ,  wing_y_tip  ],
+                        [wing_x_kink+wing_c_kink ,  wing_y_kink ],
+                        [wing_x_root+wing_c_root ,  wing_y_root ],
+                        [wing_x_root+wing_c_root , -wing_y_root ],
+                        [wing_x_kink+wing_c_kink , -wing_y_kink ],
+                        [wing_x_tip+wing_c_tip   , -wing_y_tip  ],
+                        [wing_x_tip              , -wing_y_tip  ],
+                        [wing_x_root             , -wing_y_root ],
+                        [wing_x_root             ,  wing_y_root ]])
 
-    wing_yz = np.array([[ wing_y_root  , wing_z_root                        ] ,
-                        [ wing_y_kink  , wing_z_kink                        ] ,
-                        [ wing_y_tip   , wing_z_tip                         ] ,
-                        [ wing_y_tip   , wing_z_tip+wing_toc_t*wing_c_tip   ] ,
-                        [ wing_y_kink  , wing_z_kink+wing_toc_k*wing_c_kink ] ,
-                        [ wing_y_root  , wing_z_root+wing_toc_r*wing_c_root ] ,
-                        [-wing_y_root  , wing_z_root+wing_toc_r*wing_c_root ] ,
-                        [-wing_y_kink  , wing_z_kink+wing_toc_k*wing_c_kink ] ,
-                        [-wing_y_tip   , wing_z_tip+wing_toc_t*wing_c_tip   ] ,
-                        [-wing_y_tip   , wing_z_tip                         ] ,
-                        [-wing_y_kink  , wing_z_kink                        ] ,
-                        [-wing_y_root  , wing_z_root                        ] ,
+    wing_yz = np.array([[ wing_y_root  , wing_z_root                        ],
+                        [ wing_y_kink  , wing_z_kink                        ],
+                        [ wing_y_tip   , wing_z_tip                         ],
+                        [ wing_y_tip   , wing_z_tip+wing_toc_t*wing_c_tip   ],
+                        [ wing_y_kink  , wing_z_kink+wing_toc_k*wing_c_kink ],
+                        [ wing_y_root  , wing_z_root+wing_toc_r*wing_c_root ],
+                        [-wing_y_root  , wing_z_root+wing_toc_r*wing_c_root ],
+                        [-wing_y_kink  , wing_z_kink+wing_toc_k*wing_c_kink ],
+                        [-wing_y_tip   , wing_z_tip+wing_toc_t*wing_c_tip   ],
+                        [-wing_y_tip   , wing_z_tip                         ],
+                        [-wing_y_kink  , wing_z_kink                        ],
+                        [-wing_y_root  , wing_z_root                        ],
                         [ wing_y_root  , wing_z_root                        ]])
 
-    wing_xz = np.array([[wing_x_tip                  , wing_z_tip+wing_toc_t*wing_c_tip                           ] ,
-                        [wing_x_tip+0.1*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip-0.5*wing_toc_t*wing_c_tip ] ,
-                        [wing_x_tip+0.7*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip-0.5*wing_toc_t*wing_c_tip ] ,
-                        [wing_x_tip+wing_c_tip       , wing_z_tip+wing_toc_t*wing_c_tip                           ] ,
-                        [wing_x_tip+0.7*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip+0.5*wing_toc_t*wing_c_tip ] ,
-                        [wing_x_tip+0.1*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip+0.5*wing_toc_t*wing_c_tip ] ,
-                        [wing_x_tip                  , wing_z_tip+wing_toc_t*wing_c_tip                           ] ,
-                        [wing_x_kink                 , wing_z_kink+0.5*wing_toc_k*wing_c_kink                     ] ,
-                        [wing_x_root                 , wing_z_root+0.5*wing_toc_r*wing_c_root                     ] ,
-                        [wing_x_root+0.1*wing_c_root , wing_z_root                                                ] ,
-                        [wing_x_root+0.7*wing_c_root , wing_z_root                                                ] ,
-                        [wing_x_root+wing_c_root     , wing_z_root+0.5*wing_toc_r*wing_c_root                     ] ,
-                        [wing_x_kink+wing_c_kink     , wing_z_kink+0.5*wing_toc_k*wing_c_kink                     ] ,
+    wing_xz = np.array([[wing_x_tip                  , wing_z_tip+wing_toc_t*wing_c_tip                           ],
+                        [wing_x_tip+0.1*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip-0.5*wing_toc_t*wing_c_tip ],
+                        [wing_x_tip+0.7*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip-0.5*wing_toc_t*wing_c_tip ],
+                        [wing_x_tip+wing_c_tip       , wing_z_tip+wing_toc_t*wing_c_tip                           ],
+                        [wing_x_tip+0.7*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip+0.5*wing_toc_t*wing_c_tip ],
+                        [wing_x_tip+0.1*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip+0.5*wing_toc_t*wing_c_tip ],
+                        [wing_x_tip                  , wing_z_tip+wing_toc_t*wing_c_tip                           ],
+                        [wing_x_kink                 , wing_z_kink+0.5*wing_toc_k*wing_c_kink                     ],
+                        [wing_x_root                 , wing_z_root+0.5*wing_toc_r*wing_c_root                     ],
+                        [wing_x_root+0.1*wing_c_root , wing_z_root                                                ],
+                        [wing_x_root+0.7*wing_c_root , wing_z_root                                                ],
+                        [wing_x_root+wing_c_root     , wing_z_root+0.5*wing_toc_r*wing_c_root                     ],
+                        [wing_x_kink+wing_c_kink     , wing_z_kink+0.5*wing_toc_k*wing_c_kink                     ],
                         [wing_x_tip+wing_c_tip       , wing_z_tip+wing_toc_t*wing_c_tip                           ]])
 
 
@@ -290,25 +294,25 @@ def draw_3d_view(aircraft,window_title,plot_title):
     # Rear nacelle
     #-----------------------------------------------------------------------------------------------------------
     if (nacelle.rear_nacelle==1):
-        r_nac_xz = np.array([[r_nac_x_axe                 , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ] ,
-                            [r_nac_x_axe+0.1*r_nac_length , r_nac_z_axe+0.5*fus_height+0.5*r_nac_width ] ,
-                            [r_nac_x_axe+0.7*r_nac_length , r_nac_z_axe+0.5*fus_height+0.5*r_nac_width ] ,
-                            [r_nac_x_axe+r_nac_length     , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ] ,
-                            [r_nac_x_axe+r_nac_length     , r_nac_z_axe+0.5*fus_height-0.4*r_nac_width ] ,
-                            [r_nac_x_axe+0.7*r_nac_length , r_nac_z_axe+0.5*fus_height-0.5*r_nac_width ] ,
-                            [r_nac_x_axe+0.1*r_nac_length , r_nac_z_axe+0.5*fus_height-0.5*r_nac_width ] ,
-                            [r_nac_x_axe                 , r_nac_z_axe+0.5*fus_height-0.4*r_nac_width ] ,
-                            [r_nac_x_axe                 , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ]])
+        r_nac_xz = np.array([[r_nac_x_axe                 , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ],
+                            [r_nac_x_axe+0.1*r_nac_length , r_nac_z_axe+0.5*fus_height+0.5*r_nac_width ],
+                            [r_nac_x_axe+0.7*r_nac_length , r_nac_z_axe+0.5*fus_height+0.5*r_nac_width ],
+                            [r_nac_x_axe+r_nac_length     , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ],
+                            [r_nac_x_axe+r_nac_length     , r_nac_z_axe+0.5*fus_height-0.4*r_nac_width ],
+                            [r_nac_x_axe+0.7*r_nac_length , r_nac_z_axe+0.5*fus_height-0.5*r_nac_width ],
+                            [r_nac_x_axe+0.1*r_nac_length , r_nac_z_axe+0.5*fus_height-0.5*r_nac_width ],
+                            [r_nac_x_axe                  , r_nac_z_axe+0.5*fus_height-0.4*r_nac_width ],
+                            [r_nac_x_axe                  , r_nac_z_axe+0.5*fus_height+0.4*r_nac_width ]])
 
-        r_nac_xy = np.array([[r_nac_x_axe                 ,  0.4*r_nac_width ] ,
-                            [r_nac_x_axe+0.1*r_nac_length ,  0.5*r_nac_width ] ,
-                            [r_nac_x_axe+0.7*r_nac_length ,  0.5*r_nac_width ] ,
-                            [r_nac_x_axe+r_nac_length     ,  0.4*r_nac_width ] ,
-                            [r_nac_x_axe+r_nac_length     , -0.4*r_nac_width ] ,
-                            [r_nac_x_axe+0.7*r_nac_length , -0.5*r_nac_width ] ,
-                            [r_nac_x_axe+0.1*r_nac_length , -0.5*r_nac_width ] ,
-                            [r_nac_x_axe                 , -0.4*r_nac_width ] ,
-                            [r_nac_x_axe                 ,  0.4*r_nac_width ]])
+        r_nac_xy = np.array([[r_nac_x_axe                 ,  0.4*r_nac_width ],
+                            [r_nac_x_axe+0.1*r_nac_length ,  0.5*r_nac_width ],
+                            [r_nac_x_axe+0.7*r_nac_length ,  0.5*r_nac_width ],
+                            [r_nac_x_axe+r_nac_length     ,  0.4*r_nac_width ],
+                            [r_nac_x_axe+r_nac_length     , -0.4*r_nac_width ],
+                            [r_nac_x_axe+0.7*r_nac_length , -0.5*r_nac_width ],
+                            [r_nac_x_axe+0.1*r_nac_length , -0.5*r_nac_width ],
+                            [r_nac_x_axe                  , -0.4*r_nac_width ],
+                            [r_nac_x_axe                  ,  0.4*r_nac_width ]])
 
         r_d_nac_yz = np.stack([cyl[0:,0]*r_nac_width , cyl[0:,1]*r_nac_width , cyl[0:,2]*r_nac_width], axis=1)
 
@@ -371,7 +375,13 @@ def draw_3d_view(aircraft,window_title,plot_title):
         plt.fill(xTopView+fus_top[0:,0], yTopView+fus_top[0:,1], color="white", zorder=2)   # fuselage top view
         plt.plot(xTopView+fus_top[0:,0], yTopView+fus_top[0:,1], "grey", zorder=2)          # fuselage top view
 
-    plt.plot(xTopView+vtp_xy[0:,0], yTopView+vtp_xy[0:,1], "grey", zorder=8)            # vtp top view
+    if (aircraft.vertical_tail.attachment==1):
+        plt.plot(xTopView+vtp_xy[0:,0], yTopView+vtp_xy[0:,1], "grey", zorder=8)            # vtp top view
+    elif (aircraft.vertical_tail.attachment==2):
+        plt.plot(xTopView+vtp_xy[0:,0], yTopView+vtp_xy[0:,1], "grey", zorder=8)            # vtp top view
+        plt.plot(xTopView+vtp_xy[0:,0], yTopView-vtp_xy[0:,1], "grey", zorder=8)            # vtp top view
+    else:
+        raise Exception("draw_3d_view, vertical_tail.attachment value is out of range")
 
     if (aircraft.horizontal_tail.attachment==2):
         plt.plot(xTopView+htp_xy[0:,0], yTopView+htp_xy[0:,1], "grey", zorder=9)      # htp_ top view (T-tail)
@@ -416,39 +426,46 @@ def draw_3d_view(aircraft,window_title,plot_title):
 
     # Draw front view
     #-----------------------------------------------------------------------------------------------------------
-    plt.plot(xFrontView+vtp_yz[0:,0], yFrontView+vtp_yz[0:,1], color="grey", zorder=1)     # vtp_ front view
-    plt.plot(xFrontView+htp_yz[0:,0], yFrontView+htp_yz[0:,1], color="grey", zorder=1)     # htp_ front view
+    if (aircraft.vertical_tail.attachment==1):
+        plt.plot(xFrontView-vtp_yz[0:,0], yFrontView+vtp_yz[0:,1], color="grey", zorder=1)     # vtp_ front view
+    elif (aircraft.vertical_tail.attachment==2):
+        plt.plot(xFrontView-vtp_yz[0:,0], yFrontView+vtp_yz[0:,1], color="grey", zorder=1)     # vtp_ front view
+        plt.plot(xFrontView+vtp_yz[0:,0], yFrontView+vtp_yz[0:,1], color="grey", zorder=1)     # vtp_ front view
+    else:
+        raise Exception("draw_3d_view, vertical_tail.attachment value is out of range")
 
-    plt.plot(xFrontView+wing_yz[0:,0], yFrontView+wing_yz[0:,1], color="grey", zorder=2)   # wing_ front view
+    plt.plot(xFrontView-htp_yz[0:,0], yFrontView+htp_yz[0:,1], color="grey", zorder=1)     # htp_ front view
+
+    plt.plot(xFrontView-wing_yz[0:,0], yFrontView+wing_yz[0:,1], color="grey", zorder=2)   # wing_ front view
 
     if (nacelle.rear_nacelle==1):
-        plt.plot(xFrontView+r_nac_yz[0:,0], yFrontView+r_nac_yz[0:,1], color="grey", zorder=3)    # rear nacelle front view
-        plt.plot(xFrontView+r_fan_yz[0:,0], yFrontView+r_fan_yz[0:,1], color="grey", zorder=3)    # rear inlet front view
+        plt.plot(xFrontView-r_nac_yz[0:,0], yFrontView+r_nac_yz[0:,1], color="grey", zorder=3)    # rear nacelle front view
+        plt.plot(xFrontView-r_fan_yz[0:,0], yFrontView+r_fan_yz[0:,1], color="grey", zorder=3)    # rear inlet front view
 
-    plt.fill(xFrontView+fus_front[0:,0], yFrontView+fus_front[0:,1], color="white", zorder=4)   # fuselage front view
-    plt.plot(xFrontView+fus_front[0:,0], yFrontView+fus_front[0:,1], color="grey", zorder=5)    # fuselage front view
+    plt.fill(xFrontView-fus_front[0:,0], yFrontView+fus_front[0:,1], color="white", zorder=4)   # fuselage front view
+    plt.plot(xFrontView-fus_front[0:,0], yFrontView+fus_front[0:,1], color="grey", zorder=5)    # fuselage front view
 
-    plt.fill(xFrontView+nac_yz_ext[0:,0], yFrontView+nac_yz_ext[0:,1], color="white", zorder=6)   # Left nacelle front view
-    plt.plot(xFrontView+nac_yz_ext[0:,0], yFrontView+nac_yz_ext[0:,1], color="grey", zorder=7)    # Left nacelle front view
-    plt.plot(xFrontView+fan_yz_ext[0:,0], yFrontView+fan_yz_ext[0:,1], color="grey", zorder=8)    # Left Inlet front view
+    plt.fill(xFrontView-nac_yz_ext[0:,0], yFrontView+nac_yz_ext[0:,1], color="white", zorder=6)   # Left nacelle front view
+    plt.plot(xFrontView-nac_yz_ext[0:,0], yFrontView+nac_yz_ext[0:,1], color="grey", zorder=7)    # Left nacelle front view
+    plt.plot(xFrontView-fan_yz_ext[0:,0], yFrontView+fan_yz_ext[0:,1], color="grey", zorder=8)    # Left Inlet front view
     if (aircraft.propulsion.n_engine==4):
-        plt.fill(xFrontView+nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="white", zorder=6)   # Left nacelle front view
-        plt.plot(xFrontView+nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="grey", zorder=7)    # Left nacelle front view
-        plt.plot(xFrontView+fan_yz_int[0:,0], yFrontView+fan_yz_int[0:,1], color="grey", zorder=8)    # Left Inlet front view
+        plt.fill(xFrontView-nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="white", zorder=6)   # Left nacelle front view
+        plt.plot(xFrontView-nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="grey", zorder=7)    # Left nacelle front view
+        plt.plot(xFrontView-fan_yz_int[0:,0], yFrontView+fan_yz_int[0:,1], color="grey", zorder=8)    # Left Inlet front view
 
-    plt.fill(xFrontView-nac_yz_ext[0:,0], yFrontView+nac_yz_ext[0:,1], color="white", zorder=6)   # Right nacelle front view
-    plt.plot(xFrontView-nac_yz_ext[0:,0], yFrontView+nac_yz_ext[0:,1], color="grey", zorder=7)    # Right nacelle front view
-    plt.plot(xFrontView-fan_yz_ext[0:,0], yFrontView+fan_yz_ext[0:,1], color="grey", zorder=8)    # Right Inlet front view
+    plt.fill(xFrontView+nac_yz_ext[0:,0], yFrontView+nac_yz_ext[0:,1], color="white", zorder=6)   # Right nacelle front view
+    plt.plot(xFrontView+nac_yz_ext[0:,0], yFrontView+nac_yz_ext[0:,1], color="grey", zorder=7)    # Right nacelle front view
+    plt.plot(xFrontView+fan_yz_ext[0:,0], yFrontView+fan_yz_ext[0:,1], color="grey", zorder=8)    # Right Inlet front view
     if (aircraft.propulsion.n_engine==4):
-        plt.fill(xFrontView-nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="white", zorder=6)   # Right nacelle front view
-        plt.plot(xFrontView-nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="grey", zorder=7)    # Right nacelle front view
-        plt.plot(xFrontView-fan_yz_int[0:,0], yFrontView+fan_yz_int[0:,1], color="grey", zorder=8)    # Right Inlet front view
+        plt.fill(xFrontView+nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="white", zorder=6)   # Right nacelle front view
+        plt.plot(xFrontView+nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="grey", zorder=7)    # Right nacelle front view
+        plt.plot(xFrontView+fan_yz_int[0:,0], yFrontView+fan_yz_int[0:,1], color="grey", zorder=8)    # Right Inlet front view
 
     if (aircraft.propulsion.architecture=="PTE2"):
-        plt.fill(xFrontView+body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # Left nacelle front view
-        plt.plot(xFrontView+body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # Left nacelle front view
-        plt.fill(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # Right nacelle front view
-        plt.plot(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # Right nacelle front view
+        plt.fill(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # Left nacelle front view
+        plt.plot(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # Left nacelle front view
+        plt.fill(xFrontView+body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # Right nacelle front view
+        plt.plot(xFrontView+body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # Right nacelle front view
 
     plt.show()
 

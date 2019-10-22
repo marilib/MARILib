@@ -45,7 +45,7 @@ def eval_turbofan_engine_design(aircraft):
     engine = aircraft.turbofan_engine
     propulsion = aircraft.propulsion
 
-#    engine.rating_factor = {"MTO":0.800, "MCN":0.688, "MCL":0.624, "MCR":0.560, "FID":0.100}
+    engine.rating_factor = {"MTO":0.800, "MCN":0.688, "MCL":0.624, "MCR":0.560, "FID":0.100}
 
     engine.reference_thrust = propulsion.reference_thrust
 
@@ -83,6 +83,9 @@ def eval_turbofan_nacelle_design(aircraft):
     propulsion = aircraft.propulsion
 
     nacelle = aircraft.turbofan_nacelle
+
+    nacelle.n_engine = propulsion.n_engine
+    nacelle.attachment = propulsion.nacelle_attachment
 
     nacelle.width = 0.5 * engine.bpr ** 0.7 + 5.E-6 * engine.reference_thrust
 

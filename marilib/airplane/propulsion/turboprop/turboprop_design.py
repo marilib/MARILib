@@ -80,6 +80,7 @@ def eval_turboprop_nacelle_design(aircraft):
     nacelle = aircraft.turboprop_nacelle
 
     nacelle.n_engine = propulsion.n_engine
+    nacelle.attachment = propulsion.nacelle_attachment
 
     nacelle.width = 0.25*(engine.reference_power/1.e3)**0.2        # statistical regression
 

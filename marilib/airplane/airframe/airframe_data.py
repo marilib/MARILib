@@ -314,6 +314,7 @@ class VerticalTail(object):
     Vertical tail plane data
     """
     INFO = {\
+    "attachment":{"unit":"int", "om":1.e0, "txt":"Configuration of vertical tail, 1: classical, 2: H-tail"},
     "sweep":{"unit":"deg", "om":1.e0, "txt":"Vertical tail sweep angle at 25% of the chords"},
     "taper_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Taper ratio of the vertical tail"},
     "aspect_ratio":{"unit":"no_dim", "om":1.e0, "txt":"Aspect ratio of the vertical tail"},
@@ -328,9 +329,11 @@ class VerticalTail(object):
     "mass":{"unit":"kg", "om":1.e2, "txt":"Equipped mass of the vertical tail"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the CG of the vertical tail"},
     "x_root":{"unit":"m", "om":1.e1, "txt":"Longitudinal position of the vertical tail root chord"},
+    "y_root":{"unit":"m", "om":1.e1, "txt":"Span wise position of the vertical tail root chord"},
     "z_root":{"unit":"m", "om":1.e1, "txt":"Vertical position of the vertical tail root chord"},
     "c_root":{"unit":"m", "om":1.e1, "txt":"Vertical tail root chord"},
     "x_tip":{"unit":"m", "om":1.e2, "txt":"Longitudinal position of the vertical tail tip chord"},
+    "y_tip":{"unit":"m", "om":1.e2, "txt":"Span wise position of the vertical tail tip chord"},
     "z_tip":{"unit":"m", "om":1.e1, "txt":"Vertical position of the vertical tail tip chord"},
     "c_tip":{"unit":"m", "om":1.e1, "txt":"Vertical tail tip chord"},
     "x_mac":{"unit":"m", "om":1.e2, "txt":"Longitudinal position of the vertical tail mean aerodynamic chord"}
@@ -348,9 +351,11 @@ class VerticalTail(object):
                        mass = None,
                        c_g = None,
                        x_root = None,
+                       y_root = None,
                        z_root = None,
                        c_root = None,
                        x_tip = None,
+                       y_tip = None,
                        z_tip = None,
                        c_tip = None,
                        x_mac = None):
@@ -367,9 +372,11 @@ class VerticalTail(object):
         self.mass = mass
         self.c_g = c_g
         self.x_root = x_root
+        self.y_root = y_root
         self.z_root = z_root
         self.c_root = c_root
         self.x_tip = x_tip
+        self.y_tip = y_tip
         self.z_tip = z_tip
         self.c_tip = c_tip
         self.x_mac = x_mac

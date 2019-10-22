@@ -233,7 +233,7 @@ def atmosphere_geo_grad(altg,altg_d,disa,disa_d):
     P = numpy.array([earth.sea_level_pressure(), 0., 0., 0., 0., 0.])
     P_d = numpy.zeros_like(P)
 
-    T = numpy.array([earth.sea_level_temperature()+disa, 0., 0., 0., 0., 0.])
+    T = numpy.array([earth.sea_level_temperature(), 0., 0., 0., 0., 0.])
     T_d = numpy.zeros_like(T)
 
     #===========================================================================================================

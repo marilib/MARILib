@@ -131,6 +131,7 @@ def eval_ef1_nacelle_design(aircraft):
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
     nacelle.n_engine = propulsion.n_engine
+    nacelle.attachment = propulsion.nacelle_attachment
 
     # Electric nacelle is design by cruise conditions
     #-----------------------------------------------------------------------------------------------------------

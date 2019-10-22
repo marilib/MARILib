@@ -47,6 +47,7 @@ class Propulsion(object):
     INFO = {\
     "architecture":{"unit":"string", "om":1.e0, "txt":"Propulsion architecture, TF:turbofan, PTE1:partial turbo electric n°1, EF1, electric with batteries"},
     "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of main engines"},
+    "nacelle_attachment":{"unit":"int", "om":1.e0, "txt":"Main engine nacelle attachment (1= under wing, 2= rear fuselage)"},
     "fuel_type":{"unit":"string", "om":1.e0, "txt":"Type of fuel, Kerosene, Hydrogene, Methane, Battery"},
     "battery_energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
     "reference_thrust":{"unit":"daN", "om":1.e5, "txt":"Reference_thrust that drives the engine size and assocoated systems"},
@@ -69,6 +70,7 @@ class Propulsion(object):
     }
     def __init__(self, architecture = None,
                        n_engine = None,
+                       nacelle_attachment = None,
                        fuel_type = None,
                        battery_energy_density = None,
                        reference_thrust = None,
@@ -90,6 +92,7 @@ class Propulsion(object):
                        c_g = None):
         self.architecture = architecture
         self.n_engine = n_engine
+        self.nacelle_attachment = nacelle_attachment
         self.fuel_type = fuel_type
         self.battery_energy_density = battery_energy_density
         self.reference_thrust = reference_thrust
