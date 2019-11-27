@@ -118,6 +118,7 @@ class HighSpeed(object):
     "req_ttc":{"unit":"min", "om":1.e1, "txt":"Required maximum Time To Climb"},
     "eff_ttc":{"unit":"min", "om":1.e1, "txt":"Effective Time To Climb"},
     "perfo_constraint_3":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on time to climb, must be kept positive"},
+    "perfo_constraint_4":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on fuel capacity, must be kept positive"}
     }
     def __init__(self, disa_climb = None,
                        req_vz_climb = None,
@@ -131,7 +132,8 @@ class HighSpeed(object):
                        cas2_ttc = None,
                        req_ttc = None,
                        eff_ttc = None,
-                       perfo_constraint_3 = None):
+                       perfo_constraint_3 = None,
+                       perfo_constraint_4 = None):
         self.disa_climb = disa_climb
         self.req_vz_climb = req_vz_climb
         self.eff_vz_climb = eff_vz_climb
@@ -145,6 +147,7 @@ class HighSpeed(object):
         self.req_ttc = req_ttc
         self.eff_ttc = eff_ttc
         self.perfo_constraint_3 = perfo_constraint_3
+        self.perfo_constraint_4 = perfo_constraint_4
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class MaxPayloadMission(object):
@@ -200,7 +203,8 @@ class NominalMission(object):
     "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the nominal mission"},
     "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the nominal mission"},
     "unified_sar":{"unit":"m/J", "om":1.e0, "txt":"Specific Air Range in meter per Joule (SAR/FLHV for fuelled airplanes)"},
-    "req_battery_mass":{"unit":"kg", "om":1.e3, "txt":"Required battery mass of the nominal mission"}
+    "req_battery_mass":{"unit":"kg", "om":1.e3, "txt":"Required battery mass of the nominal mission"},
+    "fuel_margin":{"unit":"m3", "om":1.e1, "txt":"Remainin storage capacity for the nominal mission"}
     }
     def __init__(self, range = None,
                        payload = None,

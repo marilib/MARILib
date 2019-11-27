@@ -423,3 +423,8 @@ def get_ordered_data_dict(obj, obj_name, ord_dict):
                         get_ordered_data_dict(attribute, attr_name, ord_dict_d)
                 i = eol + 1
     return ord_dict
+
+
+def smart_format(value):
+    # Convert val expressed in standard unit to ulab
+    return to_user_format(value, STANDARD_FORMAT)

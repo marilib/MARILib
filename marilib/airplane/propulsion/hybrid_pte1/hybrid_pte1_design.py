@@ -74,7 +74,7 @@ def eval_pte1_engine_design(aircraft):
 
     Vair = Vsnd*fd_mach[MTO]
 
-    power_offtake = throttle * r_engine.mto_r_shaft_power/(nacelle.n_engine-nei) / power_elec.overall_efficiency
+    power_offtake = throttle * r_engine.mto_r_shaft_power/(propulsion.n_engine-nei) / power_elec.overall_efficiency
 
     shaft_power1 = shaft_power0 - power_offtake     # Shaft power dedicated to the fan
 
@@ -111,6 +111,9 @@ def eval_pte1_nacelle_design(aircraft):
 
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
+
+    nacelle.n_engine = propulsion.n_engine
+    nacelle.attachment = propulsion.nacelle_attachment
 
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 

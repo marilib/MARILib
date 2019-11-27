@@ -121,6 +121,11 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.wing.span = init.wing_span(aircraft.wing.area,aircraft.wing.aspect_ratio)
     aircraft.wing.x_root = init.wing_x_root(aircraft.wing.aspect_ratio,aircraft.wing.span)
 
+    aircraft.tanks.architecture = init.tank_architecture()
+    aircraft.tanks.pod_length = init.tank_pod_length(aircraft.tanks.architecture)
+    aircraft.tanks.pod_width = init.tank_pod_width(aircraft.tanks.architecture)
+    aircraft.tanks.pod_surface_mass = init.pod_surface_mass()
+
     aircraft.horizontal_tail.attachment = init.htp_attachment(propu_config,aircraft.propulsion.nacelle_attachment)
     aircraft.horizontal_tail.area = init.htp_area(aircraft.wing.area)
 
@@ -181,6 +186,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.pte1_battery.power_feed = init.battery_power_feed()
     aircraft.pte1_battery.time_feed = init.battery_time_feed()
     aircraft.pte1_battery.energy_cruise = init.battery_energy_cruise()
+    aircraft.pte1_battery.density = init.battery_density()
     aircraft.pte1_battery.energy_density = init.battery_energy_density(propu_config)
     aircraft.pte1_battery.power_density = init.battery_power_density()
 
@@ -213,6 +219,7 @@ def aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propu_co
     aircraft.ef1_power_elec_chain.cooling_pw_density = init.cooling_pw_density()
 
     aircraft.ef1_battery.stacking = init.battery_stacking()
+    aircraft.ef1_battery.density = init.battery_density()
     aircraft.ef1_battery.energy_density = init.battery_energy_density(propu_config)
     aircraft.ef1_battery.power_density = init.battery_power_density()
     aircraft.ef1_battery.density = init.battery_density()
@@ -245,6 +252,8 @@ def eval_geometrical_analysis(aircraft):
     propulsion.eval_propulsion_design(aircraft)
 
     airframe.eval_vtp_statistical_sizing(aircraft)
+
+    airframe.eval_pod_design(aircraft)
 
     airplane.eval_aerodynamics_design(aircraft)
 
@@ -296,6 +305,8 @@ def eval_tail_statistical_sizing(aircraft):
     airframe.eval_wing_design(aircraft)
     airframe.eval_tail_design(aircraft)
 
+    airframe.eval_pod_design(aircraft)
+
     propulsion.eval_propulsion_design(aircraft)
 
     airplane.eval_aerodynamics_design(aircraft)
@@ -344,6 +355,8 @@ def eval_aircraft_pre_design(aircraft):
     airframe.eval_wing_design(aircraft)
     airframe.eval_tail_design(aircraft)
 
+    airframe.eval_pod_design(aircraft)
+
     propulsion.eval_propulsion_design(aircraft)
 
     airplane.eval_aerodynamics_design(aircraft)
@@ -372,6 +385,9 @@ def eval_aircraft_statistical_pre_design(aircraft):
 
         airframe.eval_tail_design(ac)
 
+        airframe.eval_htp_constraint(aircraft)
+        airframe.eval_vtp_constraint(aircraft)
+
         y_out = np.array([ac.horizontal_tail.htp_sizing_constraint_1,
                           ac.vertical_tail.vtp_sizing_constraint_1])
 
@@ -392,6 +408,8 @@ def eval_aircraft_statistical_pre_design(aircraft):
 
     airframe.eval_wing_design(aircraft)
     airframe.eval_tail_design(aircraft)
+
+    airframe.eval_pod_design(aircraft)
 
     propulsion.eval_propulsion_design(aircraft)
 
@@ -438,6 +456,8 @@ def eval_aircraft_statistical_pre_design_2(aircraft):
 
     airframe.eval_wing_design(aircraft)
     airframe.eval_tail_design(aircraft)
+
+    airframe.eval_pod_design(aircraft)
 
     propulsion.eval_propulsion_design(aircraft)
 
@@ -943,7 +963,7 @@ def mdf_process(aircraft,search_domain,criterion,mda_type):
 
     # res = minimize(eval_optim_crt, start_value, args=(aircraft,crit_index,crit_ref,mda_type,), method="SLSQP", bounds=search_domain,
     #                constraints={"type":"ineq","fun":eval_optim_cst,"args":(aircraft,crit_index,crit_ref,mda_type,)},
-    #                jac="2-point",options={"maxiter":30,"ftol":0.0001,"eps":0.01},tol=1e-14)
+    #                jac="2-point",options={"maxiter":30,"ftol":1e-14,"eps":0.01},tol=1e-14)
 
     #res = minimize(eval_optim_crt, x_in, args=(aircraft,crit_index,crit_ref,mda_type,), method="COBYLA", bounds=((110000,140000),(120,160)),
     #               constraints={"type":"ineq","fun":eval_optim_cst,"args":(aircraft,crit_index,crit_ref,mda_type,)},
@@ -1024,6 +1044,7 @@ def explore_design_space(aircraft, res, step, mda_type, file):
                     ["Vz_MCL","ft/min"],
                     ["Vz_MCR","ft/min"],
                     ["TTC","min"],
+                    ["Fuel_margin","m3"],
                     ["Block_fuel","kg"],
                     ["COC","$/trip"],
                     ["CO2_metric","10e-3uc"]])
@@ -1061,6 +1082,7 @@ def explore_design_space(aircraft, res, step, mda_type, file):
                             ["%8.1f"%unit.ftpmin_mps(aircraft.high_speed.eff_vz_climb)],
                             ["%8.1f"%unit.ftpmin_mps(aircraft.high_speed.eff_vz_cruise)],
                             ["%8.1f"%unit.min_s(aircraft.high_speed.eff_ttc)],
+                            ["%8.1f"%aircraft.nominal_mission.fuel_margin],
                             ["%8.1f"%aircraft.cost_mission.block_fuel],
                             ["%8.1f"%aircraft.economics.cash_operating_cost],
                             ["%8.1f"%(aircraft.environmental_impact.CO2_metric*1000000)]])

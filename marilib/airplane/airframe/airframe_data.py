@@ -387,10 +387,23 @@ class Tanks(object):
     Fuel volume data
     """
     INFO = {\
+    "architecture":{"unit":"int", "om":1.e0, "txt":"Tank architecture, 0: wing box, 1:wing pods, 2:piggyback pod"},
+    "pod_x_axe":{"unit":"m", "om":1.e1, "txt":"X wise position of tank pod nose (on wing or piggyback)"},
+    "pod_y_axe":{"unit":"m", "om":1.e1, "txt":"Y wise position of tank pod nose (on wing or piggyback)"},
+    "pod_z_axe":{"unit":"m", "om":1.e1, "txt":"Z wise position of tank pod nose (on wing or piggyback)"},
+    "wing_c_axe":{"unit":"m", "om":1.e1, "txt":"Wing chord at pod center line (on wing only)"},
+    "wing_x_axe":{"unit":"m", "om":1.e1, "txt":"Wing chord x position at pod center line (on wing only)"},
+    "pod_length":{"unit":"m", "om":1.e1, "txt":"Length of tank pod (on wing or piggyback"},
+    "pod_width":{"unit":"m", "om":1.e1, "txt":"Diameter of tank pod (on wing or piggyback"},
+    "pod_net_wetted_area":{"unit":"m2", "om":1.e1, "txt":"Net wetted area of tank pod(s) (on wing or piggyback"},
+    "pod_surface_mass":{"unit":"kg/m2", "om":1.e3, "txt":"Mass per area of the pod(s), structure + insulation"},
+    "pod_mass":{"unit":"kg", "om":1.e3, "txt":"Total mass of the pod(s)"},
+    "pod_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of the pod(s)"},
     "cantilever_volume":{"unit":"m3", "om":1.e1, "txt":"Volume of tanks in the cantilever wing"},
     "central_volume":{"unit":"m3", "om":1.e1, "txt":"Volume of tanks in the central part of the wing (inside the fuselage)"},
+    "max_volume":{"unit":"m3", "om":1.e1, "txt":"Total storage volume"},
     "mfw_volume_limited":{"unit":"kg", "om":1.e4, "txt":"Maximum geometrical fuel volume"},
-    "fuel_density":{"unit":"kg/m3", "om":1.e2, "txt":"Fuel density"},
+    "fuel_density":{"unit":"kg/m3", "om":1.e2, "txt":"Fuel density or battery density"},
     "fuel_cantilever_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of tanks in the cantilever wing"},
     "fuel_central_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of tanks in the central part of the wing (inside the fuselage)"},
     "fuel_total_cg":{"unit":"m", "om":1.e1, "txt":"Center of gravity of wing tanks"},
@@ -399,8 +412,21 @@ class Tanks(object):
     "fuel_max_bwd_mass":{"unit":"kg", "om":1.e3, "txt":"Fuel mass of max backward fuel cg"},
     "fuel_max_bwd_cg":{"unit":"m", "om":1.e1, "txt":"Max backward fuel cg"}
     }
-    def __init__(self, cantilever_volume = None,
+    def __init__(self, architecture = None,
+                       pod_x_axe = None,
+                       pod_y_axe = None,
+                       pod_z_axe = None,
+                       wing_c_axe = None,
+                       wing_x_axe = None,
+                       pod_length = None,
+                       pod_width = None,
+                       pod_net_wetted_area = None,
+                       pod_surface_mass = None,
+                       pod_mass = None,
+                       pod_cg = None,
+                       cantilever_volume = None,
                        central_volume = None,
+                       max_volume = None,
                        mfw_volume_limited = None,
                        fuel_density = None,
                        fuel_cantilever_cg = None,
@@ -411,8 +437,21 @@ class Tanks(object):
                        fuel_max_bwd_mass = None,
                        fuel_max_bwd_cg = None,
                  ):
+        self.architecture = architecture
+        self.pod_x_axe = pod_x_axe
+        self.pod_y_axe = pod_y_axe
+        self.pod_z_axe = pod_z_axe
+        self.wing_c_axe = wing_c_axe
+        self.wing_x_axe = wing_x_axe
+        self.pod_length = pod_length
+        self.pod_width = pod_width
+        self.pod_net_wetted_area = pod_net_wetted_area
+        self.pod_surface_mass = pod_surface_mass
+        self.pod_mass = pod_mass
+        self.pod_cg = pod_cg
         self.cantilever_volume = cantilever_volume
         self.central_volume = central_volume
+        self.max_volume = max_volume
         self.mfw_volume_limited = mfw_volume_limited
         self.fuel_density = fuel_density
         self.fuel_cantilever_cg = fuel_cantilever_cg

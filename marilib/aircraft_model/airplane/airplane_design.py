@@ -91,7 +91,7 @@ def eval_aircraft_weights(aircraft):
     weights = aircraft.weights
 
     weights.mwe =  cabin.m_furnishing + fuselage.mass + wing.mass + htp.mass + vtp.mass \
-                 + ldg.mass + systems.mass + propulsion.mass
+                 + ldg.mass + systems.mass + propulsion.mass + tanks.pod_mass
 
     weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + weights.battery_in_owe
 
@@ -161,23 +161,24 @@ def eval_aircraft_cg(aircraft):
 
     c_g = aircraft.center_of_gravity
 
-    c_g.mwe = (  fuselage.c_g*fuselage.mass + cabin.cg_furnishing*cabin.m_furnishing + wing.c_g*wing.mass \
-               + ldg.c_g*ldg.mass + propulsion.c_g*propulsion.mass + htp.c_g*htp.mass \
-               + vtp.c_g*vtp.mass + systems.c_g*systems.mass \
+    c_g.mwe = (  fuselage.c_g*fuselage.mass + cabin.cg_furnishing*cabin.m_furnishing + wing.c_g*wing.mass
+               + ldg.c_g*ldg.mass + propulsion.c_g*propulsion.mass + htp.c_g*htp.mass
+               + vtp.c_g*vtp.mass + systems.c_g*systems.mass
+               + tanks.pod_cg*tanks.pod_mass
                )/weights.mwe
 
-    c_g.owe = (  c_g.mwe*weights.mwe + cabin.cg_op_item*cabin.m_op_item + c_g.battery*weights.battery_in_owe \
-               + payload.cg_container_pallet*payload.m_container_pallet \
+    c_g.owe = (  c_g.mwe*weights.mwe + cabin.cg_op_item*cabin.m_op_item + c_g.battery*weights.battery_in_owe
+               + payload.cg_container_pallet*payload.m_container_pallet
                ) / weights.owe
 
     c_g.max_fwd_mass = weights.owe + tanks.fuel_max_fwd_mass + payload.max_fwd_mass
-    c_g.max_fwd_req_cg =  (  c_g.owe*weights.owe + tanks.fuel_max_fwd_cg*tanks.fuel_max_fwd_mass \
-                           + payload.max_fwd_req_cg*payload.max_fwd_mass \
+    c_g.max_fwd_req_cg =  (  c_g.owe*weights.owe + tanks.fuel_max_fwd_cg*tanks.fuel_max_fwd_mass
+                           + payload.max_fwd_req_cg*payload.max_fwd_mass
                            )/c_g.max_fwd_mass
 
     c_g.max_bwd_mass = weights.owe + tanks.fuel_max_bwd_mass + payload.max_bwd_mass
-    c_g.max_bwd_req_cg = (  c_g.owe*weights.owe + tanks.fuel_max_bwd_cg*tanks.fuel_max_bwd_mass \
-                          + payload.max_bwd_req_cg*payload.max_bwd_mass \
+    c_g.max_bwd_req_cg = (  c_g.owe*weights.owe + tanks.fuel_max_bwd_cg*tanks.fuel_max_bwd_mass
+                          + payload.max_bwd_req_cg*payload.max_bwd_mass
                           )/c_g.max_bwd_mass
 
     return

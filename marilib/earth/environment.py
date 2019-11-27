@@ -429,7 +429,7 @@ def fuel_density(fuel_type):
 #===========================================================================================================
 def fuel_heat(fuel_type):
     """
-    Reference fuel lower heating value
+    Reference fuel lower heating value or battery energy density
     """
     if (fuel_type=="Kerosene"):
         fuel_heat = 43.1e6 # J/kg, kerosene

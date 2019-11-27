@@ -9,7 +9,6 @@ Created on Thu Jan 24 23:22:21 2019
 
 from marilib import numpy
 from copy import deepcopy
-from marilib.aircraft_data.aircraft_description import STANDARD_FORMAT, to_user_format
 
       
 def s_min(min): return min*60.   # Translate minutes into seconds
@@ -538,8 +537,4 @@ def convert_to(ulab, val):
         val = int(val)
     return val / UNIT[ulab]
 
-
-def smart_format(value):
-    # Convert val expressed in standard unit to ulab
-    return to_user_format(value, STANDARD_FORMAT)
 

@@ -9,6 +9,8 @@ Created on Thu Jan 24 23:22:21 2019
 
 from marilib.tools.math import maximize_1d
 
+from marilib.earth import environment as earth
+
 from marilib.aircraft_model.operations import mission_b, mission_f
 
 from marilib.aircraft_model.operations import other_performances as perfo

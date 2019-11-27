@@ -49,7 +49,8 @@ class Propulsion(object):
     "n_engine":{"unit":"int", "om":1.e0, "txt":"Number of main engines"},
     "nacelle_attachment":{"unit":"int", "om":1.e0, "txt":"Main engine nacelle attachment (1= under wing, 2= rear fuselage)"},
     "fuel_type":{"unit":"string", "om":1.e0, "txt":"Type of fuel, Kerosene, Hydrogene, Methane, Battery"},
-    "battery_energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
+    "fuel_heat":{"unit":"J/kg", "om":1.e8, "txt":"Fuel heating value"},
+    "battery_energy_density":{"unit":"kWh/kg", "om":1.e3, "txt":"Battery energy density"},
     "reference_thrust":{"unit":"daN", "om":1.e5, "txt":"Reference_thrust that drives the engine size and assocoated systems"},
     "reference_thrust_effective":{"unit":"daN", "om":1.e5, "txt":"Effective reference_thrust computed as max thrust(Mach = 0.25, ISA+15, Sea Level) / 0.8"},
     "y_ext_nacelle":{"unit":"m", "om":1.e1, "txt":"Span wise position of the out most right engine nacelle"},
@@ -72,6 +73,7 @@ class Propulsion(object):
                        n_engine = None,
                        nacelle_attachment = None,
                        fuel_type = None,
+                       fuel_heat = None,
                        battery_energy_density = None,
                        reference_thrust = None,
                        reference_thrust_effective = None,
@@ -94,6 +96,7 @@ class Propulsion(object):
         self.n_engine = n_engine
         self.nacelle_attachment = nacelle_attachment
         self.fuel_type = fuel_type
+        self.fuel_heat = fuel_heat
         self.battery_energy_density = battery_energy_density
         self.reference_thrust = reference_thrust
         self.reference_thrust_effective = reference_thrust_effective

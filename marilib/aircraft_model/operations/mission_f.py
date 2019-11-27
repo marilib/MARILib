@@ -31,7 +31,7 @@ def f_mission(aircraft,dist_range,tow,altp,mach,disa):
     (MTO,MCN,MCL,MCR,FID) = propulsion.rating_code
 
     g = earth.gravity()
-    fhv = earth.fuel_heat(propulsion.fuel_type)
+    fhv = propulsion.fuel_heat
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
@@ -169,6 +169,12 @@ def nominal_f_mission(aircraft):
 
     payload = aircraft.nominal_mission.payload
     owe = aircraft.weights.owe
+
+    aircraft.nominal_mission.fuel_margin = (  aircraft.tanks.max_volume
+                                            - total_fuel / aircraft.tanks.fuel_density
+                                            )
+
+    aircraft.high_speed.perfo_constraint_4 = aircraft.nominal_mission.fuel_margin
 
     mtow = owe + payload + total_fuel
 

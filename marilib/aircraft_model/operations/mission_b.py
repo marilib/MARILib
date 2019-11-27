@@ -41,7 +41,7 @@ def b_mission(aircraft,dist_range,tow,altp,mach,disa):
 
     # Proportion of fuel heat used for propulsion propulsion in ground phases
     # This factor is used to convert into energy the amount of fuel coming from allowance formulas
-    e_factor = 0.25 * earth.fuel_heat("Kerosene")
+    e_factor = 0.25 * propulsion.fuel_heat
 
     # Departure ground phases
     #-----------------------------------------------------------------------------------------------------------
@@ -175,6 +175,13 @@ def nominal_b_mission(aircraft):
     owe = aircraft.weights.owe
 
     aircraft.nominal_mission.req_battery_mass = total_enrg / aircraft.propulsion.battery_energy_density
+
+    aircraft.nominal_mission.fuel_margin = (  aircraft.tanks.max_volume
+                                            - total_enrg   / ( aircraft.propulsion.battery_energy_density
+                                                              *aircraft.tanks.fuel_density)
+                                            )
+
+    aircraft.high_speed.perfo_constraint_4 = aircraft.nominal_mission.fuel_margin
 
     if (aircraft.ef1_battery.stacking=="Variable"):
         mtow = owe + payload + aircraft.nominal_mission.req_battery_mass

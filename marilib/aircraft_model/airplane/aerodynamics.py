@@ -64,6 +64,7 @@ def drag(aircraft, pamb, tamb, mach, cz):
     design_driver = aircraft.design_driver
     fuselage = aircraft.fuselage
     wing = aircraft.wing
+    tanks = aircraft.tanks
     htp = aircraft.horizontal_tail
     vtp = aircraft.vertical_tail
 
@@ -76,16 +77,17 @@ def drag(aircraft, pamb, tamb, mach, cz):
     fac = ( 1 + 0.126*mach**2 )
 
     fuse_cxf = 1.05*((0.455/fac)*(numpy.log(10)/numpy.log(re*fuselage.length))**2.58 ) * fuselage.net_wetted_area / wing.area
+    pod_cxf = 1.05*((0.455/fac)*(numpy.log(10)/numpy.log(re*tanks.pod_length))**2.58 ) * tanks.pod_net_wetted_area / wing.area
     wing_cxf = 1.4*((0.455/fac)*(numpy.log(10)/numpy.log(re*wing.mac))**2.58) * wing.net_wetted_area / wing.area
     htp_cxf = 1.4*((0.455/fac)*(numpy.log(10)/numpy.log(re*htp.mac))**2.58) * htp.net_wetted_area / wing.area
     vtp_cxf = 1.4*((0.455/fac)*(numpy.log(10)/numpy.log(re*vtp.mac))**2.58) * vtp.net_wetted_area / wing.area
 
-    aircraft_cxf = fuse_cxf + wing_cxf + htp_cxf + vtp_cxf + nac_cxf
+    aircraft_cxf = fuse_cxf + wing_cxf + htp_cxf + vtp_cxf + nac_cxf + pod_cxf
 
     # Parasitic drag (seals, antennas, sensors, ...)
     #-----------------------------------------------------------------------------------------------------------
     aircraft_net_wetted_area =   fuselage.net_wetted_area + wing.net_wetted_area + htp.net_wetted_area + vtp.net_wetted_area \
-                               + nac_nwa
+                               + tanks.pod_net_wetted_area + nac_nwa
 
     aircraft_knwa = aircraft_net_wetted_area/1000.
 

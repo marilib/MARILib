@@ -44,10 +44,13 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
     Warning : ALL engine thrust returned
     """
 
+    propulsion = aircraft.propulsion
     engine = aircraft.turbofan_engine
     nacelle = aircraft.turbofan_nacelle
 
-    sfc = ( 0.4 + 1./engine.bpr**0.895 )/36000.
+    sfc_ref = ( 0.4 + 1./engine.bpr**0.895 )/36000.
+
+    sfc = sfc_ref * earth.fuel_heat("Kerosene") / propulsion.fuel_heat
 
     factor = engine.rating_factor       # [MTO,MCN,MCL,MCR,FID]
 
@@ -68,7 +71,7 @@ def turbofan_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     shaft_power0 = fn_fan0*Vair/nacelle.efficiency_prop   # Available total shaft power for one engine
 
-    fn = fn0*(nacelle.n_engine - nei)        # All turbofan thrust
+    fn = fn0*(propulsion.n_engine - nei)        # All turbofan thrust
 
     data = (fn_core,fn_fan0,fn0,shaft_power0)   # Data for ONE turbofan engine
 

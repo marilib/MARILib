@@ -40,6 +40,8 @@ def eval_propulsion_design(aircraft):
 
     propulsion = aircraft.propulsion
 
+    propulsion.fuel_heat = earth.fuel_heat(aircraft.propulsion.fuel_type)
+
     if (propulsion.architecture=="TF"):
         eval_turbofan_engine_design(aircraft)
         eval_turbofan_nacelle_design(aircraft)
@@ -229,6 +231,10 @@ def eval_tank_mass(aircraft):
     eval_wing_tank_data(aircraft)
 
     if (propulsion.fuel_type=="Kerosene"):
+        eval_fuel_cg_range(aircraft)
+    elif (propulsion.fuel_type=="Methane"):
+        eval_fuel_cg_range(aircraft)
+    elif (propulsion.fuel_type=="Hydrogen"):
         eval_fuel_cg_range(aircraft)
     elif (propulsion.fuel_type=="Battery"):
         eval_battery_cg_range(aircraft)

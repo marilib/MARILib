@@ -61,7 +61,9 @@ def pte1_sfc_old(aircraft,pamb,tamb,mach,rating,nei):
                    "MCR":power_elec.mcr_e_power_ratio,
                    "FID":power_elec.fid_e_power_ratio}
 
-    sfc0 = ( 0.4 + 1./engine.bpr**0.895 )/36000.
+    sfc0_ref = ( 0.4 + 1./engine.bpr**0.895 )/36000.
+
+    sfc0 = sfc0_ref * earth.fuel_heat("Kerosene") / propulsion.fuel_heat
 
     if (propulsion.bli_effect>0):
         kBLIe = propulsion.bli_r_thrust_factor

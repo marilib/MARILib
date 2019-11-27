@@ -159,36 +159,15 @@ def thrust_pitch_moment(aircraft,fn,pamb,mach,dcx_oei):
     else:
         raise Exception("propulsion.architecture index is out of range")
 
-    cm_prop = nacelle.z_ext*(dcx_oei - fn/(0.5*gam*pamb*mach**2*wing.area))
+    if (nacelle.n_engine==2):
+        cm_prop = nacelle.z_ext*(dcx_oei - fn/(0.5*gam*pamb*mach**2*wing.area))
+    elif (nacelle.n_engine==4):
+        cm_prop =   nacelle.z_ext*(dcx_oei - (fn/3.)/(0.5*gam*pamb*mach**2*wing.area)) \
+                  - nacelle.z_int*(2.*fn/3.)/(0.5*gam*pamb*mach**2*wing.area)
+    else:
+        raise Exception("thrust_pitch_moment, Number of engine is not supported")
 
     return cm_prop
-
-
-#===========================================================================================================
-def thrust_yaw_moment(aircraft,fn,pamb,mach,dcx_oei):
-    """
-    Assumed right engine inoperative
-    """
-
-    propulsion = aircraft.propulsion
-    wing = aircraft.wing
-
-    gam = earth.heat_ratio()
-
-    if (propulsion.architecture=="TF"):
-        nacelle = aircraft.turbofan_nacelle
-    elif (propulsion.architecture=="TP"):
-        nacelle = aircraft.turboprop_nacelle
-    elif (propulsion.architecture=="PTE1"):
-        nacelle = aircraft.turbofan_nacelle
-    elif (propulsion.architecture=="EF1"):
-        nacelle = aircraft.electrofan_nacelle
-    else:
-        raise Exception("propulsion.architecture index is out of range")
-
-    cn_prop = (nacelle.y_ext/wing.mac)*(fn/(0.5*gam*pamb*mach**2*wing.area) + dcx_oei)
-
-    return cn_prop
 
 
 #===========================================================================================================

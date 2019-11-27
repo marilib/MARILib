@@ -43,6 +43,7 @@ def turboprop_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
     Warning : ALL engine thrust returned
     """
 
+    propulsion = aircraft.propulsion
     engine = aircraft.turboprop_engine
     nacelle = aircraft.turboprop_nacelle
 
@@ -50,7 +51,9 @@ def turboprop_thrust(aircraft,Pamb,Tamb,Mach,rating,throttle,nei):
 
     eta_prop = nacelle.efficiency_prop
 
-    psfc = 0.4*1.68969e-07   # 0.4 lb/shp/h
+    psfc_ref = 0.4*1.68969e-07   # 0.4 lb/shp/h
+
+    psfc = psfc_ref * earth.fuel_heat("Kerosene") / propulsion.fuel_heat
 
     rho,sig = earth.air_density(Pamb,Tamb)
     Vsnd = earth.sound_speed(Tamb)

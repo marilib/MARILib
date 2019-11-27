@@ -68,6 +68,7 @@ class Pte1Battery(object):
     "energy_cruise":{"unit":"kWh", "om":1.e1, "txt":"Total battery energy dedicated to cruise"},
     "energy_density":{"unit":"kWh/kg", "om":1.e0, "txt":"Battery energy density"},
     "power_density":{"unit":"kW/kg", "om":1.e0, "txt":"Battery power density (capability to release power per mass unit"},
+    "density":{"unit":"kg/m3", "om":1.e3, "txt":"Battery density (mass per volume unit)"},
     "mass":{"unit":"kg", "om":1.e3, "txt":"Total battery mass"},
     "c_g":{"unit":"m", "om":1.e1, "txt":"Global CG of batteries"}
     }
@@ -77,6 +78,7 @@ class Pte1Battery(object):
                        energy_cruise = None,
                        energy_density = None,
                        power_density = None,
+                       density = None,
                        mass = None,
                        c_g = None):
         self.strategy = strategy
@@ -85,6 +87,7 @@ class Pte1Battery(object):
         self.energy_cruise = energy_cruise
         self.energy_density = energy_density
         self.power_density = power_density
+        self.density = density
         self.mass = mass
         self.c_g = c_g
 

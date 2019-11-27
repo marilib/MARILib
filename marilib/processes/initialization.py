@@ -350,6 +350,36 @@ def prop_architecture():
     return prop_architecture_i
 
 #===========================================================================================================
+def tank_architecture():
+    tank_architecture_i = 0    # tank_architecture, 0: wing box, 1:wing pods, 2:piggyback pod
+    return tank_architecture_i
+
+#===========================================================================================================
+def tank_pod_length(tanks_architecture):
+    if (tanks_architecture==0):
+        tank_pod_length_i = 1.e-6
+    elif (tanks_architecture==1):
+        tank_pod_length_i = 6.
+    elif (tanks_architecture==2):
+        tank_pod_length_i = 10.
+    return tank_pod_length_i
+
+#===========================================================================================================
+def tank_pod_width(tanks_architecture):
+    if (tanks_architecture==0):
+        tank_pod_width_i = 1.e-6
+    elif (tanks_architecture==1):
+        tank_pod_width_i = 2.
+    elif (tanks_architecture==2):
+        tank_pod_width_i = 2.
+    return tank_pod_width_i
+
+#===========================================================================================================
+def pod_surface_mass():
+    pod_surface_mass_i = 50.    # kg/m2
+    return pod_surface_mass_i
+
+#===========================================================================================================
 def electric_shaft_power():
     electric_shaft_power_i = 1.e6    # Watts, electric motor power
     return electric_shaft_power_i

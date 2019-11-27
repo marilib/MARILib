@@ -61,7 +61,7 @@ def forward_cg_stall(aircraft,altp,disa,nei,hld_conf,speed_mode,mass):
 
     cm_prop = propu.thrust_pitch_moment(aircraft,fn,pamb,mach,dcx_oei)
 
-    cg_max_fwd_stall = (cm_prop + xlc_wo_htp*cz_max_wing - xlc_htp*cz_max_htp)/(cz_max_wing - cz_max_htp) ;
+    cg_max_fwd_stall = (cm_prop + xlc_wo_htp*cz_max_wing - xlc_htp*cz_max_htp)/(cz_max_wing - cz_max_htp)
 
     aoa_wing = (cz_max_wing-cz0) / cza_wo_htp   # Wing angle of attack
     aoa = aoa_wing - wing.setting               # Reference angle of attack (fuselage axis versus air speed)
@@ -149,7 +149,7 @@ def vertical_tail_sizing(aircraft):
 
     dcx_oei = propu.oei_drag(aircraft,pamb,tamb)
 
-    cn_prop = propu.thrust_yaw_moment(aircraft,fn,pamb,mach_mca,dcx_oei)
+    cn_prop = thrust_yaw_moment(aircraft,fn,pamb,mach_mca,dcx_oei)
 
     max_bwd_req_cg = xlc_vtp - (cn_prop*wing.mac)/(cyb_vtp*aoa_max_vtp)
 
@@ -158,3 +158,21 @@ def vertical_tail_sizing(aircraft):
     c_of_g.max_bwd_oei_mass = tow
 
     return
+
+
+#===========================================================================================================
+def thrust_yaw_moment(aircraft,fn,pamb,mach,dcx_oei):
+    """
+    Assumed right engine inoperative
+    """
+
+    propulsion = aircraft.propulsion
+    wing = aircraft.wing
+
+    gam = earth.heat_ratio()
+
+    cn_prop = (propulsion.y_ext_nacelle/wing.mac)*(fn/(0.5*gam*pamb*mach**2*wing.area) + dcx_oei)
+
+    return cn_prop
+
+

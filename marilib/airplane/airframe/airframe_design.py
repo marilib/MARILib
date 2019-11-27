@@ -543,6 +543,66 @@ def eval_landing_gear_mass(aircraft):
 
 
 #===========================================================================================================
+def eval_pod_design(aircraft):
+    """
+    Pod predesign, if any
+    """
+
+    propulsion = aircraft.propulsion
+    fuselage = aircraft.fuselage
+    wing = aircraft.wing
+
+    tanks = aircraft.tanks
+
+    if (tanks.architecture==0):
+
+        tanks.pod_net_wetted_area = 0.
+
+        tanks.pod_mass = 0.
+
+        tanks.pod_cg = 0.
+
+    elif (tanks.architecture==1):
+
+        tan_phi0 = 0.25*(wing.c_kink-wing.c_tip)/(wing.y_tip-wing.y_kink) + numpy.tan(wing.sweep)
+
+        tanks.pod_y_axe = propulsion.y_ext_nacelle + 2.0*tanks.pod_width
+
+        tanks.pod_x_axe = wing.x_root + (tanks.pod_y_axe-wing.y_root)*tan_phi0 - 0.40*tanks.pod_length
+
+        tanks.pod_z_axe = (tanks.pod_y_axe - 0.5 * fuselage.width) * numpy.tan(wing.dihedral)
+
+        tanks.wing_c_axe = wing.c_kink - (wing.c_kink-wing.c_tip)/(wing.y_tip-wing.y_kink)*(tanks.pod_y_axe-wing.y_kink)
+
+        tanks.wing_x_axe = wing.x_kink - (wing.x_kink-wing.x_tip)/(wing.y_tip-wing.y_kink)*(tanks.pod_y_axe-wing.y_kink)
+
+        tanks.pod_net_wetted_area = 2.*(0.85*3.14*tanks.pod_width*tanks.pod_length)
+
+        tanks.pod_mass = tanks.pod_net_wetted_area*tanks.pod_surface_mass
+
+        tanks.pod_cg = tanks.pod_x_axe + 0.45*tanks.pod_length
+
+    elif (tanks.architecture==2):
+
+        tanks.pod_y_axe = 0.
+
+        tanks.pod_x_axe = wing.x_mac - 0.35*tanks.pod_length
+
+        tanks.pod_z_axe = 1.07*fuselage.width + 0.85*tanks.pod_width
+
+        tanks.pod_net_wetted_area = 0.85*3.14*tanks.pod_width*tanks.pod_length
+
+        tanks.pod_mass = tanks.pod_net_wetted_area*tanks.pod_surface_mass
+
+        tanks.pod_cg = tanks.pod_x_axe + 0.45*tanks.pod_length
+
+    else:
+        raise Exception("eval_pod_design is out of range")
+
+    return
+
+
+#===========================================================================================================
 def eval_wing_tank_data(aircraft):
     """
     Tank predesign
@@ -554,24 +614,69 @@ def eval_wing_tank_data(aircraft):
 
     tanks = aircraft.tanks
 
-    tanks.cantilever_volume = 0.20 * (wing.area*wing.mac*(0.50*wing.t_o_c_r + 0.30*wing.t_o_c_k + 0.20*wing.t_o_c_t))
+    if (tanks.architecture==0):
 
-    tanks.central_volume = 1.3 * fuselage.width * wing.t_o_c_r * wing.mac**2
+        tanks.cantilever_volume = 0.20 * (wing.area*wing.mac*(0.50*wing.t_o_c_r + 0.30*wing.t_o_c_k + 0.20*wing.t_o_c_t))
 
-    # IMPORTANT REMARK : if fuel is "Battery", fuel density will be battery density
-    tanks.fuel_density = earth.fuel_density(propulsion.fuel_type)
+        tanks.central_volume = 1.3 * fuselage.width * wing.t_o_c_r * wing.mac**2
 
-    tanks.mfw_volume_limited = (tanks.central_volume + tanks.cantilever_volume)*tanks.fuel_density
+        # IMPORTANT REMARK : if fuel is "Battery", fuel density will be battery density
+        tanks.fuel_density = earth.fuel_density(propulsion.fuel_type)
 
-    tanks.fuel_cantilever_cg =  0.25*(wing.x_root + 0.40*wing.c_root) \
-                              + 0.65*(wing.x_kink + 0.40*wing.c_kink) \
-                              + 0.10*(wing.x_tip + 0.40*wing.c_tip)
+        tanks.max_volume = tanks.central_volume + tanks.cantilever_volume
 
-    tanks.fuel_central_cg = wing.x_root + 0.30*wing.c_root
+        tanks.mfw_volume_limited = tanks.max_volume*tanks.fuel_density
 
-    tanks.fuel_total_cg = (  tanks.fuel_central_cg*tanks.central_volume \
-                           + tanks.fuel_cantilever_cg*tanks.cantilever_volume \
-                           ) / (tanks.central_volume + tanks.cantilever_volume)
+        tanks.fuel_cantilever_cg =  0.25*(wing.x_root + 0.40*wing.c_root) \
+                                  + 0.65*(wing.x_kink + 0.40*wing.c_kink) \
+                                  + 0.10*(wing.x_tip + 0.40*wing.c_tip)
+
+        tanks.fuel_central_cg = wing.x_root + 0.30*wing.c_root
+
+        tanks.fuel_total_cg = (  tanks.fuel_central_cg*tanks.central_volume \
+                               + tanks.fuel_cantilever_cg*tanks.cantilever_volume \
+                               ) / (tanks.central_volume + tanks.cantilever_volume)
+
+    elif (tanks.architecture==1):
+
+        tanks.cantilever_volume = 0.85*tanks.pod_length*(0.25*numpy.pi*tanks.pod_width**2) * 2.
+
+        tanks.central_volume = 0.
+
+        # IMPORTANT REMARK : if fuel is "Battery", fuel density will be battery density
+        tanks.fuel_density = earth.fuel_density(propulsion.fuel_type)
+
+        tanks.max_volume = tanks.cantilever_volume
+
+        tanks.mfw_volume_limited = tanks.max_volume*tanks.fuel_density
+
+        tanks.fuel_cantilever_cg = tanks.pod_x_axe + 0.45*tanks.pod_length
+
+        tanks.fuel_central_cg = 0.
+
+        tanks.fuel_total_cg = tanks.fuel_cantilever_cg
+
+    elif (tanks.architecture==2):
+
+        tanks.cantilever_volume = 0.
+
+        tanks.central_volume = 0.85*tanks.pod_length*(0.25*numpy.pi*tanks.pod_width**2)
+
+        # IMPORTANT REMARK : if fuel is "Battery", fuel density will be battery density
+        tanks.fuel_density = earth.fuel_density(propulsion.fuel_type)
+
+        tanks.max_volume = tanks.central_volume
+
+        tanks.mfw_volume_limited = tanks.max_volume*tanks.fuel_density
+
+        tanks.fuel_cantilever_cg = 0.
+
+        tanks.fuel_central_cg = tanks.pod_x_axe + 0.45*tanks.pod_length
+
+        tanks.fuel_total_cg = tanks.fuel_central_cg
+
+    else:
+        raise Exception("Tank architecture is out of range")
 
     return
 
@@ -579,16 +684,34 @@ def eval_wing_tank_data(aircraft):
 #===========================================================================================================
 def eval_fuel_cg_range(aircraft):
     """
-    Fuel cg range estimation as long as liquid burnable fuel is used
+    Fuel cg range estimation
     """
 
     tanks = aircraft.tanks
 
-    tanks.fuel_max_fwd_cg = tanks.fuel_central_cg    # Fuel max forward CG, central tank is forward only within backward swept wing
-    tanks.fuel_max_fwd_mass = tanks.central_volume*tanks.fuel_density
+    if (tanks.architecture==0):
 
-    tanks.fuel_max_bwd_cg = tanks.fuel_cantilever_cg    # Fuel max Backward CG
-    tanks.fuel_max_bwd_mass = tanks.cantilever_volume*tanks.fuel_density
+        tanks.fuel_max_fwd_cg = tanks.fuel_central_cg    # Fuel max forward CG, central tank is forward only within backward swept wing
+        tanks.fuel_max_fwd_mass = tanks.central_volume*tanks.fuel_density
+
+        tanks.fuel_max_bwd_cg = tanks.fuel_cantilever_cg    # Fuel max Backward CG
+        tanks.fuel_max_bwd_mass = tanks.cantilever_volume*tanks.fuel_density
+
+    elif (tanks.architecture==1):
+
+        tanks.fuel_max_fwd_cg = tanks.fuel_cantilever_cg    # Fuel max Backward CG
+        tanks.fuel_max_fwd_mass = tanks.cantilever_volume*tanks.fuel_density
+
+        tanks.fuel_max_bwd_cg = tanks.fuel_cantilever_cg    # Fuel max Backward CG
+        tanks.fuel_max_bwd_mass = tanks.cantilever_volume*tanks.fuel_density
+
+    elif (tanks.architecture==2):
+
+        tanks.fuel_max_fwd_cg = tanks.fuel_central_cg - tanks.pod_length/3.8    # Fuel max Backward CG
+        tanks.fuel_max_fwd_mass = (0.50*tanks.central_volume)*tanks.fuel_density  # Supposing 2 volumes
+
+        tanks.fuel_max_bwd_cg = tanks.fuel_central_cg + tanks.pod_length/4.0    # Fuel max Backward CG
+        tanks.fuel_max_bwd_mass = (0.50*tanks.central_volume)*tanks.fuel_density  # Supposing 2 volumes
 
     return
 

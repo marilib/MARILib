@@ -37,7 +37,13 @@ print("Initialization : done")
 #======================================================================================================
 # This sequence goes through all models without doing any solving
 
+aircraft.propulsion.fuel_type = "Hydrogen"
+
 aircraft.vertical_tail.attachment = 2
+
+aircraft.tanks.architecture = 2
+aircraft.tanks.pod_length = 24.
+aircraft.tanks.pod_width = 2.5
 
 # Solve the geometric coupling between airframe and engines
 #------------------------------------------------------------------------------------------------------

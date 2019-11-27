@@ -93,12 +93,14 @@ def draw_3d_view(aircraft,window_title,plot_title):
     wing_c_tip = aircraft.wing.c_tip
     wing_toc_t = aircraft.wing.t_o_c_t
 
-    if (aircraft.propulsion.architecture=="PTE2"):
-        body_width = aircraft.pte2_blimp_body.width
-        body_length = aircraft.pte2_blimp_body.length
-        body_x_axe = aircraft.pte2_blimp_body.x_axe
-        body_y_axe = aircraft.pte2_blimp_body.y_axe
-        body_z_axe = aircraft.pte2_blimp_body.z_axe
+    if (aircraft.tanks.architecture>0):
+        body_width = aircraft.tanks.pod_width
+        body_length = aircraft.tanks.pod_length
+        body_x_axe = aircraft.tanks.pod_x_axe
+        body_y_axe = aircraft.tanks.pod_y_axe
+        body_z_axe = aircraft.tanks.pod_z_axe
+        wing_x_body = aircraft.tanks.wing_x_axe
+        wing_c_body = aircraft.tanks.wing_c_axe
 
     if (aircraft.propulsion.architecture=="TF"):
         nacelle = aircraft.turbofan_nacelle
@@ -153,9 +155,9 @@ def draw_3d_view(aircraft,window_title,plot_title):
 
     fus_top = np.vstack([np.stack([fus_xy[1:-2,0]  , fus_xy[1:-2,1]],axis=1) , np.stack([fus_xy[:0:-1,0] , fus_xy[:0:-1,2]],axis=1)])
 
-    # Blimp body shape
+    # Pod body shape
     #-----------------------------------------------------------------------------------------------------------
-    if (aircraft.propulsion.architecture=="PTE2"):
+    if (aircraft.tanks.architecture>0):
         body_cyl_yz = np.stack([body_y_axe + cyl[0:,0]*body_width , body_z_axe + cyl[0:,1]*body_width , body_z_axe + cyl[0:,2]*body_width], axis=1)
 
         body_front = np.vstack([np.stack([body_cyl_yz[0:,0] , body_cyl_yz[0:,1]],axis=1) , np.stack([body_cyl_yz[::-1,0] , body_cyl_yz[::-1,2]],axis=1)])
@@ -283,6 +285,18 @@ def draw_3d_view(aircraft,window_title,plot_title):
                         [wing_x_kink+wing_c_kink     , wing_z_kink+0.5*wing_toc_k*wing_c_kink                     ],
                         [wing_x_tip+wing_c_tip       , wing_z_tip+wing_toc_t*wing_c_tip                           ]])
 
+    if (aircraft.tanks.architecture==1):
+        tip_wing_xz = np.array([[wing_x_tip                  , wing_z_tip+wing_toc_t*wing_c_tip                           ],
+                                [wing_x_tip+0.1*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip-0.5*wing_toc_t*wing_c_tip ],
+                                [wing_x_tip+0.7*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip-0.5*wing_toc_t*wing_c_tip ],
+                                [wing_x_tip+wing_c_tip       , wing_z_tip+wing_toc_t*wing_c_tip                           ],
+                                [wing_x_tip+0.7*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip+0.5*wing_toc_t*wing_c_tip ],
+                                [wing_x_tip+0.1*wing_c_tip   , wing_z_tip+wing_toc_t*wing_c_tip+0.5*wing_toc_t*wing_c_tip ],
+                                [wing_x_tip                  , wing_z_tip+wing_toc_t*wing_c_tip                           ],
+                                [wing_x_body                  , body_z_axe+0.5*wing_toc_k*wing_c_body                      ],
+                                [wing_x_body+wing_c_body      , body_z_axe+0.5*wing_toc_k*wing_c_body                      ],
+                                [wing_x_tip+wing_c_tip       , wing_z_tip+wing_toc_t*wing_c_tip                           ]])
+
 
     # External engine shape
     #-----------------------------------------------------------------------------------------------------------
@@ -359,11 +373,11 @@ def draw_3d_view(aircraft,window_title,plot_title):
         plt.fill(xTopView+nac_xy_ext[0:,0], yTopView-nac_xy_ext[0:,1], color="white", zorder=4)        # Right nacelle top view
         plt.plot(xTopView+nac_xy_ext[0:,0], yTopView-nac_xy_ext[0:,1], color="grey", zorder=4)        # Right nacelle top view
 
-    if (aircraft.propulsion.architecture=="PTE2"):
-        plt.fill(xTopView+body_top[0:,0], yTopView-body_top[0:,1], color="white", zorder=2)   # Left blimp top view
-        plt.plot(xTopView+body_top[0:,0], yTopView-body_top[0:,1], "grey", zorder=2)          # Left blimp top view
-        plt.fill(xTopView+body_top[0:,0], yTopView+body_top[0:,1], color="white", zorder=2)   # Right blimp top view
-        plt.plot(xTopView+body_top[0:,0], yTopView+body_top[0:,1], "grey", zorder=2)          # Right blimp top view
+    if (aircraft.tanks.architecture==1):
+        plt.fill(xTopView+body_top[0:,0], yTopView-body_top[0:,1], color="white", zorder=5)   # Left pod top view
+        plt.plot(xTopView+body_top[0:,0], yTopView-body_top[0:,1], "grey", zorder=5)          # Left pod top view
+        plt.fill(xTopView+body_top[0:,0], yTopView+body_top[0:,1], color="white", zorder=5)   # Right pod top view
+        plt.plot(xTopView+body_top[0:,0], yTopView+body_top[0:,1], "grey", zorder=5)          # Right pod top view
 
     if (aircraft.horizontal_tail.attachment==1):
         plt.plot(xTopView+htp_xy[0:,0], yTopView+htp_xy[0:,1], "grey", zorder=1)      # htp_ top view (Classic or Vtail)
@@ -374,6 +388,10 @@ def draw_3d_view(aircraft,window_title,plot_title):
     elif (aircraft.wing.attachment==2):
         plt.fill(xTopView+fus_top[0:,0], yTopView+fus_top[0:,1], color="white", zorder=2)   # fuselage top view
         plt.plot(xTopView+fus_top[0:,0], yTopView+fus_top[0:,1], "grey", zorder=2)          # fuselage top view
+
+    if (aircraft.tanks.architecture==2):
+        plt.fill(xTopView+body_top[0:,0], yTopView-body_top[0:,1], color="white", zorder=7)   # pod top view
+        plt.plot(xTopView+body_top[0:,0], yTopView-body_top[0:,1], "grey", zorder=7)          # pod top view
 
     if (aircraft.vertical_tail.attachment==1):
         plt.plot(xTopView+vtp_xy[0:,0], yTopView+vtp_xy[0:,1], "grey", zorder=8)            # vtp top view
@@ -391,10 +409,15 @@ def draw_3d_view(aircraft,window_title,plot_title):
 
     # Draw side view
     #-----------------------------------------------------------------------------------------------------------
+    plt.fill(xSideView+vtp_xz[0:,0], ySideView+vtp_xz[0:,1], color="white", zorder=2)      # vtp_ side view
     plt.plot(xSideView+vtp_xz[0:,0], ySideView+vtp_xz[0:,1], color="grey", zorder=2)      # vtp_ side view
 
     plt.fill(xSideView+fus_side[0:,0], ySideView+fus_side[0:,1], color="white", zorder=2) # fuselage side view
     plt.plot(xSideView+fus_side[0:,0], ySideView+fus_side[0:,1], color="grey", zorder=3)  # fuselage side view
+
+    if (aircraft.tanks.architecture==2):
+        plt.fill(xSideView+body_side[0:,0], ySideView+body_side[0:,1], color="white", zorder=1)     # Pod side view
+        plt.plot(xSideView+body_side[0:,0], ySideView+body_side[0:,1], color="grey", zorder=1)      # Pod side view
 
     if (nacelle.rear_nacelle==1):
         plt.fill(xSideView+r_nac_xz[0:,0], ySideView+r_nac_xz[0:,1], color="white", zorder=4)   # rear nacelle side view
@@ -417,12 +440,14 @@ def draw_3d_view(aircraft,window_title,plot_title):
         plt.fill(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="white", zorder=7)     # nacelle side view
         plt.plot(xSideView+nac_xz_ext[0:,0], ySideView+nac_xz_ext[0:,1], color="grey", zorder=7)      # nacelle side view
 
+    if (aircraft.tanks.architecture==1):
+        plt.fill(xSideView+body_side[0:,0], ySideView+body_side[0:,1], color="white", zorder=8)     # Pod side view
+        plt.plot(xSideView+body_side[0:,0], ySideView+body_side[0:,1], color="grey", zorder=8)      # Pod side view
+        plt.fill(xSideView+tip_wing_xz[0:,0], ySideView+tip_wing_xz[0:,1], color="white", zorder=9)   # wing_ side view
+        plt.plot(xSideView+tip_wing_xz[0:,0], ySideView+tip_wing_xz[0:,1], color="grey", zorder=9)    # wing_ side view
+
     plt.fill(xSideView+htp_xz[0:,0], ySideView+htp_xz[0:,1], color="white", zorder=4)     # htp_ side view
     plt.plot(xSideView+htp_xz[0:,0], ySideView+htp_xz[0:,1], color="grey", zorder=5)      # htp_ side view
-
-    if (aircraft.propulsion.architecture=="PTE2"):
-        plt.fill(xSideView+body_side[0:,0], ySideView+body_side[0:,1], color="white", zorder=8)     # Blimp side view
-        plt.plot(xSideView+body_side[0:,0], ySideView+body_side[0:,1], color="grey", zorder=9)      # Blimp side view
 
     # Draw front view
     #-----------------------------------------------------------------------------------------------------------
@@ -461,11 +486,14 @@ def draw_3d_view(aircraft,window_title,plot_title):
         plt.plot(xFrontView+nac_yz_int[0:,0], yFrontView+nac_yz_int[0:,1], color="grey", zorder=7)    # Right nacelle front view
         plt.plot(xFrontView+fan_yz_int[0:,0], yFrontView+fan_yz_int[0:,1], color="grey", zorder=8)    # Right Inlet front view
 
-    if (aircraft.propulsion.architecture=="PTE2"):
-        plt.fill(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # Left nacelle front view
-        plt.plot(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # Left nacelle front view
-        plt.fill(xFrontView+body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # Right nacelle front view
-        plt.plot(xFrontView+body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # Right nacelle front view
+    if (aircraft.tanks.architecture==1):
+        plt.fill(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # Left pod front view
+        plt.plot(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # Left pod front view
+        plt.fill(xFrontView+body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # Right pod front view
+        plt.plot(xFrontView+body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # Right pod front view
+    elif (aircraft.tanks.architecture==2):
+        plt.fill(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="white", zorder=9)   # pod front view
+        plt.plot(xFrontView-body_front[0:,0], yFrontView+body_front[0:,1], color="grey", zorder=10)    # pod front view
 
     plt.show()
 
