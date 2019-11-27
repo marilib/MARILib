@@ -3,8 +3,8 @@
 """
 Created on Thu Jan 24 23:22:21 2019
 
-@author: DRUOT Thierry : original Scilab implementation
-         ROCHES Pascal : portage to Python
+.. moduleauthor:: DRUOT Thierry : original Scilab implementation
+.. moduleauthor:: ROCHES Pascal : portage to Python
 """
 
 from marilib import numpy
@@ -16,10 +16,8 @@ from marilib.earth import environment as earth
 
 #===========================================================================================================
 def efan_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width):
+    """Electrofan nacelle design
     """
-    Electrofan nacelle design
-    """
-
     gam = earth.heat_ratio()
     r = earth.gas_constant()
     Cp = earth.heat_constant(gam,r)
@@ -91,8 +89,9 @@ def efan_nacelle_design(this_nacelle,Pamb,Tamb,Mach,shaft_power,hub_width):
 def resize_boundary_layer(body_width,hub_width):
     """
     Compute the relation between d0 and d1
-    d0 : boundary layer thickness around a tube of constant diameter
-    d1 : boundary layer thickness around a the tapered part of the tube
+
+    * d0 : boundary layer thickness around a tube of constant diameter
+    * d1 : boundary layer thickness around a the tapered part of the tube
     """
 
     r0 = 0.5 * body_width   # Radius of the fuselage, supposed constant
@@ -396,11 +395,13 @@ def air_flows(rho,v_air,r,d,y):
 #===========================================================================================================
 def specific_air_flows(r,d,y):
     """
-    Specific air flows and speeds at rear end of a cylinder of radius R
-    mouving at Vair in the direction of Qs = Q/(rho*Vair)     Vs = V/Vair
-    its axes, y is the elevation upon the surface of the cylinder :
-                              0 < y < inf
-    WARNING : even if all mass flows are positive,
+    Specific air flows and speeds at rear end of a cylinder of radius :math:`R`
+    mouving at :math:`V_{air}` in the direction of :math:`Q_s=\\frac{Q}{\\rho V_{air}} V_s = \\frac{V}{V_{air}}`
+    its axes, y is the elevation upon the surface of the cylinder
+
+    .. math:: 0 < y < \\infty
+
+    **WARNING** : even if all mass flows are positive,
     Q0 and Q1 are going backward in fuselage frame, Q2 is going forward
     in ground frame
     """
@@ -429,19 +430,16 @@ def specific_air_flows(r,d,y):
 
 #===========================================================================================================
 def boundary_layer(re,x_length):
+    """Thickness of a turbulent boundary layer which developped turbulently from its starting point
     """
-    Thickness of a turbulent boundary layer which developped turbulently from its starting point
-    """
-
     d = (0.385*x_length)/(re*x_length)**(1./5.)
-
     return d
 
 
 #===========================================================================================================
 def nacelle_generic_drag(aircraft,nacelle,Re,Mach):
     """
-    WARNING : nacelle drag returned corresponds to the number of engine : nacelle.n_engine
+    **WARNING:** nacelle drag returned corresponds to the number of engine : nacelle.n_engine
     """
 
     wing = aircraft.wing
@@ -451,7 +449,7 @@ def nacelle_generic_drag(aircraft,nacelle,Re,Mach):
     # All nacelle drag
     nac_nwa = nacelle.net_wetted_area
 
-    nac_cxf =   1.15*((0.455/fac)*(numpy.log(10.)/numpy.log(Re*nacelle.length))**2.58)*nac_nwa/wing.area
+    nac_cxf = 1.15*((0.455/fac)*(numpy.log(10.)/numpy.log(Re*nacelle.length))**2.58)*nac_nwa/wing.area
 
     return nac_cxf,nac_nwa
 

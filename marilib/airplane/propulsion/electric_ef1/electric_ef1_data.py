@@ -3,7 +3,7 @@
 """
 Created on Thu Jan 24 23:22:21 2019
 
-@author: DRUOT Thierry
+.. moduleauthor:: DRUOT Thierry
 
 The EF1 architecture corresponds to the following features :
 
@@ -14,15 +14,16 @@ The EF1 architecture corresponds to the following features :
 IMPORTANT REMARKS :
 Batteries are supposed to be stacked in the wing box in place of liquid fuel, so available volume is computed the same way
 Three modes of battery stacking are possible :
-1- "Variable"
+
+1. "Variable"
    For each typical missions (nominal, max payload, max fuel, zero payload, cost) the mass of the battery
    which is put on board is exactly what is required for the mission, which supposes that the battery
    stacking system allows it ...
    In this case, battery mass is not accounted into OWE
-2- "Max"
+2. "Max"
    Battery occupies the maximum available volume into the wing box. In this case, battery mass is fixed whatever the mission
    and is accounted into the OWE
-3- "Fixed"
+3. "Fixed"
    Battery mass is fixed by the user through the attribute aircraft.weights.battery_in_owe
 """
 

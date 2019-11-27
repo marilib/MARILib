@@ -3,8 +3,8 @@
 """
 Created on Thu Jan 24 23:22:21 2019
 
-@author: DRUOT Thierry : original Scilab implementation
-         PETEILH Nicolas : portage to Python
+* DRUOT Thierry for original Scilab implementation
+* PETEILH Nicolas for portage to Python
 """
 
 from marilib.earth import environment as earth
@@ -12,10 +12,9 @@ from marilib.earth import environment as earth
 from marilib.aircraft_model.airplane import aerodynamics as airplane_aero
 
 
-#===========================================================================================================
+# ===========================================================================================================
 def eval_payload_mass(aircraft):
-    """
-    Payload mass & CG estimation
+    """Payload mass & CG estimation
     """
 
     cabin = aircraft.cabin
@@ -47,10 +46,9 @@ def eval_payload_mass(aircraft):
     return
 
 
-#===========================================================================================================
+# ===========================================================================================================
 def eval_system_mass(aircraft):
-    """
-    Systems mass & CG estimation
+    """Systems mass & CG estimation
     """
 
     fuselage = aircraft.fuselage
@@ -71,10 +69,9 @@ def eval_system_mass(aircraft):
     return
 
 
-#===========================================================================================================
+# ===========================================================================================================
 def eval_aircraft_weights(aircraft):
-    """
-    Weights estimation
+    """Weights estimation
     """
 
     cabin = aircraft.cabin
@@ -120,8 +117,7 @@ def eval_aircraft_weights(aircraft):
 
 #===========================================================================================================
 def eval_mass_coupling(aircraft):
-    """
-    Weights estimation internal coupling
+    """Weights estimation internal coupling
     This relation is put apart from aircraft_weights because GEMS does not manage functions that compute their own input
     """
 
@@ -143,8 +139,7 @@ def eval_mass_coupling(aircraft):
 
 #===========================================================================================================
 def eval_aircraft_cg(aircraft):
-    """
-    Center of gravity estimation
+    """Center of gravity estimation
     """
 
     cabin = aircraft.cabin
@@ -185,11 +180,11 @@ def eval_aircraft_cg(aircraft):
 
 #===========================================================================================================
 def eval_aerodynamics_design(aircraft):
-    """
-    Defines high lift movable deflection settings
-    HLDconf varies from 0 (clean) to 1 (full deflected)
-    Typically : HLDconf = 1 ==> CzmaxLD
-              : HLDconf = 0.1 to 0.5 ==> CzmaxTO
+    """Defines high lift movable deflection settings.
+    HLDconf varies from 0 (clean) to 1 (full deflected), typically
+
+    * HLDconf = 1 ==> CzmaxLD
+    * HLDconf = 0.1 to 0.5 ==> CzmaxTO
     """
 
     design_driver = aircraft.design_driver

@@ -3,9 +3,11 @@
 """
 Created on Thu Jan 24 23:22:21 2019
 
-@author: DRUOT Thierry : original Scilab implementation
-         PETEILH Nicolas : portage to Python
+.. moduleauthor:: DRUOT Thierry : original Scilab implementation
+.. moduleauthor:: PETEILH Nicolas : portage to Python
 
+About this module
+-----------------
 The PTE1 architecture corresponds to the following features :
 
 - Tube and wing architecture
@@ -13,14 +15,15 @@ The PTE1 architecture corresponds to the following features :
 - Rear electrical fan with use defined power on each rating
 - Eventual additional battery (attribute aircraft.pte1_battery.battery_strategy)
 
-IMPORTANT REMARKS :
+**IMPORTANT REMARKS** :
 If an additional battery is installed, two modes are available :
-1- Battery mass is driven by the necessary amount of energy to ensure a power boost at take off and climb of "pte1_battery.power_feed" for a cumulated duration of "pte1_battery.time_feed"
+
+1. Battery mass is driven by the necessary amount of energy to ensure a power boost at take off and climb of "pte1_battery.power_feed" for a cumulated duration of "pte1_battery.time_feed"
    and(or) an additional energy "pte1_battery.energy_cruise" delivered all along the cruise
-2- battery mass is given by the user (attribute aircraft.pte1_battery.mass)
+2. battery mass is given by the user (attribute aircraft.pte1_battery.mass)
 """
 
-#--------------------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------
 class Pte1PowerElectricChain(object):
     """
     Electric chain data

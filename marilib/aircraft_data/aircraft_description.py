@@ -3,8 +3,9 @@
 """
 Created on Thu Jan 24 23:22:21 2019
 
-@author: DRUOT Thierry, DELMIRO Thales, GALLARD Francois
-
+.. moduleauthor:: DRUOT Thierry
+.. moduleauthor:: DELMIRO Thales
+.. moduleauthor:: GALLARD Francois
 """
 
 from ast import literal_eval
@@ -60,14 +61,14 @@ PATTERN_RE = r'''# Match (mandatory) whitespace between...
              '''
 
 
-#--------------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 class Aircraft(object):
     """
     Assembling all aircraft data branches
     """
     def __init__(self, name = None):
-        """
-            Data structure branches, no ramification
+        """Data structure branches, no ramification
+        :param name: name of the aircraft
         """
         self.name = name
         self.design_driver = DesignDriver()
@@ -113,7 +114,6 @@ class Aircraft(object):
         self.electrofan_engine = ElectrofanEngine()
         self.ef1_power_elec_chain = Ef1PowerElectricChain()
         self.ef1_battery = Ef1Battery()
-
 
     def import_from_file(self, filename="Aircraft.ini"):
 
@@ -169,9 +169,7 @@ class Aircraft(object):
         return get_ordered_data_dict(self, class_name, OrderedDict())
 
 
-#------------------------------------------------------------------------------
-
-
+# ------------------------------------------------------------------------------
 def get_proper_value(value, declared_unit):
     is_negative = False
     isnumber = False
@@ -202,9 +200,8 @@ def get_proper_value(value, declared_unit):
     else:
         raise NotImplementedError
 
-#------------------------------------------------------------------------------
 
-
+# ------------------------------------------------------------------------------
 def convert_if_is_array(data_str, declared_unit):
     data_str = data_str.replace(", ", ",").replace(": ", ":")
     fixed_string = re.sub(PATTERN_RE, ',', data_str, flags=re.VERBOSE)
@@ -232,9 +229,7 @@ def get_ac_dataline(data_line, declared_unit):
     return convert_if_is_array(data_line, declared_unit)
 
 
-#------------------------------------------------------------------------------
-
-
+# ------------------------------------------------------------------------------
 def set_ac_data(data_dict, obj):
     for attr_path, attr_val in data_dict.items():
         if hasattr(attr_val, "__dict__"):
@@ -255,9 +250,8 @@ def set_ac_data(data_dict, obj):
                 attr_val, _ = get_proper_value(value_sequence, assigned_unit)
             setattr(obj, attr_path, attr_val)
 
-#------------------------------------------------------------------------------
 
-
+# ------------------------------------------------------------------------------
 def write_data_line(value, key, out_parser, info_dict,
                     user_format, write_unit, write_om, write_detail):
     unit_str = ""
@@ -300,8 +294,7 @@ def write_data_dict(obj, my_dict, data_dict, out_parser,
                             user_format, write_unit, write_om, write_detail)
 
 
-#-------------------------------------------------------------------------
-
+# -------------------------------------------------------------------------
 
 def isNaN(num):
     return num != num
@@ -316,6 +309,7 @@ def convert_to_orig_type(lst, orig_seq):
     else:
         return lst
 
+
 def convert_to_scientific_notation(value, dec_format=STANDARD_FORMAT):
     str_value = format(value, "".join((".", str(dec_format), "E")))
     str_value+= "}"
@@ -325,7 +319,8 @@ def convert_to_scientific_notation(value, dec_format=STANDARD_FORMAT):
     str_value = str_value.replace("10^{0", "10^{")
     return str_value
 
-#-------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
 def to_user_format(value, dec_format=STANDARD_FORMAT):
     if isinstance(value, (tuple, list, ndarray)):
         lst = list(value)
@@ -359,7 +354,7 @@ def to_user_format(value, dec_format=STANDARD_FORMAT):
         return value
 
 
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 def is_basetype(obj):
 
     if obj is None or not hasattr(obj, "__dict__"):
@@ -368,8 +363,7 @@ def is_basetype(obj):
     return False
 
 
-#-------------------------------------------------------------------------
-
+# -------------------------------------------------------------------------
 def get_data_dict(obj, obj_name, data_dict):
 
     curr_data_d = {}
@@ -389,9 +383,8 @@ def get_data_dict(obj, obj_name, data_dict):
 
     return data_dict
 
-#-------------------------------------------------------------------------
 
-
+# -------------------------------------------------------------------------
 def get_ordered_data_dict(obj, obj_name, ord_dict):
     from inspect import getsource
     ord_dict_d = OrderedDict()

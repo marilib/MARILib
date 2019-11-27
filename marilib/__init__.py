@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Sep 25 16:22:36 2018
-@author: François Gallard, Thales Delmiro
+.. moduleauthor:: François Gallard
+.. moduleauthor:: Thales Delmiro
 """
 import numpy as __np
 from scipy.optimize import fsolve as __fs

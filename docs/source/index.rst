@@ -10,6 +10,11 @@ Because this is a beautiful library.
 
 .. math:: \int_0^1 x^2 \mathrm{d}x
 
+Example of Python code::
+
+	from numpy import array
+	print("yo")
+
 
 Contents
 ========
