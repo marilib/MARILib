@@ -15,6 +15,9 @@ Example of Python code::
 	from numpy import array
 	print("yo")
 
+	:doc:'../../README.md' 
+
+
 
 Contents
 ========
