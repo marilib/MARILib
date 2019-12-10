@@ -5,7 +5,6 @@ Created on Thu Jan 24 23:22:21 2019
 @author: DRUOT Thierry
 """
 
-
 from marilib.tools import units as unit
 
 from marilib.aircraft_model.airplane import viewer as show
@@ -17,10 +16,10 @@ from marilib.processes import assembly as run
 #======================================================================================================
 # Initialization
 #======================================================================================================
-propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
+propulsive_architecture = "TF" # TF:turbofan, PTE1:partial turboelectric 1
 number_of_engine = 2
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 150
 design_range = unit.m_NM(3000)
@@ -36,21 +35,22 @@ print("Initialization : done")
 # Modify initial values here
 #======================================================================================================
 
-aircraft.turbofan_engine.reference_thrust = 119000.
+aircraft.propulsion.reference_thrust = 119000.
 aircraft.wing.area = 151.9
 
 #======================================================================================================
 # MDA process
 #======================================================================================================
-# This sequence reproduces what is done by eval_mda0 or eval_mda1 of process.assembly.py depending on
-# the selection, resp. run.eval_mass_estimation(aircraft) or run.eval_mass_mission_adaptation(aircraft)
+# This sequence reproduces what is done by eval_mda0, eval_mda1 or eval_mda2 of process.assembly.py depending on
+# the selection, resp. run.eval_mass_breakdown(...), run.eval_mass_estimation(...) or run.eval_mass_mission_adaptation(...)
 
 # Solve the geometric coupling between airframe and engines
 #------------------------------------------------------------------------------------------------------
-run.eval_aircraft_pre_design(aircraft)
+run.eval_aircraft_statistical_pre_design(aircraft)
 
 # Estimate all mass and CGs with or without Mass-Mission adaptation
 #------------------------------------------------------------------------------------------------------
+#run.eval_mass_breakdown(aircraft)
 #run.eval_mass_estimation(aircraft)
 run.eval_mass_mission_adaptation(aircraft)
 
@@ -61,6 +61,7 @@ run.eval_performance_analysis(aircraft)
 # Handling quality analysis
 #------------------------------------------------------------------------------------------------------
 run.eval_handling_quality_analysis(aircraft)
+
 
 print("-------------------------------------------")
 print("Sequence : done")
@@ -73,7 +74,7 @@ print("Number of passengers = ","%.0f"%aircraft.cabin.n_pax_ref," int")
 print("Design range = ","%.0f"%unit.NM_m(aircraft.design_driver.design_range)," NM")
 print("Cruise Mach number = ","%.2f"%aircraft.design_driver.cruise_mach," Mach")
 print("-------------------------------------------")
-print("Reference thrust turbofan = ","%.0f"%aircraft.turbofan_engine.reference_thrust," N")
+print("Reference thrust turbofan = ","%.0f"%aircraft.propulsion.reference_thrust," N")
 print("Reference thrust effective = ","%.0f"%aircraft.propulsion.reference_thrust_effective," N")
 print("Turbofan mass = ","%.0f"%aircraft.turbofan_nacelle.mass," kg")
 print("Cruise SFC = ","%.4f"%(aircraft.propulsion.sfc_cruise_ref*36000)," kg/daN/h")
@@ -119,8 +120,6 @@ print("Evaluation mission range = ","%.0f"%unit.NM_m(aircraft.cost_mission.range
 print("Evaluation mission block fuel = ","%.0f"%aircraft.cost_mission.block_fuel," kg")
 print("Evaluation mission cash op cost = ","%.0f"%aircraft.economics.cash_operating_cost," $")
 print("CO2 metric = ","%.4f"%(aircraft.environmental_impact.CO2_metric*1000)," kg/km/m0.48")
-
-
 
 # airplane 3D view
 #------------------------------------------------------------------------------------------------------

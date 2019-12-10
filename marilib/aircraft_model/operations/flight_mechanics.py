@@ -7,8 +7,8 @@ Created on Thu Jan 24 23:22:21 2019
          PETEILH Nicolas : portage to Python
 """
 
-import numpy
-from scipy.optimize import fsolve
+from marilib import numpy
+from marilib import fsolve
 from marilib.tools.math import maximize_1d
 
 from marilib.earth import environment as earth
@@ -17,22 +17,28 @@ from marilib.airplane.propulsion import propulsion_models as propu
 
 
 #===========================================================================================================
-def lift_from_speed(aircraft,pamb,mach,mass):
+def lift_from_speed(aircraft,pamb,tamb,mach,mass):
 
     wing = aircraft.wing
     g = earth.gravity()
     gam = earth.heat_ratio()
-    c_z = (2*mass*g)/(gam*pamb*mach**2*wing.area)
+
+    mg = mass*g
+
+    c_z = (2.*mg)/(gam*pamb*mach**2*wing.area)
     return c_z
 
 
 #===========================================================================================================
-def speed_from_lift(aircraft,pamb,cz,mass):
+def speed_from_lift(aircraft,pamb,tamb,cz,mass):
 
     wing = aircraft.wing
     g = earth.gravity()
     gam = earth.heat_ratio()
-    mach = numpy.sqrt((mass*g)/(0.5*gam*pamb*wing.area*cz))
+
+    mg = mass*g
+
+    mach = numpy.sqrt((mg)/(0.5*gam*pamb*wing.area*cz))
     return mach
 
 
@@ -44,7 +50,7 @@ def get_speed(pamb,speed_mode,mach):
 
     speed = {
             1 : earth.vcas_from_mach(pamb,mach),   # CAS required
-            2 : mach                                # mach required
+            2 : mach                               # mach required
             }.get(speed_mode, "Erreur: select speed_mode equal to 1 or 2")
     return speed
 
@@ -57,7 +63,7 @@ def get_mach(pamb,speed_mode,speed):
 
     mach = {
             1 : earth.mach_from_vcas(pamb,speed),   # Input is CAS
-            2 : speed                                # Input is mach
+            2 : speed                               # Input is mach
             }.get(speed_mode, "Erreur: select speed_mode equal to 1 or 2")
     return mach
 
@@ -75,9 +81,11 @@ def acceleration(aircraft,nei,altp,disa,speed_mode,speed,mass,rating):
 
     mach = get_mach(pamb,speed_mode,speed)
 
-    fn, Data = propu.thrust(aircraft,pamb,tamb,mach,rating,nei)
+    throttle = 1.
 
-    cz = lift_from_speed(aircraft,pamb,mach,mass)
+    fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
+
+    cz = lift_from_speed(aircraft,pamb,tamb,mach,mass)
 
     cx,lod = aero.drag(aircraft,pamb,tamb,mach,cz)
 
@@ -102,9 +110,11 @@ def air_path(aircraft,nei,altp,disa,speed_mode,speed,mass,rating):
 
     mach = get_mach(pamb,speed_mode,speed)
 
-    fn, data = propu.thrust(aircraft,pamb,tamb,mach,rating,nei)
+    throttle = 1.
 
-    cz = lift_from_speed(aircraft,pamb,mach,mass)
+    fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach,rating,throttle,nei)
+
+    cz = lift_from_speed(aircraft,pamb,tamb,mach,mass)
 
     [cx,lod] = aero.drag(aircraft,pamb,tamb,mach,cz)
 
@@ -133,28 +143,28 @@ def max_path(aircraft,nei,altp,disa,speed_mode,mass,rating):
     #=======================================================================================
     def fct_max_path(cz,aircraft,nei,altp,disa,speed_mode,mass,rating,isformax):
         pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
-        mach = speed_from_lift(aircraft,pamb,cz,mass)
+        mach = speed_from_lift(aircraft,pamb,tamb,cz,mass)
         speed = get_speed(pamb,speed_mode,mach)
         [slope,vz] = air_path(aircraft,nei,altp,disa,speed_mode,speed,mass,rating)
         if(isformax==True):
             return slope
         elif(isformax==False):
-            return slope,vz,speed
+            return slope,vz,mach
     #---------------------------------------------------------------------------------------
 
     cz_ini = 0.5
     dcz = 0.05
     isformax=True
 
-    fct = [fct_max_path, 1,aircraft,nei,altp,disa,speed_mode,mass,rating,isformax]
+    fct = [fct_max_path, aircraft,nei,altp,disa,speed_mode,mass,rating,isformax]
 
     (cz,slope,rc) = maximize_1d(cz_ini,dcz,fct)
 
     isformax=False
 
-    [slope,vz,speed] = fct_max_path(cz,aircraft,nei,altp,disa,speed_mode,mass,rating,isformax)
+    [slope,vz,mach] = fct_max_path(cz,aircraft,nei,altp,disa,speed_mode,mass,rating,isformax)
 
-    return slope,vz,speed,cz
+    return slope,vz,mach,cz
 
 
 #===========================================================================================================

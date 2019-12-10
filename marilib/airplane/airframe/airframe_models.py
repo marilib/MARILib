@@ -7,7 +7,7 @@ Created on Thu Jan 24 23:22:21 2019
          PETEILH Nicolas : portage to Python
 """
 
-import numpy
+from marilib import numpy
 
 from marilib.tools import units as unit
 
@@ -18,8 +18,8 @@ def  cza_wo_htp(mach,fuselage_width,aspect_ratio,span,sweep):
     Polhamus formula
     """
 
-    cza_wo_htp =  (numpy.pi*aspect_ratio*(1.07*(1+fuselage_width/span)**2)*(1-fuselage_width/span)) \
-                 / (1+numpy.sqrt(1+0.25*aspect_ratio**2*(1+numpy.tan(sweep)**2-mach**2)))
+    cza_wo_htp =  (numpy.pi*aspect_ratio*(1.07*(1+fuselage_width/span)**2)*(1.-fuselage_width/span)) \
+                 / (1+numpy.sqrt(1.+0.25*aspect_ratio**2*(1+numpy.tan(sweep)**2-mach**2)))
 
     return cza_wo_htp
 
@@ -82,7 +82,7 @@ def htp_aero_data(aircraft):
     xlc_htp = htp.x_mac + 0.25*htp.mac
 
     # Maximum angle of attack allowed for HTP
-    aoa_max_htp = unit.rad_deg(9)
+    aoa_max_htp = unit.rad_deg(9.)
 
     # HTP induced drag coefficient
     ki_htp = 1.2/(numpy.pi*htp.aspect_ratio)
@@ -105,7 +105,7 @@ def vtp_aero_data(aircraft):
     xlc_vtp = vtp.x_mac + 0.25*vtp.mac
 
     # Maximum angle of attack allowed for VTP
-    aoa_max_vtp = unit.rad_deg(35)
+    aoa_max_vtp = unit.rad_deg(35.)
 
     # VTP induced drag coefficient
     ki_vtp = 1.3/(numpy.pi*vtp.aspect_ratio)

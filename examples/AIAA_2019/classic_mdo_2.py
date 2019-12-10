@@ -19,10 +19,10 @@ from marilib.aircraft_model.operations import handling_qualities as h_q
 #======================================================================================================
 # Initialization
 #======================================================================================================
-propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
+propulsive_architecture = "TF" # TF:turbofan, PTE1:partial turboelectric 1
 number_of_engine = 2
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 150
 design_range = unit.m_NM(3000)
@@ -38,15 +38,21 @@ print("Initialization : done")
 # Modify initial values here
 #======================================================================================================
 
-aircraft.turbofan_engine.reference_thrust = 119000.
+aircraft.propulsion.reference_thrust = 119000.
 aircraft.wing.area = 151.9
 
 #======================================================================================================
 # Design process
 #======================================================================================================
-# Global design parameter n°1 : aircraft.turbofan_engine.reference_thrust, bounds = (50000,150000)
+# Global design parameter n°1 : aircraft.propulsion.reference_thrust, bounds = (50000,150000)
 # Global design parameter n°2 : aircraft.wing.area, bounds = (50,200)
 #
+# Geometrical coupling on : aircraft.turbofan_nacelle.width
+# Geometrical coupling on : aircraft.turbofan_nacelle.y_ext
+#
+# Mass design parameter n°1 : aircraft.weights.mtow
+# Mass design parameter n°2 : aircraft.weights.mlw
+# Mass design parameter n°3 : aircraft.weights.mzfw
 # Mass constraint n°1 : aircraft.weights.mass_constraint_1 ==> 0
 # Mass constraint n°2 : aircraft.weights.mass_constraint_2 ==> 0
 # Mass constraint n°3 : aircraft.weights.mass_constraint_3 ==> 0
@@ -54,16 +60,16 @@ aircraft.wing.area = 151.9
 # HQ design parameter n°1 : aircraft.wing.x_root
 # HQ design parameter n°2 : aircraft.horizontal_tail.area
 # HQ design parameter n°3 : aircraft.vertical_tail.area
-# HQ contraint n°1 : aircraft.center_of_gravity.cg_constraint_1 > 0
-# HQ contraint n°2 : aircraft.center_of_gravity.cg_constraint_2 > 0
-# HQ contraint n°3 : aircraft.center_of_gravity.cg_constraint_3 > 0
+# HQ contraint n°1 : aircraft.center_of_gravity.cg_constraint_1 ==> 0
+# HQ contraint n°2 : aircraft.center_of_gravity.cg_constraint_2 ==> 0
+# HQ contraint n°3 : aircraft.center_of_gravity.cg_constraint_3 ==> 0
 #
-# Perfo constraint n°1 : aircraft.high_speed.perfo_constraint_1 > 0
-# Perfo constraint n°2 : aircraft.high_speed.perfo_constraint_2 > 0
-# Perfo constraint n°3 : aircraft.low_speed.perfo_constraint_3 > 0
-# Perfo constraint n°4 : aircraft.high_speed.perfo_constraint_3 > 0
-# Perfo constraint n°5 : aircraft.low_speed.perfo_constraint_1 > 0
-# Perfo constraint n°6 : aircraft.low_speed.perfo_constraint_2 > 0
+# Perfo constraint n°1 : aircraft.high_speed.perfo_constraint_1 >= 0
+# Perfo constraint n°2 : aircraft.high_speed.perfo_constraint_2 >= 0
+# Perfo constraint n°3 : aircraft.low_speed.perfo_constraint_3 >= 0
+# Perfo constraint n°4 : aircraft.high_speed.perfo_constraint_3 >= 0
+# Perfo constraint n°5 : aircraft.low_speed.perfo_constraint_1 >= 0
+# Perfo constraint n°6 : aircraft.low_speed.perfo_constraint_2 >= 0
 #
 # Possible criterion : aircraft.weights.mtow
 # Possible criterion : aircraft.cost_mission.block_fuel
@@ -78,9 +84,10 @@ search_domain = (thrust_bnd,area_bnd)
 
 # Perform MDF optimization
 #------------------------------------------------------------------------------------------------------
-criterion = "block_fuel"
+criterion = "Block_fuel"
+mda_type = "MDA3"
 
-run.mdf_process(aircraft,search_domain,criterion)
+run.mdf_process(aircraft,search_domain,criterion,mda_type)
 
 print("-------------------------------------------")
 print("Optimization : done")
@@ -94,7 +101,7 @@ print("Number of passengers = ","%.0f"%aircraft.cabin.n_pax_ref," int")
 print("Design range = ","%.0f"%unit.NM_m(aircraft.design_driver.design_range)," NM")
 print("Cruise Mach number = ","%.2f"%aircraft.design_driver.cruise_mach," Mach")
 print("-------------------------------------------")
-print("Reference thrust turbofan = ","%.0f"%aircraft.turbofan_engine.reference_thrust," N")
+print("Reference thrust turbofan = ","%.0f"%aircraft.propulsion.reference_thrust," N")
 print("Reference thrust effective = ","%.0f"%aircraft.propulsion.reference_thrust_effective," N")
 print("Turbofan mass = ","%.0f"%aircraft.turbofan_nacelle.mass," kg")
 print("Cruise SFC = ","%.4f"%(aircraft.propulsion.sfc_cruise_ref*36000)," kg/daN/h")

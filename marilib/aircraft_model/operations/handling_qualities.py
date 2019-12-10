@@ -10,13 +10,15 @@ Created on Thu Jan 24 23:22:21 2019
 from marilib.tools import units as unit
 
 from marilib.earth import environment as earth
-from marilib.aircraft_model.operations import flight_mechanics as flight
+
+from marilib.aircraft_model.operations import mission, \
+                                              flight_mechanics as flight
+
 from marilib.aircraft_model.airplane import aerodynamics as airplane_aero, regulation as regul
 
 from marilib.airplane.airframe import airframe_models as frame_aero
-from marilib.airplane.propulsion import propulsion_models as propu
 
-from marilib.processes import component as sub_proc
+from marilib.airplane.propulsion import propulsion_models as propu
 
 
 #===========================================================================================================
@@ -40,14 +42,14 @@ def forward_cg_stall(aircraft,altp,disa,nei,hld_conf,speed_mode,mass):
 
     c_z = cz_max_wing - cz_max_htp      # Max forward Cg assumed, HTP has down lift
 
-    mach = flight.speed_from_lift(aircraft,pamb,c_z,mass)
+    mach = flight.speed_from_lift(aircraft,pamb,tamb,c_z,mass)
 
     [cza_wo_htp,xlc_wo_htp,ki_wing] = frame_aero.wing_aero_data(aircraft,mach,hld_conf)
 
     if(nei>0):
         dcx_oei = nei*propu.oei_drag(pamb,mach)
     else:
-        dcx_oei = 0
+        dcx_oei = 0.
 
     dw_angle = frame_aero.wing_downwash(aircraft,cz_max_wing)    # Downwash angle due to the wing
     cx_basic,lod_trash = airplane_aero.drag(aircraft,pamb,tamb,mach,cz_max_wing)    # By definition of the drag_ function
@@ -113,15 +115,15 @@ def vertical_tail_sizing(aircraft):
     cyb_vtp,xlc_vtp,aoa_max_vtp,ki_vtp = frame_aero.vtp_aero_data(aircraft)
 
     payload = 0.5*payload.nominal               # Light payload
-    range = design_driver.design_range/15       # Short mission
+    range = design_driver.design_range/15.      # Short mission
     altp = design_driver.ref_cruise_altp
     mach = design_driver.cruise_mach
-    disa = 30                                   # Hot condition
+    disa = 30.                                  # Hot condition
 
-    tow,block_fuel,block_time,total_fuel = sub_proc.mission_tow(aircraft,payload,range,altp,mach,disa)
+    tow,block_fuel,block_time,total_fuel = mission.mission_tow(aircraft,payload,range,altp,mach,disa)
 
-    altp = 0
-    disa = 15
+    altp = 0.
+    disa = 15.
   
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
 
@@ -129,20 +131,21 @@ def vertical_tail_sizing(aircraft):
 
     czmax_to = aerodynamics.cz_max_to
 
-    mach_s1g = flight.speed_from_lift(aircraft,pamb,czmax_to,tow)
+    mach_s1g = flight.speed_from_lift(aircraft,pamb,tamb,czmax_to,tow)
 
     mach_35ft = stall_margin*mach_s1g       # V2 speed
   
     mach_mca = mach_35ft/1.1      #Approximation of required VMCA
 
-    altp = 0
-    disa = 15
-  
+    altp = 0.
+    disa = 15.
+
+    throttle = 1.
     nei = 1
 
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
   
-    fn,data = propu.thrust(aircraft,pamb,tamb,mach_mca,MTO,nei)
+    fn,sfc,sec,data = propu.thrust(aircraft,pamb,tamb,mach_mca,MTO,throttle,nei)
 
     dcx_oei = propu.oei_drag(aircraft,pamb,tamb)
 

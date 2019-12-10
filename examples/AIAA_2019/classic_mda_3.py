@@ -17,10 +17,10 @@ from marilib.processes import assembly as run, initialization as init
 #======================================================================================================
 # Initialization
 #======================================================================================================
-propulsive_architecture = 1 # 1:turbofan, 2:partial turboelectric
+propulsive_architecture = "TF" # TF:turbofan, PTE1:partial turboelectric 1
 number_of_engine = 2
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 150
 design_range = unit.m_NM(3000)
@@ -36,16 +36,14 @@ print("Initialization : done")
 # Modify initial values here
 #======================================================================================================
 
-aircraft.turbofan_engine.reference_thrust = 119000.
+aircraft.propulsion.reference_thrust = 119000.
 aircraft.wing.area = 151.9
 
 #======================================================================================================
 # MDA process
 #======================================================================================================
+# This call perform a full MDA with HQ based empennage sizing treated as a constraint satisfaction problem
 
-# Initialization of HTP and VTP areas, compulsory with mda3
-#------------------------------------------------------------------------------------------------------
-run.eval_mda0(aircraft)
 
 # Full MDA process
 #------------------------------------------------------------------------------------------------------
@@ -63,7 +61,7 @@ print("Number of passengers = ","%.0f"%aircraft.cabin.n_pax_ref," int")
 print("Design range = ","%.0f"%unit.NM_m(aircraft.design_driver.design_range)," NM")
 print("Cruise Mach number = ","%.2f"%aircraft.design_driver.cruise_mach," Mach")
 print("-------------------------------------------")
-print("Reference thrust turbofan = ","%.0f"%aircraft.turbofan_engine.reference_thrust," N")
+print("Reference thrust turbofan = ","%.0f"%aircraft.propulsion.reference_thrust," N")
 print("Reference thrust effective = ","%.0f"%aircraft.propulsion.reference_thrust_effective," N")
 print("Turbofan mass = ","%.0f"%aircraft.turbofan_nacelle.mass," kg")
 print("Cruise SFC = ","%.4f"%(aircraft.propulsion.sfc_cruise_ref*36000)," kg/daN/h")

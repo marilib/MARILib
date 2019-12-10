@@ -12,27 +12,50 @@ class DesignDriver(object):
     """
     Top level design drivers
     """
+    INFO = {\
+    "design_range":{"unit":"NM", "om":1.e3, "txt":"Range of design mission"},
+    "cruise_mach":{"unit":"mach", "om":1.e0, "txt":"Nominal cruise Mach number"},
+    "ref_cruise_altp":{"unit":"ft", "om":1.e4, "txt":"Reference cruise altitude (generally 35000ft)"},
+    "top_of_climb_altp":{"unit":"ft", "om":1.e4, "txt":"Top of climb altitude (may be lower or equal to reference cruise altitude"}
+    }
     def __init__(self, design_range = None,
                        cruise_mach = None,
                        ref_cruise_altp = None,
                        top_of_climb_altp = None):
-        """
-        Constructor :
-            :param design_range: Uu NM - OoM 10^3 - Range of design mission
-            :param cruise_mach: Uu mach - OoM 10^0 - Nominal cruise Mach number
-            :param ref_cruise_altp: Uu ft - OoM 10^4 - Reference cruise altitude (generally 35000ft)
-            :param top_of_climb_altp: Uu ft - OoM 10^4 - Top of climb altitude (may be lower or equal to reference cruise altitude
-        """
-        self.design_range = design_range 
+        self.design_range = design_range
         self.cruise_mach = cruise_mach
         self.ref_cruise_altp = ref_cruise_altp
         self.top_of_climb_altp = top_of_climb_altp
+
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class LowSpeed(object):
     """
     Low speed performance data
     """
+    INFO = {\
+    "disa_tofl":{"unit":"degK", "om":1.e1, "txt":"Temperature shift for take off field length computation"},
+    "altp_tofl":{"unit":"ft", "om":1.e4, "txt":"Altitude for take off field length computation"},
+    "kvs1g_tofl":{"unit":"no_dim", "om":1.e0, "txt":"Minimum allowed stall speed margin at take off"},
+    "req_tofl":{"unit":"m", "om":1.e3, "txt":"Maximum take off field length at MTOW and given conditions"},
+    "eff_tofl":{"unit":"m", "om":1.e3, "txt":"Effective take off field length at MTOW and given condition"},
+    "eff_kvs1g":{"unit":"no_dim", "om":1.e0, "txt":"Effective stall speed margin at take off"},
+    "seg2_path":{"unit":"no_dim", "om":1.e-1, "txt":"Air path at 35 ft at take off"},
+    "limitation":{"unit":"int", "om":1.e0, "txt":"Active limitation, 0: error, 1: field length, 2: min climb path"},
+    "perfo_constraint_1":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on Take Off Field Length, must be kept positive"},
+    "disa_app_speed":{"unit":"degK", "om":1.e1, "txt":"Temperature shift for approach speed computation"},
+    "altp_app_speed":{"unit":"ft", "om":1.e3, "txt":"Altitude for approach speed computation"},
+    "kvs1g_app_speed":{"unit":"no_dim", "om":1.e0, "txt":"Minimum allowed stall speed margin at landing"},
+    "req_app_speed":{"unit":"kt", "om":1.e2, "txt":"Maximum approach speed at MLW and given conditions"},
+    "eff_app_speed":{"unit":"kt", "om":1.e2, "txt":"Effective approach speed at MLW and given condition"},
+    "perfo_constraint_2":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on Approach Speed, must be kept positive"},
+    "disa_oei":{"unit":"degK", "om":1.e1, "txt":"Temperature shift for One Engine Inoperative (OEI)"},
+    "req_oei_altp":{"unit":"ft", "om":1.e4, "txt":"Required One Engine Inoperative (OEI) minimum altitude"},
+    "req_oei_path":{"unit":"%", "om":1.e-1, "txt":"Required minimum slope OEI at 95%MTOW, required altitude and MCN rating"},
+    "eff_oei_path":{"unit":"%", "om":1.e-1, "txt":"Effective slope OEI at 95%MTOW, required altitude and MCN rating"},
+    "oei_best_speed":{"unit":"kt", "om":1.e2, "txt":"Calibrated Air Speed (CAS) at which slope is maximum in given conditions"},
+    "perfo_constraint_3":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on One Engine Inoperative performance, must be kept positive"}
+    }
     def __init__(self, disa_tofl = None,
                        altp_tofl = None,
                        kvs1g_tofl = None,
@@ -54,30 +77,6 @@ class LowSpeed(object):
                        eff_oei_path = None,
                        oei_best_speed = None,
                        perfo_constraint_3 = None):
-        """
-        Constructor :
-            :param disa_tofl: Uu degK - OoM 10^1 - Temperature shift for take off field length computation
-            :param altp_tofl: Uu ft - OoM 10^4 - Altitude for take off field length computation
-            :param kvs1g_tofl: Uu no_dim - OoM 10^0 - Minimum allowed stall speed margin at take off
-            :param req_tofl: Uu m - OoM 10^3 - Maximum take off field length at MTOW and given conditions
-            :param eff_tofl: Uu m - OoM 10^3 - Effective take off field length at MTOW and given condition
-            :param eff_kvs1g: Uu no_dim - OoM 10^0 - Effective stall speed margin at take off
-            :param seg2_path: Uu no_dim - OoM 10^-1 - Air path at 35 ft at take off
-            :param limitation: Uu int - OoM 10^0 - Active limitation, 0: error, 1: field length, 2: min climb path
-            :param perfo_constraint_1: Uu m - OoM 10^0 - Constraint on Take Off Field Length, must be kept positive
-            :param disa_app_speed: Uu degK - OoM 10^1 - Temperature shift for approach speed computation
-            :param altp_app_speed: Uu ft - OoM 10^3 - Altitude for approach speed computation
-            :param kvs1g_app_speed: Uu no_dim - OoM 10^0 - Minimum allowed stall speed margin at landing
-            :param req_app_speed: Uu kt - OoM 10^2 - Maximum approach speed at MLW and given conditions
-            :param eff_app_speed: Uu kt - OoM 10^2 - Effective approach speed at MLW and given condition
-            :param perfo_constraint_2: Uu m - OoM 10^0 - Constraint on Approach Speed, must be kept positive
-            :param disa_oei: Uu degK - OoM 10^1 - Temperature shift for One Engine Inoperative (OEI)
-            :param req_oei_altp: Uu ft - OoM 10^4 - Required One Engine Inoperative (OEI) minimum altitude
-            :param req_oei_path: Uu % - OoM 10^-1 - Required minimum slope OEI at 95%MTOW, required altitude and MCN rating
-            :param eff_oei_path: Uu % - OoM 10^-1 - Effective slope OEI at 95%MTOW, required altitude and MCN rating
-            :param oei_best_speed: Uu kt - OoM 10^2 - Calibrated Air Speed (CAS) at which slope is maximum in given conditions
-            :param perfo_constraint_3: Uu % - OoM 10^-1 - Constraint on One Engine Inoperative performance, must be kept positive
-        """
         self.disa_tofl = disa_tofl
         self.altp_tofl = altp_tofl
         self.kvs1g_tofl = kvs1g_tofl
@@ -105,6 +104,21 @@ class HighSpeed(object):
     """
     High speed performance data
     """
+    INFO = {\
+    "disa_climb":{"unit":"degK", "om":1.e1, "txt":"Temperature shift for Maximum climb speed computation"},
+    "req_vz_climb":{"unit":"ft/min", "om":1.e2, "txt":"Required minimum climb speed at 97%MTOW, nominal initial cruise altitude and MCL rating"},
+    "eff_vz_climb":{"unit":"ft/min", "om":1.e2, "txt":"Effective climb speed at 97%MTOW, nominal initial cruise altitude and MCL rating"},
+    "perfo_constraint_1":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on climb performance with MCL rating, must be kept positive"},
+    "req_vz_cruise":{"unit":"ft/min", "om":1.e2, "txt":"Required minimum climb speed at 97%MTOW, nominal initial cruise altitude and MCR rating"},
+    "eff_vz_cruise":{"unit":"ft/min", "om":1.e2, "txt":"Effective climb speed at 97%MTOW, nominal initial cruise altitude and MCR rating"},
+    "perfo_constraint_2":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on climb performance with MCR rating, must be kept positive"},
+    "req_toc_altp":{"unit":"ft", "om":1.e4, "txt":"Targeted Top Of Climb Altitude (TOC) for Time To Climb (TTC) computation"},
+    "cas1_ttc":{"unit":"kt", "om":1.e2, "txt":"Calibrated Air Speed (CAS) below 10000ft for TTC computation"},
+    "cas2_ttc":{"unit":"kt", "om":1.e2, "txt":"Calibrated Air Speed (CAS) above 10000ft for TTC computation"},
+    "req_ttc":{"unit":"min", "om":1.e1, "txt":"Required maximum Time To Climb"},
+    "eff_ttc":{"unit":"min", "om":1.e1, "txt":"Effective Time To Climb"},
+    "perfo_constraint_3":{"unit":"no_dim", "om":1.e0, "txt":"Constraint on time to climb, must be kept positive"},
+    }
     def __init__(self, disa_climb = None,
                        req_vz_climb = None,
                        eff_vz_climb = None,
@@ -117,27 +131,7 @@ class HighSpeed(object):
                        cas2_ttc = None,
                        req_ttc = None,
                        eff_ttc = None,
-                       perfo_constraint_3 = None,
-                       cruise_sfc = None,
-                       cruise_lod = None):
-        """
-        Constructor :
-            :param disa_climb: Uu degK - OoM 10^1 - Temperature shift for Maximum climb speed computation
-            :param req_vz_climb: Uu ft/min - OoM 10^2 - Required minimum climb speed at 97%MTOW, nominal initial cruise altitude and MCL rating
-            :param eff_vz_climb: Uu ft/min - OoM 10^2 - Effective climb speed at 97%MTOW, nominal initial cruise altitude and MCL rating
-            :param perfo_constraint_1: Uu ft/min - OoM 10^0 - Constraint on climb performance with MCL rating, must be kept positive
-            :param req_vz_cruise: Uu ft/min - OoM 10^2 - Required minimum climb speed at 97%MTOW, nominal initial cruise altitude and MCR rating
-            :param eff_vz_cruise: Uu ft/min - OoM 10^2 - Effective climb speed at 97%MTOW, nominal initial cruise altitude and MCR rating
-            :param perfo_constraint_2: Uu ft/min - OoM 10^0 - Constraint on climb performance with MCR rating, must be kept positive
-            :param req_toc_altp: Uu ft - OoM 10^4 - Targeted Top Of Climb Altitude (TOC) for Time To Climb (TTC) computation
-            :param cas1_ttc: Uu kt - OoM 10^2 - Calibrated Air Speed (CAS) below 10000ft for TTC computation
-            :param cas2_ttc: Uu kt - OoM 10^2 - Calibrated Air Speed (CAS) above 10000ft for TTC computation
-            :param req_ttc: Uu min - OoM 10^1 - Required maximum Time To Climb
-            :param eff_ttc: Uu min - OoM 10^1 - Effective Time To Climb
-            :param perfo_constraint_3: Uu min - OoM 10^0 - Constraint on time to climb, must be kept positive
-            :param cruise_sfc: Uu kg/daN/h - OoM 10^0 - Specific fuel consumption for nominal mission cruise
-            :param cruise_lod: Uu no_dim - OoM 10^1 - Lift over drag ratio for nominal mission cruise
-        """
+                       perfo_constraint_3 = None):
         self.disa_climb = disa_climb
         self.req_vz_climb = req_vz_climb
         self.eff_vz_climb = eff_vz_climb
@@ -151,119 +145,177 @@ class HighSpeed(object):
         self.req_ttc = req_ttc
         self.eff_ttc = eff_ttc
         self.perfo_constraint_3 = perfo_constraint_3
-        self.cruise_sfc = cruise_sfc
-        self.cruise_lod = cruise_lod
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class MaxPayloadMission(object):
     """
     Max payload mission data
     """
+    INFO = {\
+    "range":{"unit":"NM", "om":1.e3, "txt":"Range of the max payload mission"},
+    "payload":{"unit":"kg", "om":1.e4, "txt":"Payload of the max payload mission"},
+    "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the max payload mission"},
+    "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the max payload mission"},
+    "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the max payload mission"},
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the max payload mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the max payload mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the max payload mission"},
+    "req_battery_mass":{"unit":"kg", "om":1.e3, "txt":"Required battery mass of the max payload mission"}
+    }
     def __init__(self, range = None,
                        payload = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
-                       block_time = None):
-        """
-        Constructor :
-            :param range: Uu NM - OoM 10^3 - Range of the max payload mission
-            :param payload: Uu kg - OoM 10^4 - Payload of the max payload mission
-            :param tow: Uu kg - OoM 10^4 - Take off weight of the max payload mission
-            :param total_fuel: Uu kg - OoM 10^4 - Total fuel of the max payload mission
-            :param block_fuel: Uu kg - OoM 10^4 - Block fuel of the max payload mission
-            :param block_time: Uu h - OoM 10^1 - Block time of the max payload mission
-        """
-        self.range = range 
+                       block_time = None,
+                       block_enrg = None,
+                       total_enrg = None,
+                       req_battery_mass = None):
+        self.range = range
         self.payload = payload 
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time 
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
+        self.req_battery_mass = req_battery_mass
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class NominalMission(object):
     """
     Nominal mission data
     """
+    INFO = {\
+    "range":{"unit":"NM", "om":1.e3, "txt":"Range of the nominal mission"},
+    "payload":{"unit":"kg", "om":1.e4, "txt":"Payload of the nominal mission"},
+    "nominal_cruise_mach":{"unit":"mach", "om":1.e0, "txt":"Cruise mach of nominal mission"},
+    "nominal_cruise_altp":{"unit":"ft", "om":1.e0, "txt":"Cruise altitude of nominal mission"},
+    "vz_cruise_margin":{"unit":"ft/min", "om":1.e2, "txt":"Margin versus required climb speed at 97%MTOW, nominal cruise altitude and MCR rating"},
+    "vz_climb_margin":{"unit":"ft/min", "om":1.e2, "txt":"Margin versus required climb speed at 97%MTOW, nominal cruise altitude and MCL rating"},
+    "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the nominal mission"},
+    "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the nominal mission"},
+    "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the nominal mission"},
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the nominal mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the nominal mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the nominal mission"},
+    "unified_sar":{"unit":"m/J", "om":1.e0, "txt":"Specific Air Range in meter per Joule (SAR/FLHV for fuelled airplanes)"},
+    "req_battery_mass":{"unit":"kg", "om":1.e3, "txt":"Required battery mass of the nominal mission"}
+    }
     def __init__(self, range = None,
                        payload = None,
+                       nominal_cruise_mach = None,
+                       nominal_cruise_altp = None,
+                       vz_cruise_margin = None,
+                       vz_climb_margin = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
-                       block_time = None):
-        """
-        Constructor :
-            :param range: Uu NM - OoM 10^3 - Range of the nominal mission
-            :param payload: Uu kg - OoM 10^4 - Payload of the nominal mission
-            :param tow: Uu kg - OoM 10^4 - Take off weight of the nominal mission
-            :param total_fuel: Uu kg - OoM 10^4 - Total fuel of the nominal mission
-            :param block_fuel: Uu kg - OoM 10^4 - Block fuel of the nominal mission
-            :param block_time: Uu h - OoM 10^1 - Block time of the nominal mission
-        """
-        self.range = range 
-        self.payload = payload 
+                       block_time = None,
+                       block_enrg = None,
+                       total_enrg = None,
+                       unified_sar = None,
+                       req_battery_mass = None):
+        self.range = range
+        self.payload = payload
+        self.nominal_cruise_mach = nominal_cruise_mach
+        self.nominal_cruise_altp = nominal_cruise_altp
+        self.vz_cruise_margin = vz_cruise_margin
+        self.vz_climb_margin = vz_climb_margin
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time 
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
+        self.unified_sar = unified_sar
+        self.req_battery_mass = req_battery_mass
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class MaxFuelMission(object):
     """
     Max fuel mission data
     """
+    INFO = {\
+    "range":{"unit":"NM", "om":1.e3, "txt":"Range of the max fuel mission"},
+    "payload":{"unit":"kg", "om":1.e4, "txt":"Payload of the max fuel mission"},
+    "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the max fuel mission"},
+    "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the max fuel mission"},
+    "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the max fuel mission"},
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the max fuel mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the max fuel mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the max fuel mission"},
+    "req_battery_mass":{"unit":"kg", "om":1.e3, "txt":"Required battery mass of the max fuel mission"}
+    }
     def __init__(self, range = None,
                        payload = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
-                       block_time = None):
-        """
-        Constructor :
-            :param range: Uu NM - OoM 10^3 - Range of the max fuel mission
-            :param payload: Uu kg - OoM 10^4 - Payload of the max fuel mission
-            :param tow: Uu kg - OoM 10^4 - Take off weight of the max fuel mission
-            :param total_fuel: Uu kg - OoM 10^4 - Total fuel of the max fuel mission
-            :param block_fuel: Uu kg - OoM 10^4 - Block fuel of the max fuel mission
-            :param block_time: Uu h - OoM 10^1 - Block time of the max fuel mission
-        """
-        self.range = range 
+                       block_time = None,
+                       block_enrg = None,
+                       total_enrg = None,
+                       req_battery_mass = None):
+        self.range = range
         self.payload = payload 
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time 
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
+        self.req_battery_mass = req_battery_mass
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class ZeroPayloadMission(object):
     """
     Zero payload mission data
     """
+    INFO = {\
+    "range":{"unit":"NM", "om":1.e3, "txt":"Range of the zero payload mission"},
+    "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the zero payload mission"},
+    "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the zero payload mission"},
+    "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the zero payload mission"},
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the zero payload mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the zero payload mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the zero payload mission"},
+    "req_battery_mass":{"unit":"kg", "om":1.e3, "txt":"Required battery mass of the zero payload mission"}
+    }
     def __init__(self, range = None,
                        tow = None,
                        total_fuel = None,
                        block_fuel = None,
-                       block_time = None):
-        """
-        Constructor :
-            :param range: Uu NM - OoM 10^3 - Range of the zero payload mission
-            :param tow: Uu kg - OoM 10^4 - Take off weight of the zero payload mission
-            :param total_fuel: Uu kg - OoM 10^4 - Total fuel of the zero payload mission
-            :param block_fuel: Uu kg - OoM 10^4 - Block fuel of the zero payload mission
-            :param block_time: Uu h - OoM 10^1 - Block time of the zero payload mission
-        """
-        self.range = range 
+                       block_time = None,
+                       block_enrg = None,
+                       total_enrg = None,
+                       req_battery_mass = None):
+        self.range = range
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time 
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
+        self.req_battery_mass = req_battery_mass
 
 #--------------------------------------------------------------------------------------------------------------------------------
 class CostMission(object):
     """
     Mission data for cost evaluation
     """
+    INFO = {\
+    "disa":{"unit":"degK", "om":1.e1, "txt":"Temperature shift of the cost evaluation mission"},
+    "range":{"unit":"NM", "om":1.e3, "txt":"Range of the cost evaluation mission"},
+    "payload":{"unit":"kg", "om":1.e4, "txt":"Payload of the cost evaluation mission"},
+    "tow":{"unit":"kg", "om":1.e4, "txt":"Take off weight of the cost evaluation mission"},
+    "total_fuel":{"unit":"kg", "om":1.e4, "txt":"Total fuel of the cost evaluation mission"},
+    "block_fuel":{"unit":"kg", "om":1.e4, "txt":"Block fuel of the cost evaluation mission"},
+    "block_time":{"unit":"h", "om":1.e1, "txt":"Block time of the cost evaluation mission"},
+    "block_enrg":{"unit":"MWh", "om":1.e1, "txt":"Block energy of the cost evaluation mission"},
+    "total_enrg":{"unit":"MWh", "om":1.e1, "txt":"Total energy of the cost evaluation mission"},
+    "req_battery_mass":{"unit":"kg", "om":1.e3, "txt":"Required battery mass of the cost evaluation mission"},
+    "block_CO2":{"unit":"kg", "om":1.e4, "txt":"Mass of carbon dioxide emitted during the mission"}
+    }
     def __init__(self, disa = None,
                        range = None,
                        payload = None,
@@ -271,25 +323,20 @@ class CostMission(object):
                        total_fuel = None,
                        block_fuel = None,
                        block_time = None,
+                       block_enrg = None,
+                       total_enrg = None,
+                       req_battery_mass = None,
                        block_CO2 = None):
-        """
-        Constructor :
-            :param disa: Uu degK - OoM 10^1 - Temperature shift of the cost evaluation mission
-            :param range: Uu NM - OoM 10^3 - Range of the cost evaluation mission
-            :param payload: Uu kg - OoM 10^4 - Payload of the cost evaluation mission
-            :param tow: Uu kg - OoM 10^4 - Take off weight of the cost evaluation mission
-            :param total_fuel: Uu kg - OoM 10^4 - Total fuel of the cost evaluation mission
-            :param block_fuel: Uu kg - OoM 10^4 - Block fuel of the cost evaluation mission
-            :param block_time: Uu h - OoM 10^1 - Block time of the cost evaluation mission
-            :param block_CO2: Uu kg - OoM 10^4 - Mass of carbon dioxide emitted during the mission
-        """
-        self.disa = disa 
+        self.disa = disa
         self.range = range 
         self.payload = payload 
         self.tow = tow  
         self.total_fuel = total_fuel 
         self.block_fuel = block_fuel 
         self.block_time = block_time
+        self.block_enrg = block_enrg
+        self.total_enrg = total_enrg
+        self.req_battery_mass = req_battery_mass
         self.block_CO2 = block_CO2
 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -297,10 +344,41 @@ class Economics(object):
     """
     Cost data
     """
+    INFO = {\
+    "gear_price":{"unit":"M$", "om":1.e1, "txt":"Price of landing gears"},
+    "engine_price":{"unit":"M$", "om":1.e1, "txt":"Price of one engine"},
+    "airplane_price":{"unit":"M$", "om":1.e1, "txt":"Price of the airplane"},
+    "battery_price":{"unit":"k$", "om":1.e1, "txt":"Total price of the battery (eventual)"},
+    "battery_mass_price":{"unit":"$/kg", "om":1.e1, "txt":"Mass price of battery (eventual)"},
+    "fuel_price":{"unit":"$/gal", "om":1.e1, "txt":"Fuel price"},
+    "elec_price":{"unit":"$/kWh", "om":1.e-1, "txt":"Price of electricity"},
+    "labor_cost":{"unit":"$/h", "om":1.e1, "txt":"Labor cost"},
+    "irp":{"unit":"year", "om":1.e1, "txt":"Interest recovery period"},
+    "period":{"unit":"year", "om":1.e1, "txt":"Utilisation period"},
+    "interest_rate":{"unit":"%", "om":1.e1, "txt":"Interest rate"},
+    "utilisation":{"unit":"int", "om":1.e3, "txt":"Number of flights per year"},
+    "cockpit_crew_cost":{"unit":"$/trip", "om":1.e3, "txt":"Cockpit crew cost"},
+    "cabin_crew_cost":{"unit":"$/trip", "om":1.e3, "txt":"Cabin crew cost"},
+    "fuel_cost":{"unit":"$/trip", "om":1.e3, "txt":"Fuel cost"},
+    "elec_cost":{"unit":"$/trip", "om":1.e3, "txt":"Cost of electricity"},
+    "landing_fees":{"unit":"$/trip", "om":1.e3, "txt":"Landing fees"},
+    "navigation_fees":{"unit":"$/trip", "om":1.e3, "txt":"Navigation fees"},
+    "catering_cost":{"unit":"$/trip", "om":1.e3, "txt":"Catering cost"},
+    "pax_handling_cost":{"unit":"$/trip", "om":1.e3, "txt":"Pax handling cost"},
+    "ramp_handling_cost":{"unit":"$/trip", "om":1.e3, "txt":"Ramp handling cost"},
+    "standard_operating_cost":{"unit":"$/trip", "om":1.e4, "txt":"Standard operating cost"},
+    "cash_operating_cost":{"unit":"$/trip", "om":1.e4, "txt":"Cash operating cost"},
+    "total_investment":{"unit":"$", "om":1.e3, "txt":"Total investment"},
+    "interest":{"unit":"$/trip", "om":1.e3, "txt":"Interest"},
+    "insurance":{"unit":"$/trip", "om":1.e3, "txt":"Insurance"},
+    "depreciation":{"unit":"$/trip", "om":1.e3, "txt":"Depreciation"},
+    "direct_operating_cost":{"unit":"$/trip", "om":1.e4, "txt":"Direct operating cost"}
+    }
     def __init__(self, gear_price = None,
                        engine_price = None,
-                       battery_price = None,
                        airplane_price = None,
+                       battery_price = None,
+                       battery_mass_price = None,
                        fuel_price = None,
                        elec_price = None,
                        labor_cost = None,
@@ -311,6 +389,7 @@ class Economics(object):
                        cockpit_crew_cost = None,
                        cabin_crew_cost = None,
                        fuel_cost = None,
+                       elec_cost = None,
                        landing_fees = None,
                        navigation_fees = None,
                        catering_cost = None,
@@ -323,40 +402,12 @@ class Economics(object):
                        insurance = None,
                        depreciation = None,
                        direct_operating_cost = None):
-        """
-        Constructor :
-            :param gear_price: Uu M$ - OoM 10^1 - Price of landing gears 
-            :param engine_price: Uu M$ - OoM 10^1 - Price of one engine 
-            :param battery_price: Uu $/kg - OoM 10^1 - Mass price of battery (eventual)
-            :param airplane_price: Uu M$ - OoM 10^1 - Price of the airplane
-            :param fuel_price: Uu $/gal - OoM 10^1 - Fuel price 
-            :param elec_price: Uu $/kWh - OoM 10^-1 - Price of electricity
-            :param labor_cost: Uu $/h - OoM 10^1 - Labor cost
-            :param irp: Uu year - OoM 10^1 - Interest recovery period 
-            :param period: Uu year - OoM 10^1 - Utilisation period 
-            :param interest_rate: Uu % - OoM 10^1 - Interest rate 
-            :param utilisation: Uu int - OoM 10^3 - Number of flights per year
-            :param cockpit_crew_cost: Uu $/trip - OoM 10^3 - Cockpit crew cost
-            :param cabin_crew_cost: Uu $/trip - OoM 10^3 - Cabin crew cost
-            :param fuel_cost: Uu $/trip - OoM 10^3 - Fuel cost
-            :param landing_fees: Uu $/trip - OoM 10^3 - Landing fees
-            :param navigation_fees: Uu $/trip - OoM 10^3 - Navigation fees
-            :param catering_cost: Uu $/trip - OoM 10^3 - Catering cost
-            :param pax_handling_cost: Uu $/trip - OoM 10^3 - Pax handling cost
-            :param ramp_handling_cost: Uu $/trip - OoM 10^3 - Ramp handling cost
-            :param standard_operating_cost: Uu $/trip - OoM 10^4 - Standard operating cost
-            :param cash_operating_cost: Uu $/trip - OoM 10^4 - Cash operating cost
-            :param total_investment: Uu $/trip - OoM 10^3 - Total investment
-            :param interest: Uu $/trip - OoM 10^3 - Interest
-            :param insurance: Uu $/trip - OoM 10^3 - Insurance
-            :param depreciation: Uu $/trip - OoM 10^3 - Depreciation
-            :param direct_operating_cost: Uu $/trip - OoM 10^4 - Direct operating cost
-        """
-        self.gear_price = gear_price 
-        self.engine_price = engine_price 
-        self.battery_price = battery_price
+        self.gear_price = gear_price
+        self.engine_price = engine_price
         self.airplane_price = airplane_price
-        self.fuel_price = fuel_price 
+        self.battery_price = battery_price
+        self.battery_mass_price = battery_mass_price
+        self.fuel_price = fuel_price
         self.elec_price = elec_price
         self.labor_cost = labor_cost
         self.irp = irp 
@@ -366,6 +417,7 @@ class Economics(object):
         self.cockpit_crew_cost = cockpit_crew_cost
         self.cabin_crew_cost = cabin_crew_cost 
         self.fuel_cost = fuel_cost
+        self.elec_cost = elec_cost
         self.landing_fees = landing_fees
         self.navigation_fees = navigation_fees 
         self.catering_cost = catering_cost 
@@ -384,6 +436,20 @@ class Environmental_Impact(object):
     """
     Environmental impact data
     """
+    INFO = {\
+    "rgf":{"unit":"m2", "om":1.e2, "txt":"Reference Geometric Factor, close to cabin floor pressurized area (but higher)"},
+    "CO2_metric":{"unit":"kg/km/m0.48", "om":1.e0, "txt":"Fuel efficiency metric"},
+    "CO2_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of carbon dioxide emitted per kg of fuel"},
+    "H2O_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of water emitted per kg of fuel"},
+    "SO2_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of sulfur dioxide emitted per kg of fuel"},
+    "NOx_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of nitrogen oxide emitted per kg of fuel"},
+    "CO_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of carbon monoxide emitted per kg of fuel"},
+    "HC_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of unburnt hydrocarbon emitted per kg of fuel"},
+    "sulfuric_acid_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of sulfuric acid emitted per kg of fuel"},
+    "nitrous_acid_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of nitrous acid emitted per kg of fuel"},
+    "nitric_acid_index":{"unit":"g/kg", "om":1.e3, "txt":"Mass of nitric acid emitted per kg of fuel"},
+    "soot_index":{"unit":"int", "om":1.e12, "txt":"Number of soot particle emitted per kg of fuel"}
+    }
     def __init__(self, rgf = None,
                        CO2_metric = None,
                        CO2_index = None,
@@ -392,33 +458,19 @@ class Environmental_Impact(object):
                        NOx_index = None,
                        CO_index = None,
                        HC_index = None,
-                       sulphuric_acid_index = None,
+                       sulfuric_acid_index = None,
                        nitrous_acid_index = None,
                        nitric_acid_index = None,
                        soot_index = None):
-        """
-        Constructor :
-            :param rgf: Uu m2 - OoM 10^2 - Reference Geometric Factor, close to cabin floor pressurized area (but higher)
-            :param CO2_metric: Uu kg/km/m0.48 - OoM 10^0 - Fuel efficiency metric
-            :param CO2_index: Uu g/kg - OoM 10^3 - Mass of carbon dioxide emitted per kg of fuel
-            :param H2O_index: Uu g/kg - OoM 10^3 - Mass of water emitted per kg of fuel
-            :param SO2_index: Uu g/kg - OoM 10^3 - Mass of sulfur dioxide emitted per kg of fuel
-            :param NOx_index: Uu g/kg - OoM 10^3 - Mass of nitrogen oxide emitted per kg of fuel
-            :param CO_index: Uu g/kg - OoM 10^3 - Mass of carbon monoxide emitted per kg of fuel
-            :param HC_index: Uu g/kg - OoM 10^3 - Mass of unburnt hydrocarbon emitted per kg of fuel
-            :param sulphuric_acid_index: Uu g/kg - OoM 10^3 - Mass of sulfuric acid emitted per kg of fuel
-            :param nitrous_acid_index: Uu g/kg - OoM 10^3 - Mass of nitrous acid emitted per kg of fuel
-            :param nitric_acid_index: Uu g/kg - OoM 10^3 - Mass of nitric acid emitted per kg of fuel
-            :param soot_index: Uu int - OoM 10^12 - Number of soot particle emitted per kg of fuel
-        """
         self.rgf = rgf
         self.CO2_metric = CO2_metric
+        self.CO2_index = CO2_index
         self.H2O_index = H2O_index
         self.SO2_index = SO2_index
         self.NOx_index = NOx_index
         self.CO_index = CO_index
         self.HC_index = HC_index
-        self.sulphuric_acid_index = sulphuric_acid_index
+        self.sulfuric_acid_index = sulfuric_acid_index
         self.nitrous_acid_index = nitrous_acid_index
         self.nitric_acid_index = nitric_acid_index
         self.soot_index = soot_index

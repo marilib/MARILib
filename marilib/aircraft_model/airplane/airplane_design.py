@@ -3,8 +3,8 @@
 """
 Created on Thu Jan 24 23:22:21 2019
 
-@author: DRUOT Thierry : original Scilab implementation
-         PETEILH Nicolas : portage to Python
+* DRUOT Thierry for original Scilab implementation
+* PETEILH Nicolas for portage to Python
 """
 
 from marilib.earth import environment as earth
@@ -12,10 +12,9 @@ from marilib.earth import environment as earth
 from marilib.aircraft_model.airplane import aerodynamics as airplane_aero
 
 
-#===========================================================================================================
+# ===========================================================================================================
 def eval_payload_mass(aircraft):
-    """
-    Payload mass & CG estimation
+    """Payload mass & CG estimation
     """
 
     cabin = aircraft.cabin
@@ -26,7 +25,13 @@ def eval_payload_mass(aircraft):
 
     payload.m_container_pallet = 4.36*fuselage.width*fuselage.length        # Containers and pallets
 
-    payload.maximum = cabin.n_pax_ref*payload.m_pax_max
+    if (aircraft.propulsion.fuel_type=="Battery"):
+        if (aircraft.ef1_battery.stacking=="Variable"):
+            payload.maximum = cabin.n_pax_ref*payload.m_pax_max
+        else:
+            payload.maximum = cabin.n_pax_ref*payload.m_pax_nominal # Because in this case, MZFW = MTOW
+    else:
+        payload.maximum = cabin.n_pax_ref*payload.m_pax_max
 
     payload.nominal = cabin.n_pax_ref*payload.m_pax_nominal
 
@@ -41,10 +46,9 @@ def eval_payload_mass(aircraft):
     return
 
 
-#===========================================================================================================
+# ===========================================================================================================
 def eval_system_mass(aircraft):
-    """
-    Systems mass & CG estimation
+    """Systems mass & CG estimation
     """
 
     fuselage = aircraft.fuselage
@@ -65,10 +69,9 @@ def eval_system_mass(aircraft):
     return
 
 
-#===========================================================================================================
+# ===========================================================================================================
 def eval_aircraft_weights(aircraft):
-    """
-    Weights estimation
+    """Weights estimation
     """
 
     cabin = aircraft.cabin
@@ -81,39 +84,62 @@ def eval_aircraft_weights(aircraft):
     systems = aircraft.systems
     propulsion = aircraft.propulsion
     tanks = aircraft.tanks
-    battery = aircraft.battery
 
     weights = aircraft.weights
 
     weights.mwe =  cabin.m_furnishing + fuselage.mass + wing.mass + htp.mass + vtp.mass \
                  + ldg.mass + systems.mass + propulsion.mass
 
-    weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + battery.mass
+    weights.owe = weights.mwe + cabin.m_op_item + payload.m_container_pallet + weights.battery_in_owe
 
+    if (propulsion.fuel_type=="Battery"):
+        mzfw = weights.mtow
+    else:
+        mzfw = weights.owe + payload.maximum
+
+    weights.mass_constraint_1 = (weights.mzfw - mzfw) / weights.mzfw
+
+    if (propulsion.fuel_type=="Battery"):
+        mlw = weights.mtow
+    else:
+        if (cabin.n_pax_ref>100):
+            mlw = min(weights.mtow , (1.07*weights.mzfw))
+        else:
+            mlw = weights.mtow
+
+    weights.mass_constraint_2 = (weights.mlw - mlw) / weights.mlw
+
+    # WARNING : for EF1 architecture, MFW corresponds to max battery weight
     weights.mfw = min(tanks.mfw_volume_limited, weights.mtow - weights.owe)
 
-    mzfw = weights.owe + payload.maximum
+    return
 
-    weights.mass_constraint_1 = weights.mzfw - mzfw
 
-    if (cabin.n_pax_ref>100):
-        mlw = min(weights.mtow , (1.07*weights.mzfw))
-    else:
-        mlw = weights.mtow
+#===========================================================================================================
+def eval_mass_coupling(aircraft):
+    """Weights estimation internal coupling
+    This relation is put apart from aircraft_weights because GEMS does not manage functions that compute their own input
+    """
 
-    weights.mass_constraint_2 = weights.mlw - mlw
+    cabin = aircraft.cabin
+    payload = aircraft.payload
+    weights = aircraft.weights
 
-#    weights.mzfw = mzfw     # MZFW is overwritten here
+    if (aircraft.propulsion.fuel_type!="Battery"):
 
-#    weights.mlw = mlw       # MLW is overwritten here
+        weights.mzfw = weights.owe + payload.maximum
+
+        if (cabin.n_pax_ref>100):
+            weights.mlw = min(weights.mtow , (1.07*weights.mzfw))
+        else:
+            weights.mlw = weights.mtow
 
     return
 
 
 #===========================================================================================================
 def eval_aircraft_cg(aircraft):
-    """
-    Center of gravity estimation
+    """Center of gravity estimation
     """
 
     cabin = aircraft.cabin
@@ -126,7 +152,6 @@ def eval_aircraft_cg(aircraft):
     systems = aircraft.systems
     propulsion = aircraft.propulsion
     tanks = aircraft.tanks
-    battery = aircraft.battery
     weights = aircraft.weights
 
     c_g = aircraft.center_of_gravity
@@ -136,7 +161,7 @@ def eval_aircraft_cg(aircraft):
                + vtp.c_g*vtp.mass + systems.c_g*systems.mass \
                )/weights.mwe
 
-    c_g.owe = (  c_g.mwe*weights.mwe + cabin.cg_op_item*cabin.m_op_item + battery.c_g*battery.mass \
+    c_g.owe = (  c_g.mwe*weights.mwe + cabin.cg_op_item*cabin.m_op_item + c_g.battery*weights.battery_in_owe \
                + payload.cg_container_pallet*payload.m_container_pallet \
                ) / weights.owe
 
@@ -155,11 +180,11 @@ def eval_aircraft_cg(aircraft):
 
 #===========================================================================================================
 def eval_aerodynamics_design(aircraft):
-    """
-    Defines high lift movable deflection settings
-    HLDconf varies from 0 (clean) to 1 (full deflected)
-    Typically : HLDconf = 1 ==> CzmaxLD
-              : HLDconf = 0.1 to 0.5 ==> CzmaxTO
+    """Defines high lift movable deflection settings.
+    HLDconf varies from 0 (clean) to 1 (full deflected), typically
+
+    * HLDconf = 1 ==> CzmaxLD
+    * HLDconf = 0.1 to 0.5 ==> CzmaxTO
     """
 
     design_driver = aircraft.design_driver
@@ -169,19 +194,16 @@ def eval_aerodynamics_design(aircraft):
 
     mach = design_driver.cruise_mach
     altp = design_driver.ref_cruise_altp
-    disa = 0
+    disa = 0.
 
     pamb,tamb,tstd,dtodz = earth.atmosphere(altp,disa)
 
     aerodynamics.cruise_lod_max, aerodynamics.cz_cruise_lod_max = airplane_aero.lod_max(aircraft, pamb, tamb, mach)
 
-    aerodynamics.hld_conf_clean = 0        # By definition (0=<hld_conf=<1)
     aerodynamics.cz_max_clean,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_clean)
 
-    aerodynamics.hld_conf_to = 0.3      # Take off (empirical setting)
     aerodynamics.cz_max_to,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_to)
 
-    aerodynamics.hld_conf_ld = 1        # By definition (0=<hld_conf=<1), 1 is full landing
     aerodynamics.cz_max_ld,Cz0 = airplane_aero.high_lift(wing, aerodynamics.hld_conf_ld)
 
     return

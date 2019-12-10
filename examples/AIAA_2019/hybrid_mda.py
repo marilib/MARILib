@@ -17,16 +17,17 @@ from marilib.aircraft_model.operations import handling_qualities as h_q
 from marilib.earth import environment as earth
 
 from marilib.airplane.propulsion import jet_models as jet
+from marilib.airplane.propulsion.hybrid_pte1.hybrid_pte1_models import pte1_thrust
 
 from marilib.aircraft_model.airplane import viewer as show
 
 #======================================================================================================
 # Initialization
 #======================================================================================================
-propulsive_architecture = 2 # 1:turbofan, 2:partial turboelectric
+propulsive_architecture = "PTE1" # TF:turbofan, PTE1:partial turboelectric 1
 number_of_engine = 2
 
-aircraft = Aircraft(propulsive_architecture)
+aircraft = Aircraft()
 
 n_pax_ref = 150
 design_range = unit.m_NM(3000)
@@ -39,29 +40,29 @@ run.aircraft_initialize(aircraft, n_pax_ref, design_range, cruise_mach, propulsi
 # Modify initial values here
 #======================================================================================================
 
-aircraft.turbofan_engine.reference_thrust = 118482.
+aircraft.propulsion.reference_thrust = 118482.
 aircraft.wing.area = 152.9
 
 e_power = 1.0e6       # Watts, electric motor power
 
-aircraft.power_elec_chain.mto = e_power
-aircraft.power_elec_chain.mcn = e_power
-aircraft.power_elec_chain.mcl = e_power
-aircraft.power_elec_chain.mcr = e_power
+aircraft.rear_electric_engine.mto_r_shaft_power = e_power
+aircraft.rear_electric_engine.mcn_r_shaft_power = e_power
+aircraft.rear_electric_engine.mcl_r_shaft_power = e_power
+aircraft.rear_electric_engine.mcr_r_shaft_power = e_power
 
 aircraft.propulsion.bli_effect = 1                      #init.boundary_layer_effect()
-aircraft.power_elec_chain.overall_efficiency = 0.90     # 0.90 from init.e_chain_efficiency()
+aircraft.pte1_power_elec_chain.overall_efficiency = 0.90     # 0.90 from init.e_chain_efficiency()
 
 pw_density_factor = 1.
 
-aircraft.power_elec_chain.generator_pw_density = init.generator_power_density() * pw_density_factor
-aircraft.power_elec_chain.rectifier_pw_density = init.rectifier_pw_density() * pw_density_factor
-aircraft.power_elec_chain.wiring_pw_density = init.wiring_pw_density() * pw_density_factor
-aircraft.power_elec_chain.cooling_pw_density = init.cooling_pw_density() * pw_density_factor
+aircraft.pte1_power_elec_chain.generator_pw_density = init.generator_power_density() * pw_density_factor
+aircraft.pte1_power_elec_chain.rectifier_pw_density = init.rectifier_pw_density() * pw_density_factor
+aircraft.pte1_power_elec_chain.wiring_pw_density = init.wiring_pw_density() * pw_density_factor
+aircraft.pte1_power_elec_chain.cooling_pw_density = init.cooling_pw_density() * pw_density_factor
 
-aircraft.electric_nacelle.controller_pw_density = init.controller_pw_density() * pw_density_factor
-aircraft.electric_nacelle.motor_pw_density = init.e_motor_pw_density() * pw_density_factor
-aircraft.electric_nacelle.nacelle_pw_density = init.e_nacelle_pw_density() * pw_density_factor
+aircraft.rear_electric_nacelle.controller_pw_density = init.controller_pw_density() * pw_density_factor
+aircraft.rear_electric_nacelle.motor_pw_density = init.e_motor_pw_density() * pw_density_factor
+aircraft.rear_electric_nacelle.nacelle_pw_density = init.e_nacelle_pw_density() * pw_density_factor
 
 #======================================================================================================
 # Design process
@@ -84,38 +85,24 @@ run.eval_performance_analysis(aircraft)
 #------------------------------------------------------------------------------------------------------
 run.eval_handling_quality_analysis(aircraft)
 
-d_vtp_area = h_q.vertical_tail_sizing(aircraft)
 
 # Some performances about electric chain
 #------------------------------------------------------------------------------------------------------
-gen_pwd = aircraft.power_elec_chain.generator_pw_density
-rec_pwd = aircraft.power_elec_chain.rectifier_pw_density
-wire_pwd = aircraft.power_elec_chain.wiring_pw_density
-cool_pwd = aircraft.power_elec_chain.cooling_pw_density
+gen_pwd = aircraft.pte1_power_elec_chain.generator_pw_density
+rec_pwd = aircraft.pte1_power_elec_chain.rectifier_pw_density
+wire_pwd = aircraft.pte1_power_elec_chain.wiring_pw_density
+cool_pwd = aircraft.pte1_power_elec_chain.cooling_pw_density
 
-cont_pwd = aircraft.electric_nacelle.controller_pw_density
-mot_pwd = aircraft.electric_nacelle.motor_pw_density
-nac_pwd = aircraft.electric_nacelle.nacelle_pw_density
+cont_pwd = aircraft.rear_electric_nacelle.controller_pw_density
+mot_pwd = aircraft.rear_electric_nacelle.motor_pw_density
+nac_pwd = aircraft.rear_electric_nacelle.nacelle_pw_density
 
 global_e_mass = (1/gen_pwd + 1/rec_pwd + 1/wire_pwd + 1/cool_pwd + 1/cont_pwd + 1/mot_pwd + 1/nac_pwd)*e_power
 
 #------------------------------------------------------------------------------------------------------
-if (propulsive_architecture==2):
+if (propulsive_architecture=="PTE1"):
 
-    kC = aircraft.turbofan_engine.core_thrust_ratio
-    kW = aircraft.electric_engine.mcr_e_power_ratio
-
-    eff_prop = aircraft.turbofan_nacelle.efficiency_prop
-    eff_e_prop = aircraft.electric_nacelle.efficiency_prop
-    eff_chain = aircraft.power_elec_chain.overall_efficiency
-
-    kBLIe = aircraft.propulsion.bli_e_thrust_factor  # Thrust increase due to BLI at iso shaft power for the e-fan
-
-    eff_h = kC + (1-kC)*( kW*kBLIe*(eff_e_prop/eff_prop)*eff_chain + (1-kW) )
-    sfc_factor = 1./eff_h   # factor on cruise SFC due to rear fuselage electric nacelle with bli
-
-    #------------------------------------------------------------------------------------------------------
-    shaft_power = aircraft.electric_engine.mcr_e_shaft_power
+    shaft_power = aircraft.rear_electric_engine.mcr_r_shaft_power
 
     disa = 0.
     altp = aircraft.design_driver.ref_cruise_altp
@@ -123,21 +110,33 @@ if (propulsive_architecture==2):
 
     (pamb,tamb,tstd,dt_o_dz) = earth.atmosphere(altp,disa)
 
-    (e_fan_thrust,q_air,dv_bli) = jet.fan_thrust_with_bli(aircraft.electric_nacelle,pamb,tamb,mach,shaft_power)
+    (e_fan_thrust,q_air,dv_bli) = jet.fan_thrust_with_bli(aircraft.rear_electric_nacelle,pamb,tamb,mach,shaft_power)
 
     vair = mach*earth.sound_speed(tamb)
 
     kVbli = dv_bli / vair
 
+    #------------------------------------------------------------------------------------------------------
+    (MTO,MCN,MCL,MCR,FID) = aircraft.propulsion.rating_code
+
+    throttle = 1.
+    nei = 0
+
+    fn,sfc,sec,data = pte1_thrust(aircraft,pamb,tamb,mach,MCR,throttle,nei)
+
+    (fn_core,fn_fan1,fn_fan2,dVbli_o_V,shaft_power2,fn0,shaft_power0,sfc0) = data
+
+    sfc_factor = sfc/sfc0   # factor on cruise SFC due to rear fuselage electric nacelle with bli
+
     # Print some results
     #------------------------------------------------------------------------------------------------------
     print("-------------------------------------------")
     print("Global mass of electric chain = ","%.0f"%global_e_mass," kg")
-    print("Electric fan length = ","%.2f"%aircraft.electric_nacelle.length," m")
-    print("Electric fan diameter = ","%.2f"%aircraft.electric_nacelle.fan_width," m")
-    print("Electric nozzle diameter = ","%.2f"%aircraft.electric_nacelle.nozzle_width," m")
+    print("Electric fan length = ","%.2f"%aircraft.rear_electric_nacelle.length," m")
+    print("Electric fan diameter = ","%.2f"%aircraft.rear_electric_nacelle.fan_width," m")
+    print("Electric nozzle diameter = ","%.2f"%aircraft.rear_electric_nacelle.nozzle_width," m")
     print("relative decrease of e-fan inlet velocity in cruise = ","%.3f"%kVbli," no_dim")
-    print("Factor on e-fan thrust due to BLI in cruise = ","%.3f"%aircraft.propulsion.bli_e_thrust_factor," no_dim")
+    print("Factor on e-fan thrust due to BLI in cruise = ","%.3f"%aircraft.propulsion.bli_r_thrust_factor," no_dim")
     print("Global factor on SFC in cruise = ","%.4f"%sfc_factor," no_dim")
 
 print("-------------------------------------------")
@@ -145,7 +144,7 @@ print("Number of passengers = ","%.0f"%aircraft.cabin.n_pax_ref," int")
 print("Design range = ","%.0f"%unit.NM_m(aircraft.design_driver.design_range)," NM")
 print("Cruise Mach number = ","%.2f"%aircraft.design_driver.cruise_mach," Mach")
 print("-------------------------------------------")
-print("Reference thrust turbofan = ","%.0f"%aircraft.turbofan_engine.reference_thrust," N")
+print("Reference thrust turbofan = ","%.0f"%aircraft.propulsion.reference_thrust," N")
 print("Reference thrust effective = ","%.0f"%aircraft.propulsion.reference_thrust_effective," N")
 print("Turbofan mass = ","%.0f"%aircraft.turbofan_nacelle.mass," kg")
 print("Cruise SFC = ","%.4f"%(aircraft.propulsion.sfc_cruise_ref*36000)," kg/daN/h")

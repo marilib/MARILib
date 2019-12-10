@@ -7,7 +7,7 @@ Created on Thu Jan 24 23:22:21 2019
          PETEILH Nicolas : portage to Python
 """
 
-import numpy
+from marilib import numpy
 
 from marilib.tools.math import maximize_1d, lin_interp_1d
 
@@ -29,12 +29,12 @@ def high_lift(wing,hld_conf):
     cz_max_ld = {
             0 : 1.45 ,  # Clean
             1 : 2.25 ,  # Flap only, Rotation without slot
-            2 : 2.60 ,  # Flap only, Rotation with slot      (ATR)
+            2 : 2.60 ,  # Flap only, Rotation single slot      (ATR)
             3 : 2.80 ,  # Flap only, Rotation double slot
-            4 : 2.80 ,  # Flap only, Fowler
-            5 : 2.00 ,  # Slap only
-            6 : 2.45 ,  # Slat + Flap rotation double slot
-            7 : 2.60 ,  # Slat + Flap rotation with slot
+            4 : 2.80 ,  # Fowler Flap
+            5 : 2.00 ,  # Slat only
+            6 : 2.45 ,  # Slat + Flap rotation without slot
+            7 : 2.70 ,  # Slat + Flap rotation single slot
             8 : 2.90 ,  # Slat + Flap rotation double slot
             9 : 3.00 ,  # Slat + Fowler                      (A320)
             10 : 3.20,  # Slat + Fowler + Fowler double slot (A321)
@@ -87,7 +87,7 @@ def drag(aircraft, pamb, tamb, mach, cz):
     aircraft_net_wetted_area =   fuselage.net_wetted_area + wing.net_wetted_area + htp.net_wetted_area + vtp.net_wetted_area \
                                + nac_nwa
 
-    aircraft_knwa = aircraft_net_wetted_area/1000
+    aircraft_knwa = aircraft_net_wetted_area/1000.
 
     aircraft_kp = (0.0247*aircraft_knwa - 0.11)*aircraft_knwa + 0.166       # Parasitic drag factor
 
@@ -96,7 +96,7 @@ def drag(aircraft, pamb, tamb, mach, cz):
     # Additional drag
     #-----------------------------------------------------------------------------------------------------------
     X = numpy.array([1.0, 1.5, 2.4, 3.3, 4.0, 5.0])
-    Y = numpy.array([0.036, 0.020, 0.0075, 0.0025, 0, 0])
+    Y = numpy.array([0.036, 0.020, 0.0075, 0.0025, 0., 0.])
 
     param = fuselage.tail_cone_length/fuselage.width
 
@@ -119,7 +119,7 @@ def drag(aircraft, pamb, tamb, mach, cz):
     cz_design = 0.5
     aircraft_mach_div = 0.03 + design_driver.cruise_mach + 0.1*(cz_design-cz)
 
-    aircraft_cxc = 0.0025 * numpy.exp(40*(mach - aircraft_mach_div) )
+    aircraft_cxc = 0.0025 * numpy.exp(40.*(mach - aircraft_mach_div) )
 
     # Sum up
     #-----------------------------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ def lod_max(aircraft,pamb,tamb,mach):
     cz_ini = 0.5
     dcz = 0.05
 
-    fct = [fct_lod_max, 1,aircraft,pamb,tamb,mach]
+    fct = [fct_lod_max, aircraft,pamb,tamb,mach]
     (lod_max_cz,lod_max,rc) = maximize_1d(cz_ini,dcz,fct)
 
     return lod_max,lod_max_cz

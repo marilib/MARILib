@@ -7,9 +7,11 @@ Created on Thu Jan 24 23:22:21 2019
          PETEILH Nicolas : portage to Python
 """
 
-import numpy
+from marilib import numpy
 
-from scipy.optimize import fsolve
+from marilib.tools import units as unit
+
+from marilib import fsolve
 
 
 #===========================================================================================================
@@ -53,11 +55,15 @@ def sea_level_sound_speed():
     return vc0
 
 #===========================================================================================================
-def gaz_constant():
+def gas_constant(gas="air"):
     """
-    Ideal gaz constant
+    Ideal gas constant (J/kg/K)
     """
-    R = 287.053      # (J/kg/K) Ideal gaz constant for the air
+    R = {
+         "air" : 287.053 ,
+         "helium" : 2077. ,
+         "hydrogen" : 4124.
+         }.get(gas, "Erreur: type of gas is unknown")
     return R
 
 #===========================================================================================================
@@ -73,7 +79,7 @@ def heat_constant(gam,R):
     """
     Reference air heat at constant pressure
     """
-    Cp = gam*R/(gam-1) # Heat constant at constant pressure
+    Cp = gam*R/(gam-1.) # Heat constant at constant pressure
     return Cp
 
 #===========================================================================================================
@@ -89,18 +95,18 @@ def air_viscosity(tamb):
 
 
 #===========================================================================================================
-def reynolds_number(pamb,tamb,mach):
+def reynolds_number_old(pamb,tamb,mach):
     """
     Reynolds number
     """
-    fac = ( 1 + 0.126*mach**2 )
+    fac = ( 1. + 0.126*mach**2 )
     re = 47899*pamb*mach*(fac*tamb + 110.4) / (tamb**2 * fac**2.5)
     return re
 
 #===========================================================================================================
-def reynolds_number_Sutherland(pamb,tamb,mach):
+def reynolds_number(pamb,tamb,mach):
     """
-    Reynolds number
+    Reynolds number based on Sutherland viscosity model
     """
     vsnd = sound_speed(tamb)
     rho,sig = air_density(pamb,tamb)
@@ -117,7 +123,7 @@ def atmosphere(altp,disa):
     Pressure from pressure altitude from ground to 50 km
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
 
     Z = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodz = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
@@ -133,7 +139,7 @@ def atmosphere(altp,disa):
     while (Z[1+j]<=altp):
         T[j+1] = T[j] + dtodz[j]*(Z[j+1]-Z[j])
         if (0.<numpy.abs(dtodz[j])):
-            P[j+1] = P[j]*(1 + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
+            P[j+1] = P[j]*(1. + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
         else:
             P[j+1] = P[j]*numpy.exp(-(g/R)*((Z[j+1]-Z[j])/T[j]))
         j = j + 1
@@ -169,13 +175,13 @@ def atmosphere_geo(altg,disa):
     Pressure from pressure altitude from ground to 50 km
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
 
     Zi = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodzi = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
 
-    Z = numpy.array([0., 0., 0., 0., 0., 0.])
-    dtodz = numpy.array([0., 0., 0., 0., 0.])
+    Z = numpy.zeros_like(Zi)
+    dtodz = numpy.zeros_like(dtodzi)
 
     P = numpy.array([sea_level_pressure(), 0., 0., 0., 0., 0.])
     T = numpy.array([sea_level_temperature(), 0., 0., 0., 0., 0.])
@@ -190,7 +196,7 @@ def atmosphere_geo(altg,disa):
     while (j<n and Z[1+j]<=altg):
         T[j+1] = T[j] + dtodz[j]*(Z[j+1]-Z[j])
         if (0.<numpy.abs(dtodz[j])):
-            P[j+1] = P[j]*(1 + (dtodz[j]/(T[j]+disa))*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
+            P[j+1] = P[j]*(1. + (dtodz[j]/(T[j]+disa))*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
         else:
             P[j+1] = P[j]*numpy.exp(-(g/R)*((Z[j+1]-Z[j])/(T[j]+disa)))
         j = j + 1
@@ -216,7 +222,7 @@ def pressure_altitude(pamb):
     Pressure altitude from ground to 50 km
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
 
     Z = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodz = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
@@ -226,14 +232,14 @@ def pressure_altitude(pamb):
 
     j = 0
     n = len(P)-1
-    P[1] = P[0]*(1 + (dtodz[0]/T[0])*(Z[1]-Z[0]))**(-g/(R*dtodz[0]))
+    P[1] = P[0]*(1. + (dtodz[0]/T[0])*(Z[1]-Z[0]))**(-g/(R*dtodz[0]))
     T[1] = T[0] + dtodz[0]*(Z[1]-Z[0])
 
     while (j<n and pamb<P[j+1]):
         j = j + 1
         T[j+1] = T[j] + dtodz[j]*(Z[j+1]-Z[j])
         if (0.<numpy.abs(dtodz[j])):
-            P[j+1] = P[j]*(1 + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
+            P[j+1] = P[j]*(1. + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
         else:
             P[j+1] = P[j]*numpy.exp(-(g/R)*((Z[j+1]-Z[j])/T[j]))
 
@@ -254,7 +260,7 @@ def pressure(altp):
     Pressure from pressure altitude from ground to 50 km
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
 
     Z = numpy.array([0., 11000., 20000.,32000., 47000., 50000.])
     dtodz = numpy.array([-0.0065, 0., 0.0010, 0.0028, 0.])
@@ -270,7 +276,7 @@ def pressure(altp):
     while (Z[1+j]<=altp):
         T[j+1] = T[j] + dtodz[j]*(Z[j+1]-Z[j])
         if (0.<numpy.abs(dtodz[j])):
-            P[j+1] = P[j]*(1 + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
+            P[j+1] = P[j]*(1. + (dtodz[j]/T[j])*(Z[j+1]-Z[j]))**(-g/(R*dtodz[j]))
         else:
             P[j+1] = P[j]*numpy.exp(-(g/R)*((Z[j+1]-Z[j])/T[j]))
         j = j + 1
@@ -285,9 +291,9 @@ def pressure(altp):
 #===========================================================================================================
 def air_density(pamb,tamb):
     """
-    Ideal gaz density
+    Ideal gas density
     """
-    R = gaz_constant()
+    R = gas_constant()
     rho0 = sea_level_density()
     rho = pamb / ( R * tamb )
     sig = rho / rho0
@@ -296,9 +302,9 @@ def air_density(pamb,tamb):
 #===========================================================================================================
 def sound_speed(tamb):
     """
-    Sound speed for ideal gaz
+    Sound speed for ideal gas
     """
-    R = gaz_constant()
+    R = gas_constant()
     gam = heat_ratio()
     vsnd = numpy.sqrt( gam * R * tamb )
     return vsnd
@@ -309,7 +315,7 @@ def total_temperature(tamb,mach):
     Stagnation temperature
     """
     gam = heat_ratio()
-    ttot = tamb*(1+((gam-1)/2)*mach**2)
+    ttot = tamb*(1.+((gam-1.)/2.)*mach**2)
     return ttot
 
 #===========================================================================================================
@@ -318,7 +324,7 @@ def total_pressure(pamb,mach):
     Stagnation pressure
     """
     gam = heat_ratio()
-    ptot = pamb*(1+((gam-1)/2)*mach**2)**(gam/(gam-1))
+    ptot = pamb*(1+((gam-1.)/2.)*mach**2)**(gam/(gam-1.))
     return ptot
 
 #===========================================================================================================
@@ -339,8 +345,8 @@ def mach_from_vcas(pamb,Vcas):
     gam = heat_ratio()
     P0 = sea_level_pressure()
     vc0 = sea_level_sound_speed()
-    fac = gam/(gam-1)
-    mach = numpy.sqrt(((((((gam-1)/2)*(Vcas/vc0)**2+1)**fac-1)*P0/pamb+1)**(1/fac)-1)*(2/(gam-1)))
+    fac = gam/(gam-1.)
+    mach = numpy.sqrt(((((((gam-1.)/2.)*(Vcas/vc0)**2+1)**fac-1.)*P0/pamb+1.)**(1./fac)-1.)*(2./(gam-1.)))
     return mach
 
 #===========================================================================================================
@@ -351,8 +357,8 @@ def vcas_from_mach(pamb,mach):
     gam = heat_ratio()
     P0 = sea_level_pressure()
     vc0 = sea_level_sound_speed()
-    fac = gam/(gam-1)
-    vcas = vc0*numpy.sqrt(5*((((pamb/P0)*((1+((gam-1)/2)*mach**2)**fac-1))+1)**(1/fac)-1))
+    fac = gam/(gam-1.)
+    vcas = vc0*numpy.sqrt(5.*((((pamb/P0)*((1.+((gam-1.)/2.)*mach**2)**fac-1.))+1.)**(1./fac)-1.))
     return vcas
 
 #===========================================================================================================
@@ -376,7 +382,7 @@ def cross_over_altp(Vcas,mach):
     vc0 = sea_level_sound_speed()
     fac = gam/(gam-1)
 
-    pamb = ((1+((gam-1)/2)*(Vcas/vc0)**2)**fac-1)*P0/((1+((gam-1)/2)*mach**2)**fac-1)
+    pamb = ((1.+((gam-1.)/2.)*(Vcas/vc0)**2)**fac-1.)*P0/((1.+((gam-1.)/2.)*mach**2)**fac-1.)
 
     altp = pressure_altitude(pamb)
 
@@ -389,15 +395,15 @@ def climb_mode(speed_mode,dtodz,tstd,disa,mach):
     WARNING : input is mach number whatever SpeedMode
     """
     g = gravity()
-    R = gaz_constant()
+    R = gas_constant()
     gam = heat_ratio()
 
     if (speed_mode==1):
-        fac = (gam-1)/2
-        acc_factor = 1 + (((1+fac*mach**2)**(gam/(gam-1))-1)/(1+fac*mach**2)**(1/(gam-1))) \
-                       + ((gam*R)/(2*g))*(mach**2)*(tstd/(tstd+disa))*dtodz
+        fac = (gam-1.)/2.
+        acc_factor = 1. + (((1.+fac*mach**2)**(gam/(gam-1.))-1.)/(1.+fac*mach**2)**(1./(gam-1.))) \
+                        + ((gam*R)/(2.*g))*(mach**2)*(tstd/(tstd+disa))*dtodz
     elif (speed_mode==2):
-        acc_factor = 1 + ((gam*R)/(2*g))*(mach**2)*(tstd/(tstd+disa))*dtodz
+        acc_factor = 1. + ((gam*R)/(2.*g))*(mach**2)*(tstd/(tstd+disa))*dtodz
     else:
         raise Exception("climb_mode index is out of range")
 
@@ -408,12 +414,14 @@ def fuel_density(fuel_type):
     """
     Reference fuel density
     """
-    if (fuel_type==1):
+    if (fuel_type=="Kerosene"):
         fuel_density = 803. # Kerosene : between 775-840 kg/m3
-    elif (fuel_type==2):
+    elif (fuel_type=="Hydrogen"):
         fuel_density = 70.8 # Liquid hydrogene
-    elif (fuel_type==3):
+    elif (fuel_type=="Methane"):
         fuel_density = 422.6 # Liquid methane
+    elif (fuel_type=="Battery"):
+        fuel_density = 2800. # Lithium-ion
     else:
         raise Exception("fuel_type index is out of range")
     return fuel_density
@@ -423,12 +431,14 @@ def fuel_heat(fuel_type):
     """
     Reference fuel lower heating value
     """
-    if (fuel_type==1):
+    if (fuel_type=="Kerosene"):
         fuel_heat = 43.1e6 # J/kg, kerosene
-    elif (fuel_type==2):
+    elif (fuel_type=="Hydrogen"):
         fuel_heat = 121.0e6 # J/kg, Liquid hydrogene
-    elif (fuel_type==3):
+    elif (fuel_type=="Methane"):
         fuel_heat = 50.3e6 # J/kg, Liquid methane
+    elif (fuel_type=="Battery"):
+        fuel_heat = unit.J_kWh(0.200) # J/kg, best Lithium-ion
     else:
         raise Exception("fuel_type index is out of range")
     return fuel_heat

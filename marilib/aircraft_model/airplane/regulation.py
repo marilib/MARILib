@@ -49,17 +49,17 @@ def ceil_oei_min_path(n_engine):
 
 #===========================================================================================================
 def diversion_range():
-    diversion_range = unit.m_NM(200)
+    diversion_range = unit.m_NM(200.)
     return diversion_range
 
 #===========================================================================================================
 def holding_time():
-    holding_time = unit.s_min(30)
+    holding_time = unit.s_min(30.)
     return holding_time
 
 #===========================================================================================================
 def reserve_fuel_ratio(design_range):
-    if (design_range<unit.m_NM(6500)):
+    if (design_range<unit.m_NM(6500.)):
         reserve_fuel_ratio = 0.05 ;
     else:
         reserve_fuel_ratio = 0.03 ;

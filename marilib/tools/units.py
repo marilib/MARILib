@@ -7,59 +7,74 @@ Created on Thu Jan 24 23:22:21 2019
          PETEILH Nicolas : portage to Python
 """
 
-import numpy
+from marilib import numpy
+from copy import deepcopy
+from marilib.aircraft_data.aircraft_description import STANDARD_FORMAT, to_user_format
+
       
-def s_min(min): return min*60   # Translate minutes into seconds
+def s_min(min): return min*60.   # Translate minutes into seconds
 
-def min_s(s): return s/60   # Translate seconds into minutes
+def min_s(s): return s/60.   # Translate seconds into minutes
 
-def s_h(h): return h*3600   # Translate hours into seconds
+def s_h(h): return h*3600.   # Translate hours into seconds
 
-def h_s(s): return s/3600   # Translate seconds into hours
+def h_s(s): return s/3600.   # Translate seconds into hours
 
 def m_ft(ft): return ft*0.3048   # Translate feet into metres
 
 def ft_m(m): return m/0.3048   # Translate metres into feet
 
-def m_NM(NM): return NM*1852   # Translate nautical miles into metres
+def m_NM(NM): return NM*1852.   # Translate nautical miles into metres
 
-def NM_m(m): return m/1852   # Translate metres into nautical miles
+def NM_m(m): return m/1852.   # Translate metres into nautical miles
 
-def mps_kmph(kmph): return kmph*1000/3600   # Translate knots into meters per second
+def mps_kmph(kmph): return kmph*1000./3600.   # Translate knots into meters per second
 
-def kmph_mps(mps): return mps*3600/1000   # Translate knots into meters per second
+def kmph_mps(mps): return mps*3600./1000.   # Translate knots into meters per second
 
 def mps_kt(kt): return kt*1852/3600   # Translate knots into meters per second
 
-def kt_mps(mps): return mps*3600/1852   # Translate meters per second into knots
+def kt_mps(mps): return mps*3600./1852.   # Translate meters per second into knots
 
-def mps_ftpmin(ftpmin): return ftpmin*0.3048/60   # Translate feet per minutes into meters per second
+def mps_ftpmin(ftpmin): return ftpmin*0.3048/60.   # Translate feet per minutes into meters per second
 
-def ftpmin_mps(mps): return mps/0.3048*60   # Translate meters per second into feet per minutes
+def ftpmin_mps(mps): return mps/0.3048*60.   # Translate meters per second into feet per minutes
 
 def liter_usgal(usgal): return usgal*3.7853982   # Translate US gallons into liters
 
 def usgal_liter(liter): return liter/3.7853982   # Translate liters into US gallons
 
-def rad_deg(deg): return deg*numpy.pi/180   # Translate degrees into radians
+def rad_deg(deg): return deg*numpy.pi/180.   # Translate degrees into radians
 
-def deg_rad(rad): return rad*180/numpy.pi   # Translate radians into degrees
+def deg_rad(rad): return rad*180./numpy.pi   # Translate radians into degrees
 
 def J_kWh(kWh): return kWh*3.6e6   # Translate kWh into J
 
+def J_MWh(MWh): return MWh*3.6e9   # Translate MWh into J
+
 def kWh_J(J): return J/3.6e6   # Translate J into kWh
 
-#=========================================================================================================================================
-def smart_round(X,S):
-	Fac = (10*numpy.ones(S))**numpy.min(4,max(0,4-round(numpy.log10(S))))
-	return round(X*Fac)#Fac
+def MWh_J(J): return J/3.6e9   # Translate J into MWh
+
+def daN_N(N): return N/10.   # Translate N into daN
+
+def N_daN(N): return daN*10.   # Translate daN into N
+
+def pc_no_dim(no_dim): return no_dim*100.   # Translate no dimension value into percentile
+
+def no_dim_pc(no_dim): return no_dim/100.   # Translate percentile into no dimension value
 
 
-#==========================================================================================================================
+def smart_round(X, S):
+    Fac = (10 * numpy.ones(S))**numpy.min(4, max(0, 4 - round(numpy.log10(S))))
+    return round(X * Fac)  # Fac
+
+
+#=========================================================================
 #
 #	Generic unit converter
 #
-#==========================================================================================================================
+#=========================================================================
 UNIT = {}
 
 # dim = "Distance"
@@ -146,6 +161,9 @@ UNIT["lb"] = 0.4535924
 UNIT["lbm"] = 0.4535924
 UNIT["t"] = 1000.
 
+# dim = "MassIndex"
+UNIT["g/kg"] = 1.
+
 # dim = "MasstoForceratio"
 UNIT["kg/N"] = 1.
 UNIT["g/N"] = 0.001
@@ -166,8 +184,8 @@ UNIT["lb/lbf/h"] = 0.000028327
 
 # dim = "SpecificEnergyConsumption"
 UNIT["J/N/s"] = 1.
-UNIT["kJ/daN/h"] = 1e3
-UNIT["MJ/lbf/h"] = 1e6
+UNIT["kJ/daN/h"] = 1.e3
+UNIT["MJ/lbf/h"] = 1.e6
 
 # dim = "SpecificConsumptionvsPower"
 UNIT["kg/W/s"] = 1.
@@ -207,7 +225,7 @@ UNIT["lb/ft3"] = 16.018499
 # dim = "MassSensitivity"
 UNIT["1/kg"] = 1.
 UNIT["%/kg"] = 0.01
-UNIT["%/ton"] = 0.01*0.001
+UNIT["%/ton"] = 0.01 * 0.001
 
 # dim = "VolumetricMassFlow"
 UNIT["kg/m3/s"] = 1.
@@ -246,6 +264,9 @@ UNIT["litre/h"] = 3.6
 UNIT["l/h"] = 3.6
 UNIT["ft3/h"] = 101.94048
 
+# dim = "VolumeCoefficient"
+UNIT["m2/kN"] = 1.
+
 # dim = "MachNumber"
 UNIT["Mach"] = 1.
 UNIT["mach"] = 1.
@@ -257,7 +278,7 @@ UNIT["dc"] = 0.0001
 # dim = "DragSensitivity"
 UNIT["1/cx"] = 1.
 UNIT["%/cx"] = 0.01
-UNIT["%/dc"] = 0.01*10000
+UNIT["%/dc"] = 0.01 * 10000.
 
 # dim = "MachNumbervariationrate"
 UNIT["Mach/s"] = 1.
@@ -283,6 +304,9 @@ UNIT["shp"] = 745.70001
 # dim = "PowerDensity"
 UNIT["W/kg"] = 1.
 UNIT["kW/kg"] = 1.e3
+
+# dim = "PowerDensityPerTime"
+UNIT["kW/daN/h"] = 1 / 36.
 
 # dim = "Euro"
 UNIT["E"] = 1.
@@ -339,6 +363,10 @@ UNIT["km/kg"] = 1000.
 UNIT["NM/t"] = 1.852
 UNIT["NM/kg"] = 1852.
 UNIT["NM/lb"] = 4082.8923
+
+# dim = "EnergeticDistance"
+UNIT["m/J"] = 1.
+UNIT["km/kWh"] = 3600.
 
 # dim = "SurfacicMass"
 UNIT["kg/m2"] = 1.
@@ -401,38 +429,45 @@ UNIT["btu/lb"] = 2325.9612
 
 # dim = "FuelCost"
 UNIT["$/l"] = 1.
+UNIT["$/gal"] = 0.264173
 UNIT["$/USgal"] = 0.264173
 UNIT["$/USbrl"] = 0.00838644
 
+# dim = "BatteryMassCost"
+UNIT["$/kg"] = 1.
+
+# dim = "BatteryEnergyCost"
+UNIT["$/kWh"] = 1. / UNIT['kWh']
+
 # dim = "nodimension"
-UNIT["sd"] = 1.
-UNIT["no_dim"] = 1.
+UNIT["sd"] = 1
+UNIT["no_dim"] = 1
 UNIT["%"] = 0.01
 UNIT["%/%"] = 1.
 
 # dim = "integer"
-UNIT["integer"] = 1.
-UNIT["int"] = 1.
-UNIT["entier"] = 1.
-UNIT["numeric"] = 1.
+UNIT["integer"] = 1
+UNIT["int"] = 1
+UNIT["entier"] = 1
+UNIT["numeric"] = 1
 
 # dim = "variouscounts"
-UNIT["aircraft"] = 1.
-UNIT["engine"] = 1.
-UNIT["pilot"] = 1.
-UNIT["attendant"] = 1.
-UNIT["trolley"] = 1.
-UNIT["toilet"] = 1.
-UNIT["seat"] = 1.
-UNIT["door"] = 1.
-UNIT["wheel"] = 1.
+UNIT["aircraft"] = 1
+UNIT["engine"] = 1
+UNIT["pilot"] = 1
+UNIT["attendant"] = 1
+UNIT["trolley"] = 1
+UNIT["toilet"] = 1
+UNIT["seat"] = 1
+UNIT["door"] = 1
+UNIT["wheel"] = 1
 
 # dim = "string"
-UNIT["string"] = 1.
-UNIT["text"] = 1.
+UNIT["string"] = 1
+UNIT["text"] = 1
 
 # dim = "textdate"
-UNIT["text_date"] = 1.
+UNIT["text_date"] = 1
 
 # dim = "GlobalWarmingEnergy"
 UNIT["W/m2/km/year"] = 1.
@@ -448,8 +483,10 @@ UNIT["m3/seat/m"] = 1.
 UNIT["l/seat/100km"] = 0.01
 
 # dim = "CO2metric"
-UNIT["kg/NM/m^0.48"] = 1.
-UNIT["kg/m/m^0.48"] = 1852.
+UNIT["kg/m/m^0.48"] = 1.
+UNIT["kg/km/m^0.48"] = 0.001
+UNIT["kg/km/m0.48"] = 0.001
+UNIT["kg/NM/m^0.48"] = 1./1852.
 
 # dim = "GlobalWarmingTemperature"
 UNIT["K/m2/km/year"] = 1.
@@ -457,15 +494,52 @@ UNIT["1e-6.K/m2/km/year"] = 1.e-6
 UNIT["1e-12.K/m2/km/year"] = 1.e-12
 
 # dim = "DataStructure"
-UNIT["structure"] = 1.
+UNIT["structure"] = 1
+UNIT["dict"] = 1
+UNIT["array"] = 1
+
 
 # Conversion functions
-#-------------------------------------------------------------------------------------------------------------------------
-def convert_from(ulab,val):
-# Convert val expressed in ulab to corresponding standard unit
-    return val*UNIT[ulab]
+#-------------------------------------------------------------------------
+def convert_from(ulab, val):
+    # Convert val expressed in ulab to corresponding standard unit
+    if isinstance(val, (type(None), str)):
+        return val
+    if isinstance(val, list):
+        return [convert_from(ulab, v) for v in val]
+    if isinstance(val, tuple):
+        return (convert_from(ulab, v) for v in val)
+    if isinstance(val, numpy.ndarray):
+        return numpy.array([convert_from(ulab, v) for v in val])
+    if isinstance(val, dict):
+        dic_val = deepcopy(val)
+        for k, v in dic_val.items():
+            dic_val[k] = convert_from(ulab, v)
+        return dic_val
+    return val * UNIT[ulab]
 
-def convert_to(ulab,val):
-# Convert val expressed in standard unit to ulab
-    return val/UNIT[ulab]
+
+def convert_to(ulab, val):
+    # Convert val expressed in standard unit to ulab
+    if isinstance(val, (type(None), str)):
+        return val
+    if isinstance(val, list):
+        return [convert_to(ulab, v) for v in val]
+    if isinstance(val, tuple):
+        return tuple([convert_to(ulab, v) for v in val])
+    if isinstance(val, numpy.ndarray):
+        return numpy.array([convert_to(ulab, v) for v in val])
+    if isinstance(val, dict):
+        dic_val = deepcopy(val)
+        for k, v in dic_val.items():
+            dic_val[k] = convert_to(ulab, v)
+        return dic_val
+    if ulab in ["integer", "int", "entier", "numeric"]:
+        val = int(val)
+    return val / UNIT[ulab]
+
+
+def smart_format(value):
+    # Convert val expressed in standard unit to ulab
+    return to_user_format(value, STANDARD_FORMAT)
 
